@@ -151,7 +151,7 @@ export function DefinitionsTrain({
 
     const getButtonClass = (index: number) => {
         const baseClasses =
-            'p-4 mb-2 w-full text-left border rounded transition-colors';
+            'p-2 mb-2 w-full text-left border rounded transition-colors';
 
         if (!hasAnswered && mode === 'answer') {
             return `${baseClasses} hover:bg-gray-700`;
@@ -182,7 +182,7 @@ export function DefinitionsTrain({
 
     return (
         <div className="flex flex-col gap-1">
-            <div className="flex justify-end">
+            <div className="flex">
                 <ToggleSwitch
                     checked={mode === 'word'}
                     onChange={checked => setMode(checked ? 'word' : 'answer')}
@@ -201,7 +201,7 @@ export function DefinitionsTrain({
                     }`}
                     disabled={hasAnswered || mode === 'word'}
                 >
-                    <div className="flex justify-between items-start gap-4">
+                    <div className="flex justify-between items-start gap-1">
                         <Definition
                             result={def}
                             wordsAll={wordsAll}
