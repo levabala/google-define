@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/db';
 import { WordData, WordStatus } from '@/app/types';
+import { getUser } from '@/auth';
 
 export async function PUT(req: NextRequest): Promise<NextResponse> {
     const { word, status } = await req.json();
@@ -14,10 +15,12 @@ export async function PUT(req: NextRequest): Promise<NextResponse> {
 
     const supabase = await createClient();
 
+    const user = await getUser(req);
     const { error } = await supabase
         .from('word')
         .update({ status })
-        .eq('word', word);
+        .eq('word', word)
+        .eq('user', user);
 
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -36,10 +39,12 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
 
     const supabase = await createClient();
 
+    const user = await getUser(req);
     const { error } = await supabase
         .from('word')
         .update({ status: 'HIDDEN' })
-        .eq('word', word);
+        .eq('word', word)
+        .eq('user', user);
 
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -65,10 +70,12 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     try {
         const supabase = await createClient();
 
+        const user = await getUser(req);
         const { data: wordDataDB } = await supabase
             .from('word')
             .select()
-            .eq('word', word);
+            .eq('word', word)
+            .eq('user', user);
 
         const wordDataCached = wordDataDB?.[0];
 
@@ -103,12 +110,20 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         if (data) {
             console.log('async write to supabase');
 
+            const user = await getUser(req);
+            supabase.from('word').insert({
+                word: data.word,
+                raw: JSON.stringify(data),
+                status: initialStatus || 'NONE',
+                user,
+            });
             supabase
                 .from('word')
                 .insert({
                     word: data.word,
                     raw: JSON.stringify(data),
                     status: initialStatus || 'NONE',
+                    user,
                 })
                 .then(res => {
                     console.log('inserted', res);

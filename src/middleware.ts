@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { jwtVerify } from 'jose';
+import { verifyUser } from './auth';
 
 if (!process.env.JWT_SECRET) {
     throw new Error('JWT_SECRET is not set');
 }
-
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function middleware(req: NextRequest) {
     const token = req.cookies.get('token')?.value;
@@ -19,7 +17,7 @@ export async function middleware(req: NextRequest) {
     }
 
     try {
-        await jwtVerify(token, JWT_SECRET);
+        await verifyUser(token);
 
         return NextResponse.next();
     } catch {

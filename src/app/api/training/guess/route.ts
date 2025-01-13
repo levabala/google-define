@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/db';
 import { WordStats } from '@/app/types';
+import { getUser } from '@/auth';
 
 export async function GET(req: NextRequest) {
     const word = req.nextUrl.searchParams.get('word');
@@ -14,10 +15,12 @@ export async function GET(req: NextRequest) {
 
     const supabase = await createClient();
 
+    const user = await getUser(req);
     const { data, error } = await supabase
         .from('training')
         .select('is_success')
-        .eq('word', word);
+        .eq('word', word)
+        .eq('user', user);
 
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -50,10 +53,12 @@ export async function POST(req: NextRequest) {
 
     const supabase = await createClient();
 
+    const user = await getUser(req);
     const { error } = await supabase.from('training').insert({
         word,
         is_success: success,
         definition,
+        user,
     });
 
     if (error) {
