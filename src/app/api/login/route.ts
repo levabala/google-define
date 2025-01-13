@@ -24,9 +24,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
         return response;
     } catch (e) {
-        return NextResponse.json(
-            { error: (e as Error).message },
-            { status: 500 },
-        );
+        console.error(e);
+        return NextResponse.redirect(new URL('/login', req.url));
     }
 }
