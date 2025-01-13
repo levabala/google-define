@@ -30,7 +30,7 @@ export default function Main() {
                     onChange={e => setTextSourceCurrent(e.target.value)}
                     className="bg-gray-800 text-white border border-gray-500 focus-visible:outline-gray-800"
                 />
-                <button type="submit">Search</button>
+                <button type="submit" className="bg-gray-300 p-1 ml-1">Search</button>
                 <ButtonToLearn
                     textSourceSubmitted={textSourceSubmitted}
                     wordsAll={wordsAll}
