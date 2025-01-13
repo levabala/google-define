@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { DBWord, WordData } from '../types';
 import { Definition } from './Definition';
+import { ToggleSwitch } from './ToggleSwitch';
 
 type DefinitionsTrainProps = {
     results: WordData['results'];
@@ -11,6 +12,8 @@ type DefinitionsTrainProps = {
     onFailure?: (definition: string) => void;
     onNext?: () => void;
 };
+
+type Mode = 'answer' | 'word';
 
 export function DefinitionsTrain({
     results,
@@ -23,6 +26,7 @@ export function DefinitionsTrain({
 }: DefinitionsTrainProps) {
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
     const [hasAnswered, setHasAnswered] = useState(false);
+    const [mode, setMode] = useState<Mode>('answer');
 
     // Calculate prevailing partOfSpeech and get the first matching definition
     const { prevailingPos, correctDefinition } = useMemo(() => {
@@ -41,9 +45,19 @@ export function DefinitionsTrain({
             b[1] > a[1] ? b : a,
         )[0];
 
-        // Get the first definition with the prevailing partOfSpeech
+        // Get definitions with the prevailing partOfSpeech from first 3 definitions
+        const firstThreeDefinitions = results.slice(0, 3);
+        const matchingDefs = firstThreeDefinitions.filter(
+            r => r.partOfSpeech === prevailingPos,
+        );
+
+        // Choose randomly from matching definitions, or from first three if no matches
+        const defsToChooseFrom =
+            matchingDefs.length > 0 ? matchingDefs : firstThreeDefinitions;
         const correctDef =
-            results.find(r => r.partOfSpeech === prevailingPos) || results[0];
+            defsToChooseFrom[
+                Math.floor(Math.random() * defsToChooseFrom.length)
+            ];
 
         return { prevailingPos, correctDefinition: correctDef };
     }, [results]);
@@ -139,7 +153,7 @@ export function DefinitionsTrain({
         const baseClasses =
             'p-4 mb-2 w-full text-left border rounded transition-colors';
 
-        if (!hasAnswered) {
+        if (!hasAnswered && mode === 'answer') {
             return `${baseClasses} hover:bg-gray-700`;
         }
 
@@ -167,13 +181,25 @@ export function DefinitionsTrain({
     };
 
     return (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
+            <div className="flex justify-end">
+                <ToggleSwitch
+                    checked={mode === 'word'}
+                    onChange={checked => setMode(checked ? 'word' : 'answer')}
+                    leftLabel="Answer Mode"
+                    rightLabel="Word Mode"
+                />
+            </div>
             {definitionChoices.map((def, index) => (
                 <button
                     key={`${def.definition}-${index}`}
-                    onClick={() => handleSelect(index)}
-                    className={getButtonClass(index)}
-                    disabled={hasAnswered}
+                    onClick={() => mode === 'answer' && handleSelect(index)}
+                    className={`${getButtonClass(index)} ${
+                        mode === 'word'
+                            ? 'cursor-default border-gray-700'
+                            : 'border-gray-600'
+                    }`}
+                    disabled={hasAnswered || mode === 'word'}
                 >
                     <div className="flex justify-between items-start gap-4">
                         <Definition
@@ -182,6 +208,7 @@ export function DefinitionsTrain({
                             textSourceSubmitted={textSourceSubmitted}
                             onWordClick={onWordClick}
                             hideExamples
+                            disableWordClick={mode === 'answer'}
                         />
                         <span
                             className={`text-white font-bold whitespace-nowrap ${!hasAnswered ? 'invisible' : 'visible'}`}

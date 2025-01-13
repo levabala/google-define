@@ -9,6 +9,7 @@ type DefinitionProps = {
     textSourceSubmitted: string | null;
     onWordClick: (word: string, addToLearn?: boolean) => void;
     hideExamples?: boolean;
+    disableWordClick?: boolean;
 };
 
 export function Definition({
@@ -17,6 +18,7 @@ export function Definition({
     textSourceSubmitted,
     onWordClick,
     hideExamples,
+    disableWordClick,
 }: DefinitionProps) {
     return (
         <div className="text-white">
@@ -30,6 +32,7 @@ export function Definition({
                         allWords={wordsAll}
                         currentWord={textSourceSubmitted}
                         onClick={onWordClick}
+                        disableWordClick={disableWordClick}
                     />
                     {wordIndex < array.length - 1 ? ' ' : ''}
                 </Fragment>

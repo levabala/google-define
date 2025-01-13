@@ -32,3 +32,10 @@ export type DBWord = {
     status: WordStatus;
     created_at: string;
 };
+
+export type WordStats = {
+    total: number;
+    successful: number;
+    failed: number;
+    ratio: number;
+};

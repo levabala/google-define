@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { randomInteger } from 'remeda';
-import { Word } from './components/Word';
+import { WordsAll } from './components/WordsAll';
 import { ButtonToLearn } from './components/ButtonToLearn';
 import { ButtonLearned } from './components/ButtonLearned';
 import { ButtonDelete } from './components/ButtonDelete';
@@ -11,6 +11,9 @@ import { useQueryGetWord } from './hooks/useQueryGetWord';
 import { useQueryGetWordsAll } from './hooks/useQueryGetWordsAll';
 import { useMutationTrainingGuess } from './hooks/useMutationTrainingGuess';
 import { DefinitionsTrain } from './components/DefinitionsTrain';
+import { useQueryGetGuessStats } from './hooks/useQueryGetGuessStats';
+import { StatsDisplay } from './components/StatsDisplay';
+import { Checkbox } from './components/Checkbox';
 
 export default function Main() {
     const trainingGuessMutation = useMutationTrainingGuess();
@@ -19,11 +22,11 @@ export default function Main() {
     const [isTraining, setIsTraining] = useState(false);
     const [addNextToLearn, setAddNextToLearn] = useState(false);
 
-    console.log({ addNextToLearn });
     const { data: wordCurrent } = useQueryGetWord(
         textSourceSubmitted,
         addNextToLearn ? 'TO_LEARN' : undefined,
     );
+    const { data: stats } = useQueryGetGuessStats(textSourceSubmitted);
     const { data: wordsAll } = useQueryGetWordsAll();
 
     useEffect(() => {
@@ -39,28 +42,18 @@ export default function Main() {
 
     return (
         <div className="flex flex-col gap-1">
-            <h2 className="text-white">my words:</h2>
-            {wordsAll && (
-                <div className="flex flex-wrap gap-2 text-white">
-                    {wordsAll
-                        .filter(word => word.status !== 'HIDDEN')
-                        .map(wordObj => (
-                            <Word
-                                key={wordObj.word}
-                                word={wordObj.word}
-                                allWords={wordsAll}
-                                currentWord={textSourceSubmitted}
-                                small
-                                onClick={word => {
-                                    setTextSourceCurrent(word);
-                                    setTextSourceSubmitted(word);
-                                }}
-                            />
-                        ))}
-                </div>
-            )}
+            <WordsAll
+                words={wordsAll}
+                isLoading={!wordsAll}
+                currentWord={textSourceSubmitted}
+                onWordClick={word => {
+                    setTextSourceCurrent(word);
+                    setTextSourceSubmitted(word);
+                }}
+            />
 
             <form
+                className="mt-2"
                 onSubmit={e => {
                     e.preventDefault();
                     setTextSourceSubmitted(textSourceCurrent);
@@ -89,15 +82,20 @@ export default function Main() {
                     setTextSourceCurrent={setTextSourceCurrent}
                     setTextSourceSubmitted={setTextSourceSubmitted}
                 />
-                <label className="ml-1 text-white">
-                    <input
-                        type="checkbox"
-                        onChange={e => setIsTraining(e.target.checked)}
+                <span className="ml-2">
+                    <Checkbox
                         checked={isTraining}
+                        onChange={setIsTraining}
+                        label="Train"
                     />
-                    Train
-                </label>
+                </span>
             </form>
+
+            <StatsDisplay
+                stats={stats}
+                word={textSourceSubmitted}
+                isLoading={!!textSourceSubmitted && !stats}
+            />
 
             {wordCurrent &&
                 (isTraining && wordsAll ? (
