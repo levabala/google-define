@@ -30,4 +30,5 @@ export type DBWord = {
     word: string;
     raw: WordData;
     status: WordStatus;
+    created_at: string;
 };

@@ -3,7 +3,7 @@ import { DBWord } from '../types';
 type WordProps = {
     word: string;
     allWords?: DBWord[];
-    onClick: (word: string) => void;
+    onClick: (word: string, addToLearn?: boolean) => void;
     small?: boolean;
     currentWord?: string | null;
 };
@@ -29,10 +29,10 @@ export function Word({
 
     return (
         <span
-            onClick={() => onClick(word)}
+            onClick={(e) => onClick(word, e.metaKey)}
             className={`cursor-pointer hover:underline ${statusColor} ${small ? 'text-sm' : ''} ${
                 matchedWord ? '' : 'text-gray-400'
-            } ${currentWord?.toLowerCase() === word.toLowerCase() ? 'font-bold' : ''}`}
+            } ${currentWord?.toLowerCase() === word.toLowerCase() ? 'underline' : ''}`}
         >
             {word}
         </span>

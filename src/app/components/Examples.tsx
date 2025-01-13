@@ -6,7 +6,7 @@ type ExamplesProps = {
     examples: string[];
     wordsAll?: DBWord[];
     textSourceSubmitted: string | null;
-    onWordClick: (word: string) => void;
+    onWordClick: (word: string, addToLearn?: boolean) => void;
 };
 
 export function Examples({

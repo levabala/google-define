@@ -8,7 +8,12 @@ export function useQueryGetWordsAll() {
             console.log('refetch all!');
             const res = await fetch('/api/words/all').catch(() => null);
 
-            return (await res?.json()) as DBWord[];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            return (await res?.json()).map((word: any) => {
+                word.raw = JSON.parse(word.raw);
+
+                return word as DBWord;
+            }) as DBWord[];
         },
     });
 }

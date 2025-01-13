@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/db';
-import { WordData } from '@/app/types';
+import { WordData, WordStatus } from '@/app/types';
 
-export async function POST(req: NextRequest): Promise<NextResponse> {
+export async function PUT(req: NextRequest): Promise<NextResponse> {
     const { word, status } = await req.json();
 
     if (!word || !['TO_LEARN', 'LEARNED'].includes(status)) {
@@ -51,6 +51,9 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
 export async function GET(req: NextRequest): Promise<NextResponse> {
     const { searchParams } = new URL(req.url);
     const word = searchParams.get('word');
+    const initialStatus = searchParams.get(
+        'initialStatus',
+    ) as WordStatus | null;
 
     if (!word) {
         return NextResponse.json(
@@ -102,7 +105,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
             supabase
                 .from('word')
-                .insert({ word: data.word, raw: JSON.stringify(data) })
+                .insert({
+                    word: data.word,
+                    raw: JSON.stringify(data),
+                    status: initialStatus || 'NONE',
+                })
                 .then(res => {
                     console.log('inserted', res);
                 });

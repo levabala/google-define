@@ -4,7 +4,11 @@ import { createClient } from '@/utils/db';
 export async function GET(): Promise<NextResponse> {
     try {
         const supabase = await createClient();
-        const { data } = await supabase.from('word').select().order('word');
+        const { data } = await supabase
+            .from('word')
+            .select()
+            .order('status')
+            .order('word');
 
         return NextResponse.json(data, { status: 200 });
     } catch (error) {

@@ -1,15 +1,21 @@
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../providers';
-import { WordData } from '../types';
+import { WordData, WordStatus, DBWord } from '../types';
 
-export function useQueryGetWord(textSource: string) {
+export function useQueryGetWord(
+    textSource: string,
+    initialStatus?: WordStatus,
+) {
     return useQuery({
         queryKey: ['dictionary', 'en', textSource],
         enabled: textSource !== '',
         queryFn: async () => {
-            const res = await fetch(`/api/words/one?word=${textSource}`).catch(
-                () => null,
-            );
+            const url = new URL('/api/words/one', window.location.origin);
+            url.searchParams.set('word', textSource);
+            if (initialStatus) {
+                url.searchParams.set('initialStatus', initialStatus);
+            }
+            const res = await fetch(url).catch(() => null);
 
             if (res === null) {
                 throw new Error();
@@ -21,7 +27,23 @@ export function useQueryGetWord(textSource: string) {
                 throw new Error();
             }
 
-            queryClient.invalidateQueries({ queryKey: ['dictionaryAll'] });
+            // Optimistically update the words list
+            const currentWords =
+                queryClient.getQueryData<DBWord[]>(['dictionaryAll']) || [];
+            const newWord: DBWord = {
+                word: json.word,
+                raw: json,
+                status: initialStatus || 'NONE',
+                created_at: new Date().toISOString(),
+            };
+
+            // Only add if the word doesn't exist
+            if (!currentWords.some(w => w.word === json.word)) {
+                queryClient.setQueryData(
+                    ['dictionaryAll'],
+                    [...currentWords, newWord],
+                );
+            }
 
             return json as WordData;
         },

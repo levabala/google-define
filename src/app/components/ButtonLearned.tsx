@@ -17,7 +17,7 @@ export function ButtonLearned({ textSourceSubmitted, wordsAll }: ButtonLearnedPr
             onClick={async () => {
                 if (!textSourceSubmitted) return;
                 await fetch('/api/words/one', {
-                    method: 'POST',
+                    method: 'PUT',
                     body: JSON.stringify({
                         word: textSourceSubmitted,
                         status: 'LEARNED',

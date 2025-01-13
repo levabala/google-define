@@ -1,5 +1,5 @@
 import { DBWord } from '../types';
-import { queryClient } from '../providers';
+import { useMutationDeleteWord } from '../hooks/useMutationDeleteWord';
 
 type ButtonDeleteProps = {
     textSourceSubmitted: string | null;
@@ -14,6 +14,8 @@ export function ButtonDelete({
     setTextSourceCurrent,
     setTextSourceSubmitted,
 }: ButtonDeleteProps) {
+    const deleteWordMutation = useMutationDeleteWord();
+
     const exists = wordsAll?.some(
         w => w.word.toLowerCase() === textSourceSubmitted?.toLowerCase(),
     );
@@ -23,16 +25,14 @@ export function ButtonDelete({
     return (
         <button
             type="button"
-            onClick={async () => {
+            onClick={() => {
                 if (!textSourceSubmitted) return;
-                await fetch(`/api/words/one?word=${textSourceSubmitted}`, {
-                    method: 'DELETE',
+                deleteWordMutation.mutate(textSourceSubmitted, {
+                    onSuccess: () => {
+                        setTextSourceCurrent('');
+                        setTextSourceSubmitted('');
+                    },
                 });
-                queryClient.invalidateQueries({
-                    queryKey: ['dictionaryAll'],
-                });
-                setTextSourceCurrent('');
-                setTextSourceSubmitted('');
             }}
             className="ml-2 px-2 py-1 text-white rounded bg-red-600 hover:bg-red-700"
         >

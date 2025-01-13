@@ -1,30 +1,29 @@
 import { DBWord } from '../types';
-import { queryClient } from '../providers';
+import { useMutationMarkWord } from '../hooks/useMutationMarkWord';
 
 type ButtonToLearnProps = {
     textSourceSubmitted: string | null;
     wordsAll?: DBWord[];
 };
 
-export function ButtonToLearn({ textSourceSubmitted, wordsAll }: ButtonToLearnProps) {
-    const isToLearn = wordsAll?.find(
-        w => w.word.toLowerCase() === textSourceSubmitted?.toLowerCase()
-    )?.status === 'TO_LEARN';
+export function ButtonToLearn({
+    textSourceSubmitted,
+    wordsAll,
+}: ButtonToLearnProps) {
+    const markWordMutation = useMutationMarkWord();
+    const isToLearn =
+        wordsAll?.find(
+            w => w.word.toLowerCase() === textSourceSubmitted?.toLowerCase(),
+        )?.status === 'TO_LEARN';
 
     return (
         <button
             type="button"
-            onClick={async () => {
+            onClick={() => {
                 if (!textSourceSubmitted) return;
-                await fetch('/api/words/one', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        word: textSourceSubmitted,
-                        status: 'TO_LEARN',
-                    }),
-                });
-                queryClient.invalidateQueries({
-                    queryKey: ['dictionaryAll'],
+                markWordMutation.mutate({
+                    word: textSourceSubmitted,
+                    status: 'TO_LEARN',
                 });
             }}
             disabled={isToLearn}
