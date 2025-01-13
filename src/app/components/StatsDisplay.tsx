@@ -64,7 +64,7 @@ export function StatsDisplay({ stats, word, isLoading, recentGuesses }: Props) {
                                     key={index}
                                     className={`w-2 h-2 rounded-full ${
                                         guess === undefined
-                                            ? 'bg-gray-600 opacity-20'
+                                            ? 'bg-gray-400 opacity-20'
                                             : guess
                                               ? 'bg-green-400'
                                               : 'bg-red-400'
@@ -100,7 +100,7 @@ export function StatsDisplay({ stats, word, isLoading, recentGuesses }: Props) {
                                     key={index}
                                     className={`w-2 h-2 rounded-full ${
                                         pronunciation === undefined
-                                            ? 'bg-gray-600 opacity-20'
+                                            ? 'bg-gray-400 opacity-20'
                                             : pronunciation
                                               ? 'bg-green-400'
                                               : 'bg-red-400'

@@ -66,7 +66,7 @@ export function WordControls({
                 </div>
             )}
 
-            <div className="ml-auto">
+            <div>
                 <ToggleSwitch
                     checked={isTraining}
                     onChange={setIsTraining}
