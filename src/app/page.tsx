@@ -3,15 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import { randomInteger } from 'remeda';
 import { WordsAll } from './components/WordsAll';
-import { ButtonToLearn } from './components/ButtonToLearn';
-import { ButtonLearned } from './components/ButtonLearned';
-import { ButtonDelete } from './components/ButtonDelete';
 import { Definitions } from './components/Definitions';
 import { useQueryGetWord } from './hooks/useQueryGetWord';
 import { useQueryGetWordsAll } from './hooks/useQueryGetWordsAll';
 import { useMutationTrainingGuess } from './hooks/useMutationTrainingGuess';
 import { DefinitionsTrain } from './components/DefinitionsTrain';
 import { useQueryGetGuessStats } from './hooks/useQueryGetGuessStats';
+import { useQueryGetRecentGuesses } from './hooks/useQueryGetRecentGuesses';
 import { StatsDisplay } from './components/StatsDisplay';
 import { WordControls } from './components/WordControls';
 
@@ -27,6 +25,8 @@ export default function Main() {
         addNextToLearn ? 'TO_LEARN' : undefined,
     );
     const { data: stats } = useQueryGetGuessStats(textSourceSubmitted);
+    const { data: recentGuesses } =
+        useQueryGetRecentGuesses(textSourceSubmitted);
     const { data: wordsAll } = useQueryGetWordsAll();
 
     useEffect(() => {
@@ -66,6 +66,7 @@ export default function Main() {
                 stats={stats}
                 word={textSourceSubmitted}
                 isLoading={!!textSourceSubmitted && !stats}
+                recentGuesses={recentGuesses}
             />
 
             {wordCurrent &&
