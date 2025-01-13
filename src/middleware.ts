@@ -1,24 +1,30 @@
-import { RequestCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { NextRequest, NextResponse } from 'next/server';
+import { jwtVerify } from 'jose';
+
+if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET is not set');
+}
+
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function middleware(req: NextRequest) {
-    const authToken = req.cookies.get('authToken');
+    const token = req.cookies.get('token')?.value;
 
-    const isValid = authToken && validateToken(authToken);
+    if (req.nextUrl.pathname === '/login') {
+        return NextResponse.next();
+    }
 
-    if (!isValid) {
-        if (req.nextUrl.pathname === '/login') {
-            return NextResponse.next();
-        }
-
+    if (!token) {
         return NextResponse.redirect(new URL('/login', req.url));
     }
 
-    return NextResponse.next();
-}
+    try {
+        await jwtVerify(token, JWT_SECRET);
 
-function validateToken(token: RequestCookie) {
-    return token.value === process.env.AUTH_TOKEN;
+        return NextResponse.next();
+    } catch {
+        return NextResponse.redirect(new URL('/login', req.url));
+    }
 }
 
 export const config = {
