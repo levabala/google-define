@@ -3,6 +3,7 @@ import { ButtonLearned } from './ButtonLearned';
 import { ButtonToLearn } from './ButtonToLearn';
 import { SpeakButton } from './SpeakButton';
 import { ToggleSwitch } from './ToggleSwitch';
+import { PronunciationButton } from './PronunciationButton';
 import { DBWord } from '../types';
 
 type Props = {
@@ -47,6 +48,7 @@ export function WordControls({
             {textSourceSubmitted && (
                 <div className="flex items-center gap-2">
                     <SpeakButton text={textSourceSubmitted} />
+                    <PronunciationButton word={textSourceSubmitted} />
                     <ButtonToLearn
                         textSourceSubmitted={textSourceSubmitted}
                         wordsAll={wordsAll}

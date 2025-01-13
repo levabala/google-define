@@ -39,3 +39,10 @@ export type WordStats = {
     failed: number;
     ratio: number;
 };
+
+export type DBPronounciation = {
+    word: string;
+    recognised_text: string;
+    created_at: string;
+    success: boolean;
+}

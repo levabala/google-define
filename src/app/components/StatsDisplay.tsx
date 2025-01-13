@@ -1,4 +1,6 @@
 import { WordStats } from '../types';
+import { useQueryGetPronunciationStats } from '../hooks/useQueryGetPronunciationStats';
+import { useQueryGetRecentPronunciations } from '../hooks/useQueryGetRecentPronunciations';
 
 type Props = {
     stats: WordStats | undefined;
@@ -7,7 +9,20 @@ type Props = {
     recentGuesses?: boolean[];
 };
 
+const emptyStats: WordStats = {
+    total: 0,
+    successful: 0,
+    failed: 0,
+    ratio: 0,
+};
+
 export function StatsDisplay({ stats, word, isLoading, recentGuesses }: Props) {
+    const pronunciationQuery = useQueryGetPronunciationStats(word);
+    const recentPronunciationsQuery = useQueryGetRecentPronunciations(word);
+
+    const pronunciationStats = pronunciationQuery.data ?? emptyStats;
+    const recentPronunciations = recentPronunciationsQuery.data ?? [];
+
     if (!word) return null;
 
     if (isLoading) {
@@ -24,21 +39,78 @@ export function StatsDisplay({ stats, word, isLoading, recentGuesses }: Props) {
     return (
         <div className="text-white text-sm inline-flex gap-3 items-center align-baseline">
             <span className="opacity-70">Stats:</span>
-            <span className="text-green-400">✓{stats.successful}</span>
-            <span className="text-red-400">✗{stats.failed}</span>
-            <span>({(stats.ratio * 100).toFixed(0)}%)</span>
-            {recentGuesses && recentGuesses.length > 0 && (
-                <div className="flex gap-1 ml-2">
-                    {recentGuesses.slice(-5).map((success, index) => (
-                        <div
-                            key={index}
-                            className={`w-2 h-2 rounded-full ${
-                                success ? 'bg-green-400' : 'bg-red-400'
-                            }`}
-                        />
-                    ))}
+            <div className="flex items-center gap-2">
+                <div
+                    title="Definition guesses"
+                    className="flex items-center gap-1"
+                >
+                    <div>
+                        📖
+                        <span className="text-green-400">
+                            ✓{stats?.successful ?? 0}
+                        </span>
+                        <span className="text-red-400">
+                            ✗{stats?.failed ?? 0}
+                        </span>
+                        <span>({((stats?.ratio ?? 0) * 100).toFixed(0)}%)</span>
+                    </div>
+                    <div className="flex gap-1">
+                        {[...Array(5)].map((_, index) => {
+                            const guess = recentGuesses?.slice(-5).reverse()[
+                                index
+                            ];
+                            return (
+                                <div
+                                    key={index}
+                                    className={`w-2 h-2 rounded-full ${
+                                        guess === undefined
+                                            ? 'bg-gray-600 opacity-20'
+                                            : guess
+                                              ? 'bg-green-400'
+                                              : 'bg-red-400'
+                                    }`}
+                                />
+                            );
+                        })}
+                    </div>
                 </div>
-            )}
+                <div
+                    title="Pronunciation attempts"
+                    className="flex items-center gap-1"
+                >
+                    <div>
+                        🎤
+                        <span className="text-green-400">
+                            ✓{pronunciationStats.successful}
+                        </span>
+                        <span className="text-red-400">
+                            ✗{pronunciationStats.failed}
+                        </span>
+                        <span>
+                            ({(pronunciationStats.ratio * 100).toFixed(0)}%)
+                        </span>
+                    </div>
+                    <div className="flex gap-1">
+                        {[...Array(5)].map((_, index) => {
+                            const pronunciation = recentPronunciations
+                                .slice()
+                                .reverse()[index];
+                            return (
+                                <div
+                                    key={index}
+                                    className={`w-2 h-2 rounded-full ${
+                                        pronunciation === undefined
+                                            ? 'bg-gray-600 opacity-20'
+                                            : pronunciation
+                                              ? 'bg-green-400'
+                                              : 'bg-red-400'
+                                    }`}
+                                />
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
