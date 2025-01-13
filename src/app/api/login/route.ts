@@ -13,7 +13,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             );
         }
 
-        const response = NextResponse.redirect(new URL('/', req.url));
+        const response = NextResponse.redirect(new URL('/', req.url), 303);
         response.cookies.set('authToken', token.toString(), {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
