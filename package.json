@@ -11,8 +11,10 @@
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.47.12",
-    "@tanstack/react-query": "^5.63.0",
+    "@tanstack/query-sync-storage-persister": "^5.64.1",
+    "@tanstack/react-query": "^5.64.1",
     "@tanstack/react-query-devtools": "^5.63.0",
+    "@tanstack/react-query-persist-client": "^5.64.1",
     "next": "15.1.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
