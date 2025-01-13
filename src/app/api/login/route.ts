@@ -25,6 +25,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         return response;
     } catch (e) {
         console.error(e);
-        return NextResponse.redirect(new URL('/login', req.url));
+        return NextResponse.redirect(new URL('/login', req.url), 303);
     }
 }
