@@ -26,5 +26,11 @@ export function useQueryGetWord(textSource: string) {
             return json as WordData;
         },
         retry: false,
+        staleTime: Infinity,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
+        refetchInterval: false,
+        refetchIntervalInBackground: false,
     });
 }
