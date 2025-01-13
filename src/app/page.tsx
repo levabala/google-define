@@ -13,7 +13,7 @@ import { useMutationTrainingGuess } from './hooks/useMutationTrainingGuess';
 import { DefinitionsTrain } from './components/DefinitionsTrain';
 import { useQueryGetGuessStats } from './hooks/useQueryGetGuessStats';
 import { StatsDisplay } from './components/StatsDisplay';
-import { Checkbox } from './components/Checkbox';
+import { WordControls } from './components/WordControls';
 
 export default function Main() {
     const trainingGuessMutation = useMutationTrainingGuess();
@@ -52,44 +52,15 @@ export default function Main() {
                 }}
             />
 
-            <form
-                className="mt-2"
-                onSubmit={e => {
-                    e.preventDefault();
-                    setTextSourceSubmitted(textSourceCurrent);
-                }}
-            >
-                <input
-                    type="text"
-                    value={textSourceCurrent}
-                    onChange={e => setTextSourceCurrent(e.target.value)}
-                    className="bg-gray-800 text-white border border-gray-500 focus-visible:outline-gray-800"
-                />
-                <button type="submit" className="bg-gray-300 p-1 ml-1">
-                    Search
-                </button>
-                <ButtonToLearn
-                    textSourceSubmitted={textSourceSubmitted}
-                    wordsAll={wordsAll}
-                />
-                <ButtonLearned
-                    textSourceSubmitted={textSourceSubmitted}
-                    wordsAll={wordsAll}
-                />
-                <ButtonDelete
-                    textSourceSubmitted={textSourceSubmitted}
-                    wordsAll={wordsAll}
-                    setTextSourceCurrent={setTextSourceCurrent}
-                    setTextSourceSubmitted={setTextSourceSubmitted}
-                />
-                <span className="ml-2">
-                    <Checkbox
-                        checked={isTraining}
-                        onChange={setIsTraining}
-                        label="Train"
-                    />
-                </span>
-            </form>
+            <WordControls
+                textSourceCurrent={textSourceCurrent}
+                setTextSourceCurrent={setTextSourceCurrent}
+                textSourceSubmitted={textSourceSubmitted}
+                setTextSourceSubmitted={setTextSourceSubmitted}
+                isTraining={isTraining}
+                setIsTraining={setIsTraining}
+                wordsAll={wordsAll}
+            />
 
             <StatsDisplay
                 stats={stats}
