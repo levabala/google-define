@@ -33,7 +33,7 @@ export function WordControls({
                 setTextSourceSubmitted(textSourceCurrent);
             }}
         >
-            <div className="flex flex-wrap items-center gap-2 flex-1 min-w-[200px] flex-grow">
+            <div className="flex items-center gap-2 flex-shrink-0">
                 <input
                     type="text"
                     value={textSourceCurrent}
