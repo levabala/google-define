@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { randomInteger } from 'remeda';
 import { WordsAll } from './components/WordsAll';
 import { Definitions } from './components/Definitions';
@@ -12,6 +12,7 @@ import { useQueryGetGuessStats } from './hooks/useQueryGetGuessStats';
 import { useQueryGetRecentGuesses } from './hooks/useQueryGetRecentGuesses';
 import { StatsDisplay } from './components/StatsDisplay';
 import { WordControls } from './components/WordControls';
+import { WordData } from './types';
 
 export default function Main() {
     const trainingGuessMutation = useMutationTrainingGuess();
@@ -19,19 +20,17 @@ export default function Main() {
     const [textSourceSubmitted, setTextSourceSubmitted] = useState<string>('');
     const [isTraining, setIsTraining] = useState(false);
     const [addNextToLearn, setAddNextToLearn] = useState(false);
+    const [wordToTrain, setWordToTrain] = useState<WordData | null>(null);
 
-    const { data: wordCurrent } = useQueryGetWord(
-        textSourceSubmitted,
-        addNextToLearn ? 'TO_LEARN' : undefined,
-    );
+    const { data: wordCurrent, isFetching: isFetchingWordCurrent } =
+        useQueryGetWord(
+            textSourceSubmitted,
+            addNextToLearn ? 'TO_LEARN' : undefined,
+        );
     const { data: stats } = useQueryGetGuessStats(textSourceSubmitted);
     const { data: recentGuesses } =
         useQueryGetRecentGuesses(textSourceSubmitted);
     const { data: wordsAll } = useQueryGetWordsAll();
-
-    useEffect(() => {
-        console.log(wordsAll);
-    }, [wordsAll]);
 
     const onWordClickCommon = (word: string, addToLearn?: boolean) => {
         console.log({ word, addToLearn });
@@ -39,6 +38,26 @@ export default function Main() {
         setTextSourceCurrent(word);
         setTextSourceSubmitted(word);
     };
+
+    useLayoutEffect(() => {
+        console.log({
+            isTraining,
+            wordCurrent,
+            wordToTrain,
+            isFetchingWordCurrent,
+        });
+        if (isTraining && wordCurrent && !isFetchingWordCurrent) {
+            setWordToTrain(wordCurrent);
+        }
+    }, [
+        isFetchingWordCurrent,
+        isTraining,
+        textSourceSubmitted,
+        wordCurrent,
+        wordToTrain,
+    ]);
+
+    console.log({ wordToTrain });
 
     return (
         <div className="flex flex-col gap-1">
@@ -54,11 +73,11 @@ export default function Main() {
                 />
                 <button
                     onClick={async () => {
-                        const response = await fetch('/api/logout', { 
+                        const response = await fetch('/api/logout', {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'application/json'
-                            }
+                                'Content-Type': 'application/json',
+                            },
                         });
                         if (response.ok) {
                             window.location.href = '/login';
@@ -89,65 +108,63 @@ export default function Main() {
                 recentGuesses={recentGuesses}
             />
 
-            {wordCurrent &&
-                (isTraining && wordsAll ? (
-                    <DefinitionsTrain
-                        results={wordCurrent.results}
-                        wordsAll={wordsAll}
-                        textSourceSubmitted={textSourceSubmitted}
-                        onWordClick={(word, addToLearn) => {
-                            onWordClickCommon(word, addToLearn);
+            {isTraining && wordToTrain && wordsAll ? (
+                <DefinitionsTrain
+                    results={wordToTrain.results}
+                    wordsAll={wordsAll}
+                    word={wordToTrain.word}
+                    onWordClick={(word, addToLearn) => {
+                        onWordClickCommon(word, addToLearn);
+                        setIsTraining(false);
+                    }}
+                    onSuccess={definition => {
+                        if (!textSourceSubmitted) return;
+                        trainingGuessMutation.mutate({
+                            word: textSourceSubmitted,
+                            success: true,
+                            definition,
+                        });
+                    }}
+                    onFailure={definition => {
+                        if (!textSourceSubmitted) return;
+                        trainingGuessMutation.mutate({
+                            word: textSourceSubmitted,
+                            success: false,
+                            definition,
+                        });
+                    }}
+                    onNext={() => {
+                        const wordsToLearn = wordsAll.filter(
+                            word =>
+                                word.word !== textSourceCurrent &&
+                                word.status === 'TO_LEARN',
+                        );
+
+                        if (wordsToLearn.length === 0) {
+                            setTextSourceCurrent('');
+                            setTextSourceSubmitted('');
                             setIsTraining(false);
-                        }}
-                        onSuccess={definition => {
-                            if (!textSourceSubmitted) return;
-                            trainingGuessMutation.mutate({
-                                word: textSourceSubmitted,
-                                success: true,
-                                definition,
-                            });
-                        }}
-                        onFailure={definition => {
-                            if (!textSourceSubmitted) return;
-                            trainingGuessMutation.mutate({
-                                word: textSourceSubmitted,
-                                success: false,
-                                definition,
-                            });
-                        }}
-                        isLoadingNextWord={false}
-                        onNext={() => {
-                            const wordsToLearn = wordsAll.filter(
-                                word =>
-                                    word.word !== textSourceCurrent &&
-                                    word.status === 'TO_LEARN',
-                            );
+                            return;
+                        }
 
-                            if (wordsToLearn.length === 0) {
-                                setTextSourceCurrent('');
-                                setTextSourceSubmitted('');
-                                setIsTraining(false);
-                                return;
-                            }
+                        const nextWordIndex = randomInteger(
+                            0,
+                            wordsToLearn.length - 1,
+                        );
 
-                            const nextWordIndex = randomInteger(
-                                0,
-                                wordsToLearn.length - 1,
-                            );
-
-                            const nextWord = wordsToLearn[nextWordIndex];
-                            setTextSourceCurrent(nextWord.word);
-                            setTextSourceSubmitted(nextWord.word);
-                        }}
-                    />
-                ) : (
-                    <Definitions
-                        results={wordCurrent.results}
-                        wordsAll={wordsAll}
-                        textSourceSubmitted={textSourceSubmitted}
-                        onWordClick={onWordClickCommon}
-                    />
-                ))}
+                        const nextWord = wordsToLearn[nextWordIndex];
+                        setTextSourceCurrent(nextWord.word);
+                        setTextSourceSubmitted(nextWord.word);
+                    }}
+                />
+            ) : wordCurrent ? (
+                <Definitions
+                    results={wordCurrent.results}
+                    wordsAll={wordsAll}
+                    textSourceSubmitted={textSourceSubmitted}
+                    onWordClick={onWordClickCommon}
+                />
+            ) : null}
         </div>
     );
 }

@@ -6,12 +6,11 @@ import { ToggleSwitch } from './ToggleSwitch';
 type DefinitionsTrainProps = {
     results: WordData['results'];
     wordsAll?: DBWord[];
-    textSourceSubmitted: string | null;
+    word: string | null;
     onWordClick: (word: string, addToLearn?: boolean) => void;
     onSuccess?: (definition: string) => void;
     onFailure?: (definition: string) => void;
     onNext?: () => void;
-    isLoadingNextWord?: boolean;
 };
 
 type Mode = 'answer' | 'word';
@@ -19,18 +18,15 @@ type Mode = 'answer' | 'word';
 export function DefinitionsTrain({
     results,
     wordsAll,
-    textSourceSubmitted,
+    word,
     onWordClick,
     onSuccess,
     onFailure,
     onNext,
-    isLoadingNextWord,
 }: DefinitionsTrainProps) {
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
     const [hasAnswered, setHasAnswered] = useState(false);
     const [mode, setMode] = useState<Mode>('answer');
-    const [isLoadingNext, setIsLoadingNext] = useState(false);
-    const [isTransitioning, setIsTransitioning] = useState(false);
     const nextButtonRef = useRef<HTMLButtonElement>(null);
 
     // Calculate prevailing partOfSpeech and get the first matching definition
@@ -98,11 +94,11 @@ export function DefinitionsTrain({
         // First try to get definitions with matching partOfSpeech
         const matchingDefinitions = allDefinitions.filter(
             def =>
-                def.fromWord !== textSourceSubmitted &&
+                def.fromWord !== word &&
                 def.partOfSpeech === prevailingPos &&
                 !def.definition
                     .toLowerCase()
-                    .includes(textSourceSubmitted?.toLowerCase() || ''),
+                    .includes(word?.toLowerCase() || ''),
         );
 
         // If we don't have enough matching definitions, include other parts of speech
@@ -115,11 +111,11 @@ export function DefinitionsTrain({
             // Get all other definitions (regardless of partOfSpeech)
             const otherPosDefinitions = allDefinitions.filter(
                 def =>
-                    def.fromWord !== textSourceSubmitted &&
+                    def.fromWord !== word &&
                     def.partOfSpeech !== prevailingPos &&
                     !def.definition
                         .toLowerCase()
-                        .includes(textSourceSubmitted?.toLowerCase() || ''),
+                        .includes(word?.toLowerCase() || ''),
             );
 
             // Combine matching and non-matching definitions
@@ -138,11 +134,11 @@ export function DefinitionsTrain({
         const choices = [...randomDefinitions];
         choices.splice(correctIndex, 0, {
             ...correctDefinition,
-            fromWord: textSourceSubmitted as string,
+            fromWord: word as string,
         });
 
         return choices;
-    }, [wordsAll, correctDefinition, textSourceSubmitted, prevailingPos]);
+    }, [wordsAll, correctDefinition, word, prevailingPos]);
 
     const handleSelect = (index: number) => {
         if (hasAnswered) return;
@@ -207,10 +203,10 @@ export function DefinitionsTrain({
         }
     }, [hasAnswered, definitionChoices]);
 
+    console.log('DefinitionsTrain', word);
+
     return (
-        <div className={`flex flex-col gap-1 transition-opacity duration-300 ${
-            isTransitioning ? 'opacity-50' : 'opacity-100'
-        }`}>
+        <div className={`flex flex-col gap-1 transition-opacity duration-300`}>
             <div className="flex">
                 <ToggleSwitch
                     checked={mode === 'word'}
@@ -227,14 +223,14 @@ export function DefinitionsTrain({
                         mode === 'word'
                             ? 'cursor-default border-gray-700'
                             : 'border-gray-600'
-                    } ${isTransitioning ? 'translate-y-2' : 'translate-y-0'}`}
+                    }`}
                     disabled={hasAnswered || mode === 'word'}
                 >
                     <div className="flex justify-between items-start gap-1">
                         <Definition
                             result={def}
                             wordsAll={wordsAll}
-                            textSourceSubmitted={textSourceSubmitted}
+                            textSourceSubmitted={word}
                             onWordClick={onWordClick}
                             hideExamples
                             disableWordClick={mode === 'answer'}
@@ -251,55 +247,19 @@ export function DefinitionsTrain({
             <button
                 ref={nextButtonRef}
                 onClick={async () => {
-                    if (!hasAnswered || isLoadingNext) return;
-                    setIsLoadingNext(true);
-                    setIsTransitioning(true);
+                    if (!hasAnswered) return;
                     setSelectedIndex(null);
                     setHasAnswered(false);
-                    
-                    try {
-                        await onNext?.();
-                        // Add a small delay for the transition animation
-                        await new Promise(resolve => setTimeout(resolve, 200));
-                    } finally {
-                        setIsLoadingNext(false);
-                        setIsTransitioning(false);
-                    }
+                    onNext?.();
                 }}
                 className={`mt-4 p-2 rounded transition-colors flex items-center justify-center gap-2 ${
-                    hasAnswered && !isLoadingNext
+                    hasAnswered
                         ? 'bg-blue-500 hover:bg-blue-600 cursor-pointer'
                         : 'bg-blue-500/50 cursor-not-allowed'
                 }`}
-                disabled={!hasAnswered || isLoadingNext}
+                disabled={!hasAnswered}
             >
-                {isLoadingNextWord || isLoadingNext ? (
-                    <>
-                        <span>Loading</span>
-                        <svg
-                            className="animate-spin h-5 w-5 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                        >
-                            <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                            ></circle>
-                            <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                        </svg>
-                    </>
-                ) : (
-                    'Next'
-                )}
+                Next
             </button>
         </div>
     );
