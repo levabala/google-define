@@ -5,11 +5,12 @@ import { toast } from 'react-toastify';
 
 type Props = {
     word: string;
+    className?: string;
 };
 
 type RecordingStatus = 'idle' | 'recording' | 'success' | 'error';
 
-export function PronunciationButton({ word }: Props) {
+export function PronunciationButton({ word, className }: Props) {
     const pronunciationMutation = useMutationPronunciation();
     const [status, setStatus] = useState<RecordingStatus>('idle');
 
@@ -42,9 +43,7 @@ export function PronunciationButton({ word }: Props) {
                 if (success) {
                     toast.success('Hit! 🎤✨');
                 } else {
-                    toast.error(
-                        `Meh. You said: "${transcript}" 🎤❌`,
-                    );
+                    toast.error(`Meh. You said: "${transcript}" 🎤❌`);
                 }
 
                 setStatus(success ? 'success' : 'error');
@@ -74,6 +73,7 @@ export function PronunciationButton({ word }: Props) {
             type="button"
             className={cn(
                 'w-8 h-8 rounded-full flex items-center justify-center transition-colors',
+                className,
                 status === 'idle' && 'bg-gray-200 hover:bg-gray-300',
                 status === 'recording' && 'bg-red-500 animate-pulse',
                 status === 'success' && 'bg-green-500',

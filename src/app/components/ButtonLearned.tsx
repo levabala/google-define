@@ -4,9 +4,16 @@ import { queryClient } from '../providers';
 type ButtonLearnedProps = {
     textSourceSubmitted: string | null;
     wordsAll?: DBWord[];
+    className?: string;
 };
 
-export function ButtonLearned({ textSourceSubmitted, wordsAll }: ButtonLearnedProps) {
+import { cn } from '../../utils/cn';
+
+export function ButtonLearned({ 
+    textSourceSubmitted, 
+    wordsAll,
+    className 
+}: ButtonLearnedProps) {
     const isLearned = wordsAll?.find(
         w => w.word.toLowerCase() === textSourceSubmitted?.toLowerCase()
     )?.status === 'LEARNED';
@@ -28,11 +35,12 @@ export function ButtonLearned({ textSourceSubmitted, wordsAll }: ButtonLearnedPr
                 });
             }}
             disabled={isLearned}
-            className={`ml-2 px-2 py-1 text-white rounded ${
+            className={cn('px-2 py-1 text-white rounded', 
                 isLearned
                     ? 'bg-green-800 cursor-not-allowed ring-2 ring-green-400'
-                    : 'bg-green-600 hover:bg-green-700'
-            }`}
+                    : 'bg-green-600 hover:bg-green-700',
+                className
+            )}
         >
             Learned
         </button>

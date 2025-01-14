@@ -27,13 +27,13 @@ export function WordControls({
 }: Props) {
     return (
         <form
-            className="mt-2 flex flex-wrap items-center gap-2"
+            className="mt-2 flex flex-wrap items-center gap-3 w-full"
             onSubmit={e => {
                 e.preventDefault();
                 setTextSourceSubmitted(textSourceCurrent);
             }}
         >
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 flex-1 min-w-[200px] flex-grow">
                 <input
                     type="text"
                     value={textSourceCurrent}
@@ -46,27 +46,30 @@ export function WordControls({
             </div>
 
             {textSourceSubmitted && (
-                <div className="flex items-center gap-2">
-                    <SpeakButton text={textSourceSubmitted} />
-                    <PronunciationButton word={textSourceSubmitted} />
+                <div className="flex flex-wrap items-center gap-2 whitespace-nowrap">
+                    <SpeakButton text={textSourceSubmitted} className="flex-shrink-0" />
+                    <PronunciationButton word={textSourceSubmitted} className="flex-shrink-0" />
                     <ButtonToLearn
                         textSourceSubmitted={textSourceSubmitted}
                         wordsAll={wordsAll}
+                        className="flex-shrink-0"
                     />
                     <ButtonLearned
                         textSourceSubmitted={textSourceSubmitted}
                         wordsAll={wordsAll}
+                        className="flex-shrink-0"
                     />
                     <ButtonDelete
                         textSourceSubmitted={textSourceSubmitted}
                         wordsAll={wordsAll}
                         setTextSourceCurrent={setTextSourceCurrent}
                         setTextSourceSubmitted={setTextSourceSubmitted}
+                        className="flex-shrink-0"
                     />
                 </div>
             )}
 
-            <div>
+            <div className="flex-shrink-0">
                 <ToggleSwitch
                     checked={isTraining}
                     onChange={setIsTraining}

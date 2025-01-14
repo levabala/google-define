@@ -4,11 +4,15 @@ import { useMutationMarkWord } from '../hooks/useMutationMarkWord';
 type ButtonToLearnProps = {
     textSourceSubmitted: string | null;
     wordsAll?: DBWord[];
+    className?: string;
 };
+
+import { cn } from '../../utils/cn';
 
 export function ButtonToLearn({
     textSourceSubmitted,
     wordsAll,
+    className,
 }: ButtonToLearnProps) {
     const markWordMutation = useMutationMarkWord();
     const isToLearn =
@@ -27,11 +31,12 @@ export function ButtonToLearn({
                 });
             }}
             disabled={isToLearn}
-            className={`ml-2 px-2 py-1 text-white rounded ${
+            className={cn('px-2 py-1 text-white rounded', 
                 isToLearn
                     ? 'bg-yellow-800 cursor-not-allowed ring-2 ring-yellow-400'
-                    : 'bg-yellow-600 hover:bg-yellow-700'
-            }`}
+                    : 'bg-yellow-600 hover:bg-yellow-700',
+                className
+            )}
         >
             To Learn
         </button>

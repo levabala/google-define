@@ -6,13 +6,17 @@ type ButtonDeleteProps = {
     wordsAll?: DBWord[];
     setTextSourceCurrent: (value: string) => void;
     setTextSourceSubmitted: (value: string) => void;
+    className?: string;
 };
+
+import { cn } from '../../utils/cn';
 
 export function ButtonDelete({
     textSourceSubmitted,
     wordsAll,
     setTextSourceCurrent,
     setTextSourceSubmitted,
+    className,
 }: ButtonDeleteProps) {
     const deleteWordMutation = useMutationDeleteWord();
 
@@ -34,7 +38,7 @@ export function ButtonDelete({
                     },
                 });
             }}
-            className="ml-2 px-2 py-1 text-white rounded bg-red-600 hover:bg-red-700"
+            className={cn('px-2 py-1 text-white rounded bg-red-600 hover:bg-red-700', className)}
         >
             Delete
         </button>
