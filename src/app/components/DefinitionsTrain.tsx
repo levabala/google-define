@@ -207,7 +207,6 @@ export function DefinitionsTrain({
 
     return (
         <div className={`flex flex-col gap-1 transition-opacity duration-300`}>
-            <div className="text-m font-bold text-white">{word}</div>
             <div className="flex">
                 <ToggleSwitch
                     checked={mode === 'word'}
@@ -216,6 +215,7 @@ export function DefinitionsTrain({
                     rightLabel="Word Mode"
                 />
             </div>
+            <div className="text-m font-bold text-white">{word} is:</div>
             {definitionChoices.map((def, index) => (
                 <button
                     key={`${def.definition}-${index}`}
