@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { DBWord, WordData } from '../types';
 import { Definition } from './Definition';
 import { ToggleSwitch } from './ToggleSwitch';
@@ -27,6 +27,7 @@ export function DefinitionsTrain({
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
     const [hasAnswered, setHasAnswered] = useState(false);
     const [mode, setMode] = useState<Mode>('answer');
+    const nextButtonRef = useRef<HTMLButtonElement>(null);
 
     // Calculate prevailing partOfSpeech and get the first matching definition
     const { prevailingPos, correctDefinition } = useMemo(() => {
@@ -182,6 +183,20 @@ export function DefinitionsTrain({
         }`;
     };
 
+    // Scroll to next button when definitions change or when answered
+    useEffect(() => {
+        if (nextButtonRef.current) {
+            const offset = 100; // 100px gap
+            const elementPosition = nextButtonRef.current.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
+    }, [hasAnswered, definitionChoices]);
+
     return (
         <div className="flex flex-col gap-1">
             <div className="flex">
@@ -221,14 +236,20 @@ export function DefinitionsTrain({
                 </button>
             ))}
 
-            {hasAnswered && (
-                <button
-                    onClick={() => {
+            <button
+                ref={nextButtonRef}
+                onClick={() => {
+                    if (!hasAnswered) return;
                         setSelectedIndex(null);
                         setHasAnswered(false);
                         onNext?.();
                     }}
-                    className="mt-4 p-2 bg-blue-500 hover:bg-blue-600 rounded transition-colors"
+                    className={`mt-4 p-2 rounded transition-colors ${
+                        hasAnswered 
+                            ? 'bg-blue-500 hover:bg-blue-600 cursor-pointer' 
+                            : 'bg-blue-500/50 cursor-not-allowed'
+                    }`}
+                    disabled={!hasAnswered}
                 >
                     Next
                 </button>
