@@ -30,6 +30,7 @@ export function DefinitionsTrain({
     const [hasAnswered, setHasAnswered] = useState(false);
     const [mode, setMode] = useState<Mode>('answer');
     const [isLoadingNext, setIsLoadingNext] = useState(false);
+    const [isTransitioning, setIsTransitioning] = useState(false);
     const nextButtonRef = useRef<HTMLButtonElement>(null);
 
     // Calculate prevailing partOfSpeech and get the first matching definition
@@ -207,7 +208,9 @@ export function DefinitionsTrain({
     }, [hasAnswered, definitionChoices]);
 
     return (
-        <div className="flex flex-col gap-1">
+        <div className={`flex flex-col gap-1 transition-opacity duration-300 ${
+            isTransitioning ? 'opacity-50' : 'opacity-100'
+        }`}>
             <div className="flex">
                 <ToggleSwitch
                     checked={mode === 'word'}
@@ -216,15 +219,15 @@ export function DefinitionsTrain({
                     rightLabel="Word Mode"
                 />
             </div>
-            {(isLoadingNext ? definitionChoices : definitionChoices).map((def, index) => (
+            {definitionChoices.map((def, index) => (
                 <button
                     key={`${def.definition}-${index}`}
                     onClick={() => mode === 'answer' && handleSelect(index)}
-                    className={`${getButtonClass(index)} ${
+                    className={`${getButtonClass(index)} transition-all duration-300 ${
                         mode === 'word'
                             ? 'cursor-default border-gray-700'
                             : 'border-gray-600'
-                    }`}
+                    } ${isTransitioning ? 'translate-y-2' : 'translate-y-0'}`}
                     disabled={hasAnswered || mode === 'word'}
                 >
                     <div className="flex justify-between items-start gap-1">
@@ -250,12 +253,17 @@ export function DefinitionsTrain({
                 onClick={async () => {
                     if (!hasAnswered || isLoadingNext) return;
                     setIsLoadingNext(true);
+                    setIsTransitioning(true);
                     setSelectedIndex(null);
                     setHasAnswered(false);
+                    
                     try {
                         await onNext?.();
+                        // Add a small delay for the transition animation
+                        await new Promise(resolve => setTimeout(resolve, 200));
                     } finally {
                         setIsLoadingNext(false);
+                        setIsTransitioning(false);
                     }
                 }}
                 className={`mt-4 p-2 rounded transition-colors flex items-center justify-center gap-2 ${
