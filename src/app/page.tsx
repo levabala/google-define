@@ -42,15 +42,35 @@ export default function Main() {
 
     return (
         <div className="flex flex-col gap-1">
-            <WordsAll
-                words={wordsAll}
-                isLoading={!wordsAll}
-                currentWord={textSourceSubmitted}
-                onWordClick={word => {
-                    setTextSourceCurrent(word);
-                    setTextSourceSubmitted(word);
-                }}
-            />
+            <div className="flex gap-4 items-start">
+                <WordsAll
+                    words={wordsAll}
+                    isLoading={!wordsAll}
+                    currentWord={textSourceSubmitted}
+                    onWordClick={word => {
+                        setTextSourceCurrent(word);
+                        setTextSourceSubmitted(word);
+                    }}
+                />
+                <button
+                    onClick={async () => {
+                        const response = await fetch('/api/logout', { 
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        if (response.ok) {
+                            window.location.href = '/login';
+                        } else {
+                            console.error('Logout failed');
+                        }
+                    }}
+                    className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
+                >
+                    Logout
+                </button>
+            </div>
 
             <WordControls
                 textSourceCurrent={textSourceCurrent}
