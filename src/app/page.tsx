@@ -21,6 +21,7 @@ export default function Main() {
     const [isTraining, setIsTraining] = useState(false);
     const [addNextToLearn, setAddNextToLearn] = useState(false);
     const [wordToTrain, setWordToTrain] = useState<WordData | null>(null);
+    const [wordToTrainNext, setWordToTrainNext] = useState<string | null>(null);
 
     const { data: wordCurrent, isFetching: isFetchingWordCurrent } =
         useQueryGetWord(
@@ -46,15 +47,37 @@ export default function Main() {
             wordToTrain,
             isFetchingWordCurrent,
         });
-        if (isTraining && wordCurrent && !isFetchingWordCurrent) {
+        if (isTraining && wordCurrent && !isFetchingWordCurrent && wordsAll) {
+            const wordsToLearn = wordsAll.filter(
+                word =>
+                    word.word !== textSourceCurrent &&
+                    word.status === 'TO_LEARN',
+            );
+
+            if (wordsToLearn.length === 0) {
+                setTextSourceCurrent('');
+                setTextSourceSubmitted('');
+                setIsTraining(false);
+                return;
+            }
+
+            const nextWordIndex = randomInteger(0, wordsToLearn.length - 1);
+
+            const nextWord = wordsToLearn[nextWordIndex];
+
             setWordToTrain(wordCurrent);
+            setWordToTrainNext(nextWord.word);
+
+            useQueryGetWord.prefetchQuery(nextWord.word);
         }
     }, [
         isFetchingWordCurrent,
         isTraining,
+        textSourceCurrent,
         textSourceSubmitted,
         wordCurrent,
         wordToTrain,
+        wordsAll,
     ]);
 
     console.log({ wordToTrain });
@@ -134,27 +157,13 @@ export default function Main() {
                         });
                     }}
                     onNext={() => {
-                        const wordsToLearn = wordsAll.filter(
-                            word =>
-                                word.word !== textSourceCurrent &&
-                                word.status === 'TO_LEARN',
-                        );
-
-                        if (wordsToLearn.length === 0) {
-                            setTextSourceCurrent('');
-                            setTextSourceSubmitted('');
+                        if (!wordToTrainNext) {
                             setIsTraining(false);
                             return;
                         }
 
-                        const nextWordIndex = randomInteger(
-                            0,
-                            wordsToLearn.length - 1,
-                        );
-
-                        const nextWord = wordsToLearn[nextWordIndex];
-                        setTextSourceCurrent(nextWord.word);
-                        setTextSourceSubmitted(nextWord.word);
+                        setTextSourceCurrent(wordToTrainNext);
+                        setTextSourceSubmitted(wordToTrainNext);
                     }}
                 />
             ) : wordCurrent ? (
