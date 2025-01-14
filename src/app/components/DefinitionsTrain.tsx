@@ -96,7 +96,9 @@ export function DefinitionsTrain({
             def =>
                 def.fromWord !== textSourceSubmitted &&
                 def.partOfSpeech === prevailingPos &&
-                !def.definition.toLowerCase().includes(textSourceSubmitted?.toLowerCase() || ''),
+                !def.definition
+                    .toLowerCase()
+                    .includes(textSourceSubmitted?.toLowerCase() || ''),
         );
 
         // If we don't have enough matching definitions, include other parts of speech
@@ -111,7 +113,9 @@ export function DefinitionsTrain({
                 def =>
                     def.fromWord !== textSourceSubmitted &&
                     def.partOfSpeech !== prevailingPos &&
-                    !def.definition.toLowerCase().includes(textSourceSubmitted?.toLowerCase() || ''),
+                    !def.definition
+                        .toLowerCase()
+                        .includes(textSourceSubmitted?.toLowerCase() || ''),
             );
 
             // Combine matching and non-matching definitions
@@ -187,12 +191,14 @@ export function DefinitionsTrain({
     useEffect(() => {
         if (nextButtonRef.current) {
             const offset = 100; // 100px gap
-            const elementPosition = nextButtonRef.current.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - offset;
+            const elementPosition =
+                nextButtonRef.current.getBoundingClientRect().top;
+            const offsetPosition =
+                elementPosition + window.pageYOffset - offset;
 
             window.scrollTo({
                 top: offsetPosition,
-                behavior: 'smooth'
+                behavior: 'smooth',
             });
         }
     }, [hasAnswered, definitionChoices]);
@@ -240,20 +246,19 @@ export function DefinitionsTrain({
                 ref={nextButtonRef}
                 onClick={() => {
                     if (!hasAnswered) return;
-                        setSelectedIndex(null);
-                        setHasAnswered(false);
-                        onNext?.();
-                    }}
-                    className={`mt-4 p-2 rounded transition-colors ${
-                        hasAnswered 
-                            ? 'bg-blue-500 hover:bg-blue-600 cursor-pointer' 
-                            : 'bg-blue-500/50 cursor-not-allowed'
-                    }`}
-                    disabled={!hasAnswered}
-                >
-                    Next
-                </button>
-            )}
+                    setSelectedIndex(null);
+                    setHasAnswered(false);
+                    onNext?.();
+                }}
+                className={`mt-4 p-2 rounded transition-colors ${
+                    hasAnswered
+                        ? 'bg-blue-500 hover:bg-blue-600 cursor-pointer'
+                        : 'bg-blue-500/50 cursor-not-allowed'
+                }`}
+                disabled={!hasAnswered}
+            >
+                Next
+            </button>
         </div>
     );
 }
