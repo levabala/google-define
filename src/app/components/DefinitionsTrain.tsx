@@ -94,7 +94,8 @@ export function DefinitionsTrain({
         const matchingDefinitions = allDefinitions.filter(
             def =>
                 def.fromWord !== textSourceSubmitted &&
-                def.partOfSpeech === prevailingPos,
+                def.partOfSpeech === prevailingPos &&
+                !def.definition.toLowerCase().includes(textSourceSubmitted?.toLowerCase() || ''),
         );
 
         // If we don't have enough matching definitions, include other parts of speech
@@ -108,7 +109,8 @@ export function DefinitionsTrain({
             const otherPosDefinitions = allDefinitions.filter(
                 def =>
                     def.fromWord !== textSourceSubmitted &&
-                    def.partOfSpeech !== prevailingPos,
+                    def.partOfSpeech !== prevailingPos &&
+                    !def.definition.toLowerCase().includes(textSourceSubmitted?.toLowerCase() || ''),
             );
 
             // Combine matching and non-matching definitions
