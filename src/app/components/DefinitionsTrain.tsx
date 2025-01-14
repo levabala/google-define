@@ -207,6 +207,9 @@ export function DefinitionsTrain({
 
     return (
         <div className={`flex flex-col gap-1 transition-opacity duration-300`}>
+            <div className="text-2xl font-bold mb-4 text-center">
+                {word}
+            </div>
             <div className="flex">
                 <ToggleSwitch
                     checked={mode === 'word'}
