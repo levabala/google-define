@@ -207,9 +207,7 @@ export function DefinitionsTrain({
 
     return (
         <div className={`flex flex-col gap-1 transition-opacity duration-300`}>
-            <div className="text-2xl font-bold mb-4 text-center">
-                {word}
-            </div>
+            <div className="text-m font-bold text-white">{word}</div>
             <div className="flex">
                 <ToggleSwitch
                     checked={mode === 'word'}
@@ -222,7 +220,7 @@ export function DefinitionsTrain({
                 <button
                     key={`${def.definition}-${index}`}
                     onClick={() => mode === 'answer' && handleSelect(index)}
-                    className={`${getButtonClass(index)} transition-all duration-300 ${
+                    className={`${getButtonClass(index)} transition-all duration-300 text-white ${
                         mode === 'word'
                             ? 'cursor-default border-gray-700'
                             : 'border-gray-600'
