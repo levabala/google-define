@@ -14,7 +14,7 @@ export function ToggleSwitch({ checked, onChange, leftLabel, rightLabel }: Props
             <button
                 onClick={() => onChange(!checked)}
                 className={`
-                    relative w-14 h-7 rounded-full transition-colors
+                    relative w-10 h-5 rounded-full transition-colors
                     ${checked ? 'bg-blue-500' : 'bg-gray-600'}
                 `}
                 type="button"
@@ -23,8 +23,8 @@ export function ToggleSwitch({ checked, onChange, leftLabel, rightLabel }: Props
             >
                 <span
                     className={`
-                        absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform
-                        ${checked ? 'translate-x-7' : 'translate-x-0'}
+                        absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform
+                        ${checked ? 'translate-x-5' : 'translate-x-0'}
                     `}
                 />
             </button>
