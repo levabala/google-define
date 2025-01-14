@@ -29,6 +29,7 @@ export function DefinitionsTrain({
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
     const [hasAnswered, setHasAnswered] = useState(false);
     const [mode, setMode] = useState<Mode>('answer');
+    const [isLoadingNext, setIsLoadingNext] = useState(false);
     const nextButtonRef = useRef<HTMLButtonElement>(null);
 
     // Calculate prevailing partOfSpeech and get the first matching definition
@@ -215,7 +216,7 @@ export function DefinitionsTrain({
                     rightLabel="Word Mode"
                 />
             </div>
-            {definitionChoices.map((def, index) => (
+            {(isLoadingNext ? definitionChoices : definitionChoices).map((def, index) => (
                 <button
                     key={`${def.definition}-${index}`}
                     onClick={() => mode === 'answer' && handleSelect(index)}
@@ -246,20 +247,25 @@ export function DefinitionsTrain({
 
             <button
                 ref={nextButtonRef}
-                onClick={() => {
-                    if (!hasAnswered) return;
+                onClick={async () => {
+                    if (!hasAnswered || isLoadingNext) return;
+                    setIsLoadingNext(true);
                     setSelectedIndex(null);
                     setHasAnswered(false);
-                    onNext?.();
+                    try {
+                        await onNext?.();
+                    } finally {
+                        setIsLoadingNext(false);
+                    }
                 }}
                 className={`mt-4 p-2 rounded transition-colors flex items-center justify-center gap-2 ${
-                    hasAnswered
+                    hasAnswered && !isLoadingNext
                         ? 'bg-blue-500 hover:bg-blue-600 cursor-pointer'
                         : 'bg-blue-500/50 cursor-not-allowed'
                 }`}
-                disabled={!hasAnswered}
+                disabled={!hasAnswered || isLoadingNext}
             >
-                {isLoadingNextWord ? (
+                {isLoadingNextWord || isLoadingNext ? (
                     <>
                         <span>Loading</span>
                         <svg

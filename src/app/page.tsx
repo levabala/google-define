@@ -19,7 +19,6 @@ export default function Main() {
     const [textSourceSubmitted, setTextSourceSubmitted] = useState<string>('');
     const [isTraining, setIsTraining] = useState(false);
     const [addNextToLearn, setAddNextToLearn] = useState(false);
-    const [isLoadingNextWord, setIsLoadingNextWord] = useState(false);
 
     const { data: wordCurrent } = useQueryGetWord(
         textSourceSubmitted,
@@ -116,7 +115,7 @@ export default function Main() {
                                 definition,
                             });
                         }}
-                        isLoadingNextWord={isLoadingNextWord}
+                        isLoadingNextWord={false}
                         onNext={() => {
                             const wordsToLearn = wordsAll.filter(
                                 word =>
@@ -136,12 +135,9 @@ export default function Main() {
                                 wordsToLearn.length - 1,
                             );
 
-                            setIsLoadingNextWord(true);
                             const nextWord = wordsToLearn[nextWordIndex];
                             setTextSourceCurrent(nextWord.word);
                             setTextSourceSubmitted(nextWord.word);
-                            // Reset loading state after a short delay to allow the new word to load
-                            setTimeout(() => setIsLoadingNextWord(false), 300);
                         }}
                     />
                 ) : (
