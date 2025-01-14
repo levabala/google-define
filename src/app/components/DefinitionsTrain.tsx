@@ -24,6 +24,7 @@ export function DefinitionsTrain({
     onSuccess,
     onFailure,
     onNext,
+    isLoadingNextWord,
 }: DefinitionsTrainProps) {
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
     const [hasAnswered, setHasAnswered] = useState(false);
