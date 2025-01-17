@@ -24,9 +24,18 @@ export function PronunciationButton({ word, className }: Props) {
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
 
+            // Set a 5 second timeout
+            const timeout = setTimeout(() => {
+                recognition.stop();
+                toast.error('Recording timed out after 5 seconds 🎤⌛');
+                setStatus('error');
+                setTimeout(() => setStatus('idle'), 2000);
+            }, 5000);
+
             recognition.start();
 
             recognition.onresult = async event => {
+                clearTimeout(timeout);
                 const transcript = event.results[0][0].transcript
                     .toLowerCase()
                     .trim();
@@ -50,7 +59,12 @@ export function PronunciationButton({ word, className }: Props) {
                 setTimeout(() => setStatus('idle'), 2000);
             };
 
+            recognition.onend = () => {
+                clearTimeout(timeout);
+            };
+
             recognition.onerror = event => {
+                clearTimeout(timeout);
                 console.error('Speech recognition error:', event.error);
                 toast.error(
                     'Failed to recognize speech. Please try again 🎤❌',
