@@ -32,7 +32,7 @@ export function DefinitionsTrain({
     // Calculate prevailing partOfSpeech and get the first matching definition
     const { prevailingPos, correctDefinition } = useMemo(() => {
         // Count occurrences of each partOfSpeech
-        const posCount = results.reduce(
+        const posCount = (results || []).reduce(
             (acc, result) => {
                 const pos = result.partOfSpeech || 'unknown';
                 acc[pos] = (acc[pos] || 0) + 1;
@@ -47,7 +47,7 @@ export function DefinitionsTrain({
         )[0];
 
         // Get definitions with the prevailing partOfSpeech from first 3 definitions
-        const firstThreeDefinitions = results.slice(0, 3);
+        const firstThreeDefinitions = (results || []).slice(0, 3);
         const matchingDefs = firstThreeDefinitions.filter(
             r => r.partOfSpeech === prevailingPos,
         );
@@ -69,7 +69,7 @@ export function DefinitionsTrain({
         const allDefinitions =
             wordsAll?.flatMap(word => {
                 // First, find the prevailing pos for this word
-                const posCount = word.raw.results.reduce(
+                const posCount = (word.raw.results || []).reduce(
                     (acc, result) => {
                         const pos = result.partOfSpeech || 'unknown';
                         acc[pos] = (acc[pos] || 0) + 1;
@@ -83,7 +83,7 @@ export function DefinitionsTrain({
                 )[0];
 
                 // Only return definitions that match the prevailing pos
-                return word.raw.results
+                return (word.raw.results || [])
                     .filter(result => result.partOfSpeech === wordPrevailingPos)
                     .map(result => ({
                         ...result,

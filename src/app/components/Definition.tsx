@@ -4,7 +4,7 @@ import { Examples } from './Examples';
 import { DBWord, WordData } from '../types';
 
 type DefinitionProps = {
-    result: WordData['results'][0];
+    result: NonNullable<WordData['results']>[number];
     wordsAll?: DBWord[];
     textSourceSubmitted: string | null;
     onWordClick: (word: string, addToLearn?: boolean) => void;
@@ -25,7 +25,7 @@ export function Definition({
             {result.partOfSpeech && (
                 <span className="font-bold">{result.partOfSpeech}: </span>
             )}
-            {result.definition.split(' ').map((word, wordIndex, array) => (
+            {result.definition.split(' ').map((word: string, wordIndex: number, array: string[]) => (
                 <Fragment key={`${word}-${wordIndex}`}>
                     <Word
                         word={word}
