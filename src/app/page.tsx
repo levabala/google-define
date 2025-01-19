@@ -29,27 +29,18 @@ export default function Main() {
     const { data: wordCurrent, isFetching: isFetchingWordCurrent } =
         useQueryGetWord(textSourceSubmitted);
 
-    console.log({ isFetchingWordCurrent });
-
     const { data: stats } = useQueryGetGuessStats(textSourceSubmitted);
     const { data: recentGuesses } =
         useQueryGetRecentGuesses(textSourceSubmitted);
     const { data: wordsAll } = useQueryGetWordsAll();
 
     const onWordClickCommon = (word: string, addToLearn?: boolean) => {
-        console.log({ word, addToLearn });
         setAddNextToLearn(addToLearn || false);
         setTextSourceCurrent(word);
         setTextSourceSubmitted(word);
     };
 
     useLayoutEffect(() => {
-        console.log({
-            isTraining,
-            wordCurrent,
-            wordToTrain,
-            isFetchingWordCurrent,
-        });
         if (isTraining && wordCurrent && !isFetchingWordCurrent && wordsAll) {
             const wordsToLearn = wordsAll.filter(
                 word =>
@@ -70,8 +61,6 @@ export default function Main() {
 
             setWordToTrain(wordCurrent);
             setWordToTrainNext(nextWord.word);
-
-            // No need to prefetch since useQueryGetWord will handle fetching
         }
     }, [
         isFetchingWordCurrent,
@@ -83,7 +72,7 @@ export default function Main() {
         wordsAll,
     ]);
 
-    console.log({ wordToTrain });
+    console.log({ wordToTrain, wordCurrent, wordsAll });
 
     return (
         <div className="flex flex-col gap-1">
