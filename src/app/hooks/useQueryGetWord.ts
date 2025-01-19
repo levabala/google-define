@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '../providers';
 import { WordData, WordStatus, DBWord } from '../types';
+import { useQueryGetWordsAll } from './useQueryGetWordsAll';
 
 export async function fetchGetWord(
     textSource: string,
@@ -44,30 +45,18 @@ export async function fetchGetWord(
     return json as WordData;
 }
 
-export function useQueryGetWord(
-    textSource: string,
-    initialStatus?: WordStatus,
-) {
-    return useQuery({
+export function useQueryGetWord(textSource: string) {
+    const { data, isFetching } = useQueryGetWordsAll();
+
+    return useQuery<WordData | undefined>({
         queryKey: ['dictionary', 'en', textSource],
         enabled: textSource !== '',
-        queryFn: () => fetchGetWord(textSource, initialStatus),
-        retry: false,
-        staleTime: Infinity,
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
-        refetchOnReconnect: false,
-        refetchInterval: false,
-        refetchIntervalInBackground: false,
+        queryFn: () => {
+            if (!data || isFetching) {
+                return new Promise(() => {});
+            }
+
+            return data.find(word => word.word === textSource)?.raw;
+        },
     });
 }
-
-useQueryGetWord.prefetchQuery = async (
-    textSource: string,
-    initialStatus?: WordStatus,
-) => {
-    queryClient.prefetchQuery({
-        queryKey: ['dictionary', 'en', textSource],
-        queryFn: () => fetchGetWord(textSource, initialStatus),
-    });
-};
