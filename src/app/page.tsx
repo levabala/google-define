@@ -14,6 +14,7 @@ import { useQueryGetRecentGuesses } from './hooks/useQueryGetRecentGuesses';
 import { StatsDisplay } from './components/StatsDisplay';
 import { WordControls } from './components/WordControls';
 import { WordData } from './types';
+import { Spinner } from './components/Spinner';
 
 export default function Main() {
     const trainingGuessMutation = useMutationTrainingGuess();
