@@ -7,6 +7,7 @@ type DefinitionsProps = {
     wordsAll?: DBWord[];
     textSourceSubmitted: string | null;
     onWordClick: (word: string, addToLearn?: boolean) => void;
+    isLoading?: boolean;
 };
 
 export function Definitions({
@@ -14,7 +15,16 @@ export function Definitions({
     wordsAll,
     textSourceSubmitted,
     onWordClick,
+    isLoading,
 }: DefinitionsProps) {
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-32">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+            </div>
+        );
+    }
+
     return (
         <div className="flex flex-col gap-2">
             {results.map(result => (

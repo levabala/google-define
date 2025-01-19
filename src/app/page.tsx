@@ -180,6 +180,7 @@ export default function Main() {
                     wordsAll={wordsAll}
                     textSourceSubmitted={textSourceSubmitted}
                     onWordClick={onWordClickCommon}
+                    isLoading={isFetchingWordCurrent}
                 />
             ) : null}
         </div>
