@@ -18,10 +18,12 @@
     .sharp-spinner {
         width: 2rem;
         height: 2rem;
+        position: relative;
         border: 0.25rem solid #f3f3f3;
         border-top: 0.25rem solid #000;
         animation: spin 1s linear infinite;
         border-radius: 0;
+        transform-origin: center;
     }
 
     @keyframes spin {
