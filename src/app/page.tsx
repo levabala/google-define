@@ -28,6 +28,8 @@ export default function Main() {
     const { data: wordCurrent, isFetching: isFetchingWordCurrent } =
         useQueryGetWord(textSourceSubmitted);
 
+    console.log({ isFetchingWordCurrent });
+
     const { data: stats } = useQueryGetGuessStats(textSourceSubmitted);
     const { data: recentGuesses } =
         useQueryGetRecentGuesses(textSourceSubmitted);
