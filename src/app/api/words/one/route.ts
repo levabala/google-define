@@ -3,6 +3,47 @@ import { createClient } from '@/utils/db';
 import { WordData, WordStatus } from '@/app/types';
 import { getUser } from '@/auth';
 
+export async function GET(req: NextRequest): Promise<NextResponse> {
+    const { searchParams } = new URL(req.url);
+    const word = searchParams.get('word');
+
+    if (!word) {
+        return NextResponse.json(
+            { error: `Error: the word is invalid` },
+            { status: 400 },
+        );
+    }
+
+    try {
+        const supabase = await createClient();
+        const user = await getUser(req);
+        
+        const { data: wordDataDB } = await supabase
+            .from('word')
+            .select()
+            .eq('word', word)
+            .eq('user', user);
+
+        const wordDataCached = wordDataDB?.[0];
+
+        if (!wordDataCached) {
+            return NextResponse.json(
+                { error: 'Word not found' },
+                { status: 404 },
+            );
+        }
+
+        return NextResponse.json(JSON.parse(wordDataCached.raw), {
+            status: 200,
+        });
+    } catch (error) {
+        return NextResponse.json(
+            { error: (error as Error).message || 'Unknown error occurred' },
+            { status: 500 },
+        );
+    }
+}
+
 export async function PUT(req: NextRequest): Promise<NextResponse> {
     const { word, status } = await req.json();
 
