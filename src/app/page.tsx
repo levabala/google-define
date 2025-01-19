@@ -5,6 +5,7 @@ import { randomInteger } from 'remeda';
 import { WordsAll } from './components/WordsAll';
 import { Definitions } from './components/Definitions';
 import { useQueryGetWord, fetchGetWord } from './hooks/useQueryGetWord';
+import { queryClient } from './providers';
 import { useQueryGetWordsAll } from './hooks/useQueryGetWordsAll';
 import { useMutationTrainingGuess } from './hooks/useMutationTrainingGuess';
 import { DefinitionsTrain } from './components/DefinitionsTrain';
