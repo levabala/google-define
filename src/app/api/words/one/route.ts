@@ -53,12 +53,8 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ success: true }, { status: 200 });
 }
 
-export async function GET(req: NextRequest): Promise<NextResponse> {
-    const { searchParams } = new URL(req.url);
-    const word = searchParams.get('word');
-    const initialStatus = searchParams.get(
-        'initialStatus',
-    ) as WordStatus | null;
+export async function POST(req: NextRequest): Promise<NextResponse> {
+    const { word, initialStatus } = await req.json();
 
     if (!word) {
         return NextResponse.json(
@@ -68,23 +64,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     }
 
     try {
-        const supabase = await createClient();
-
-        const user = await getUser(req);
-        const { data: wordDataDB } = await supabase
-            .from('word')
-            .select()
-            .eq('word', word)
-            .eq('user', user);
-
-        const wordDataCached = wordDataDB?.[0];
-
-        if (wordDataCached) {
-            return NextResponse.json(JSON.parse(wordDataCached.raw), {
-                status: 200,
-            });
-        }
-
         console.warn('------------- wordsapi is hit');
         const response = await fetch(
             `https://wordsapiv1.p.rapidapi.com/words/${word}`,
@@ -106,28 +85,16 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
         const data = (await response.json()) as WordData;
 
-        console.log('result', data);
         if (data) {
-            console.log('async write to supabase');
-
+            const supabase = await createClient();
             const user = await getUser(req);
-            supabase.from('word').insert({
+            
+            await supabase.from('word').insert({
                 word: data.word,
                 raw: JSON.stringify(data),
                 status: initialStatus || 'NONE',
                 user,
             });
-            supabase
-                .from('word')
-                .insert({
-                    word: data.word,
-                    raw: JSON.stringify(data),
-                    status: initialStatus || 'NONE',
-                    user,
-                })
-                .then(res => {
-                    console.log('inserted', res);
-                });
         }
 
         return NextResponse.json(data, { status: 200 });
