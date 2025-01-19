@@ -66,10 +66,7 @@ export default function Main() {
             setWordToTrain(wordCurrent);
             setWordToTrainNext(nextWord.word);
 
-            queryClient.prefetchQuery({
-                queryKey: ['dictionary', 'en', nextWord.word],
-                queryFn: () => fetchGetWord(nextWord.word),
-            });
+            // No need to prefetch since useQueryGetWord will handle fetching
         }
     }, [
         isFetchingWordCurrent,
