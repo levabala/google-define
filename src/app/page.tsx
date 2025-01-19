@@ -4,7 +4,7 @@ import React, { useLayoutEffect, useState } from 'react';
 import { randomInteger } from 'remeda';
 import { WordsAll } from './components/WordsAll';
 import { Definitions } from './components/Definitions';
-import { useQueryGetWord } from './hooks/useQueryGetWord';
+import { useQueryGetWord, fetchGetWord } from './hooks/useQueryGetWord';
 import { useQueryGetWordsAll } from './hooks/useQueryGetWordsAll';
 import { useMutationTrainingGuess } from './hooks/useMutationTrainingGuess';
 import { DefinitionsTrain } from './components/DefinitionsTrain';
@@ -24,10 +24,7 @@ export default function Main() {
     const [wordToTrainNext, setWordToTrainNext] = useState<string | null>(null);
 
     const { data: wordCurrent, isFetching: isFetchingWordCurrent } =
-        useQueryGetWord(
-            textSourceSubmitted,
-            addNextToLearn ? 'TO_LEARN' : undefined,
-        );
+        useQueryGetWord(textSourceSubmitted);
     const { data: stats } = useQueryGetGuessStats(textSourceSubmitted);
     const { data: recentGuesses } =
         useQueryGetRecentGuesses(textSourceSubmitted);
@@ -68,7 +65,10 @@ export default function Main() {
             setWordToTrain(wordCurrent);
             setWordToTrainNext(nextWord.word);
 
-            useQueryGetWord.prefetchQuery(nextWord.word);
+            queryClient.prefetchQuery({
+                queryKey: ['dictionary', 'en', nextWord.word],
+                queryFn: () => fetchGetWord(nextWord.word),
+            });
         }
     }, [
         isFetchingWordCurrent,
