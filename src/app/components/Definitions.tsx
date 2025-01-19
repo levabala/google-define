@@ -1,9 +1,10 @@
 import { Definition } from './Definition';
 import { DBWord } from '../types';
 import { WordData } from '../types';
+import { Spinner } from './Spinner';
 
 type DefinitionsProps = {
-    results: WordData['results'];
+    results?: WordData['results'];
     wordsAll?: DBWord[];
     textSourceSubmitted: string | null;
     onWordClick: (word: string, addToLearn?: boolean) => void;
@@ -23,7 +24,7 @@ export function Definitions({
 
     return (
         <div className="flex flex-col gap-2">
-            {results.map(result => (
+            {results?.map(result => (
                 <Definition
                     key={result.definition}
                     result={result}
