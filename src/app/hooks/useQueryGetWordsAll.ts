@@ -15,5 +15,11 @@ export function useQueryGetWordsAll() {
                 return word as DBWord;
             }) as DBWord[];
         },
+        staleTime: Infinity,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
+        refetchInterval: false,
+        refetchIntervalInBackground: false,
     });
 }
