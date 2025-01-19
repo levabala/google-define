@@ -141,7 +141,9 @@ export default function Main() {
                 recentGuesses={recentGuesses}
             />
 
-            {isTraining && wordToTrain && wordsAll ? (
+            {isFetchingWordCurrent ? (
+                <Spinner />
+            ) : isTraining && wordToTrain && wordsAll ? (
                 <DefinitionsTrain
                     results={wordToTrain.results}
                     wordsAll={wordsAll}
@@ -176,15 +178,14 @@ export default function Main() {
                         setTextSourceSubmitted(wordToTrainNext);
                     }}
                 />
-            ) : (
+            ) : wordCurrent ? (
                 <Definitions
-                    results={wordCurrent?.results}
+                    results={wordCurrent.results}
                     wordsAll={wordsAll}
                     textSourceSubmitted={textSourceSubmitted}
                     onWordClick={onWordClickCommon}
-                    isLoading={isFetchingWordCurrent}
                 />
-            )}
+            ) : null}
         </div>
     );
 }

@@ -4,11 +4,10 @@ import { WordData } from '../types';
 import { Spinner } from './Spinner';
 
 type DefinitionsProps = {
-    results?: WordData['results'];
+    results: WordData['results'];
     wordsAll?: DBWord[];
     textSourceSubmitted: string | null;
     onWordClick: (word: string, addToLearn?: boolean) => void;
-    isLoading?: boolean;
 };
 
 export function Definitions({
@@ -16,12 +15,7 @@ export function Definitions({
     wordsAll,
     textSourceSubmitted,
     onWordClick,
-    isLoading,
 }: DefinitionsProps) {
-    if (!results || isLoading) {
-        return <Spinner />;
-    }
-
     return (
         <div className="flex flex-col gap-2">
             {results?.map(result => (
