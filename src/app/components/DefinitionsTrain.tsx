@@ -31,8 +31,12 @@ export function DefinitionsTrain({
 
     // Calculate prevailing partOfSpeech and get the first matching definition
     const { prevailingPos, correctDefinition } = useMemo(() => {
+        if (!results || results.length === 0) {
+            return { prevailingPos: 'unknown', correctDefinition: { definition: '', partOfSpeech: null } };
+        }
+
         // Count occurrences of each partOfSpeech
-        const posCount = (results || []).reduce<Record<string, number>>(
+        const posCount = results.reduce<Record<string, number>>(
             (acc, result) => {
                 const pos = result.partOfSpeech || 'unknown';
                 acc[pos] = (acc[pos] || 0) + 1;
@@ -46,50 +50,58 @@ export function DefinitionsTrain({
             b[1] > a[1] ? b : a,
         )[0];
 
-        // Get definitions with the prevailing partOfSpeech from first 3 definitions
-        const firstThreeDefinitions = (results || []).slice(0, 3);
+        // Get first 3 definitions
+        const firstThreeDefinitions = results.slice(0, 3);
+        if (firstThreeDefinitions.length === 0) {
+            return { prevailingPos, correctDefinition: results[0] };
+        }
+
+        // Get definitions with the prevailing partOfSpeech
         const matchingDefs = firstThreeDefinitions.filter(
             r => r.partOfSpeech === prevailingPos,
         );
 
         // Choose randomly from matching definitions, or from first three if no matches
-        const defsToChooseFrom =
-            matchingDefs.length > 0 ? matchingDefs : firstThreeDefinitions;
-        const correctDef =
-            defsToChooseFrom[
-                Math.floor(Math.random() * defsToChooseFrom.length)
-            ];
+        const defsToChooseFrom = matchingDefs.length > 0 ? matchingDefs : firstThreeDefinitions;
+        const correctDef = defsToChooseFrom[Math.floor(Math.random() * defsToChooseFrom.length)];
 
         return { prevailingPos, correctDefinition: correctDef };
     }, [results]);
 
     // Generate 4 random definitions plus the correct one
     const definitionChoices = useMemo(() => {
+        if (!wordsAll || wordsAll.length === 0 || !word) {
+            return [];
+        }
+
         // Get all definitions grouped by word
-        const allDefinitions =
-            wordsAll?.flatMap(word => {
-                // First, find the prevailing pos for this word
-                const posCount = (word.raw.results || []).reduce<Record<string, number>>(
-                    (acc, result) => {
-                        const pos = result.partOfSpeech || 'unknown';
-                        acc[pos] = (acc[pos] || 0) + 1;
-                        return acc;
-                    },
-                    {}
-                );
+        const allDefinitions = wordsAll.flatMap(word => {
+            if (!word.raw.results || word.raw.results.length === 0) {
+                return [];
+            }
 
-                const wordPrevailingPos = Object.entries(posCount).reduce(
-                    (a, b) => (b[1] > a[1] ? b : a),
-                )[0];
+            // First, find the prevailing pos for this word
+            const posCount = word.raw.results.reduce<Record<string, number>>(
+                (acc, result) => {
+                    const pos = result.partOfSpeech || 'unknown';
+                    acc[pos] = (acc[pos] || 0) + 1;
+                    return acc;
+                },
+                {}
+            );
 
-                // Only return definitions that match the prevailing pos
-                return (word.raw.results || [])
-                    .filter(result => result.partOfSpeech === wordPrevailingPos)
-                    .map(result => ({
-                        ...result,
-                        fromWord: word.word,
-                    }));
-            }) || [];
+            const wordPrevailingPos = Object.entries(posCount).reduce(
+                (a, b) => (b[1] > a[1] ? b : a),
+            )[0];
+
+            // Only return definitions that match the prevailing pos
+            return word.raw.results
+                .filter(result => result.partOfSpeech === wordPrevailingPos)
+                .map(result => ({
+                    ...result,
+                    fromWord: word.word,
+                }));
+        });
 
         // First try to get definitions with matching partOfSpeech
         const matchingDefinitions = allDefinitions.filter(
