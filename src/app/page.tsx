@@ -28,16 +28,6 @@ export default function Main() {
     const { data: wordCurrent, isFetching: isFetchingWordCurrent } =
         useQueryGetWord(textSourceSubmitted);
 
-    // Handle adding new words
-    useLayoutEffect(() => {
-        if (textSourceSubmitted && !wordCurrent && !isFetchingWordCurrent) {
-            addWordMutation.mutate({
-                word: textSourceSubmitted,
-                initialStatus: addNextToLearn ? 'TO_LEARN' : undefined
-            });
-        }
-    }, [textSourceSubmitted, wordCurrent, isFetchingWordCurrent, addNextToLearn, addWordMutation]);
-
     const { data: stats } = useQueryGetGuessStats(textSourceSubmitted);
     const { data: recentGuesses } =
         useQueryGetRecentGuesses(textSourceSubmitted);
@@ -128,7 +118,15 @@ export default function Main() {
                 textSourceCurrent={textSourceCurrent}
                 setTextSourceCurrent={setTextSourceCurrent}
                 textSourceSubmitted={textSourceSubmitted}
-                setTextSourceSubmitted={setTextSourceSubmitted}
+                setTextSourceSubmitted={async (text) => {
+                    setTextSourceSubmitted(text);
+                    if (text && !wordsAll?.some(w => w.word === text)) {
+                        await addWordMutation.mutateAsync({
+                            word: text,
+                            initialStatus: addNextToLearn ? 'TO_LEARN' : undefined
+                        });
+                    }
+                }}
                 isTraining={isTraining}
                 setIsTraining={setIsTraining}
                 wordsAll={wordsAll}
