@@ -6,7 +6,6 @@ import { WordsAll } from './components/WordsAll';
 import { Definitions } from './components/Definitions';
 import { useQueryGetWord } from './hooks/useQueryGetWord';
 import { useMutationAddWord } from './hooks/useMutationAddWord';
-import { queryClient } from './providers';
 import { useQueryGetWordsAll } from './hooks/useQueryGetWordsAll';
 import { useMutationTrainingGuess } from './hooks/useMutationTrainingGuess';
 import { DefinitionsTrain } from './components/DefinitionsTrain';
@@ -38,6 +37,7 @@ export default function Main() {
             });
         }
     }, [textSourceSubmitted, wordCurrent, isFetchingWordCurrent, addNextToLearn, addWordMutation]);
+
     const { data: stats } = useQueryGetGuessStats(textSourceSubmitted);
     const { data: recentGuesses } =
         useQueryGetRecentGuesses(textSourceSubmitted);
