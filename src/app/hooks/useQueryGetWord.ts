@@ -14,9 +14,11 @@ export function useQueryGetWord(textSource: string) {
             }
 
             const foundWord = data.find(word => word.word === textSource);
+
             if (!foundWord) {
                 throw new Error('Word not found');
             }
+
             return foundWord.raw;
         },
     });
