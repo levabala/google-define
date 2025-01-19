@@ -13,7 +13,11 @@ export function useQueryGetWord(textSource: string) {
                 return new Promise(() => {});
             }
 
-            return data.find(word => word.word === textSource)?.raw;
+            const foundWord = data.find(word => word.word === textSource);
+            if (!foundWord) {
+                throw new Error('Word not found');
+            }
+            return foundWord.raw;
         },
     });
 }
