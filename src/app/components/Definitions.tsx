@@ -20,7 +20,7 @@ export function Definitions({
     if (isLoading) {
         return (
             <div className="flex justify-center items-center h-32">
-                <div className="sharp-spinner"></div>
+                <div className="round-spinner"></div>
             </div>
         );
     }
