@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/db';
-import { WordData, WordStatus } from '@/app/types';
+import { WordData } from '@/app/types';
 import { getUser } from '@/auth';
 
 export async function GET(req: NextRequest): Promise<NextResponse> {

@@ -1,7 +1,7 @@
 import { useQueryGetWordsAll } from './useQueryGetWordsAll';
 import { WordData } from '../types';
 
-export function useGetWord(textSource: string): WordData | undefined {
+export function useWord(textSource: string): WordData | undefined {
     const { data } = useQueryGetWordsAll();
     
     if (!textSource || !data) {

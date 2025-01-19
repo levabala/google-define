@@ -1,7 +1,6 @@
 import { Definition } from './Definition';
 import { DBWord } from '../types';
 import { WordData } from '../types';
-import { Spinner } from './Spinner';
 
 type DefinitionsProps = {
     results: WordData['results'];

@@ -4,7 +4,7 @@ import React, { useLayoutEffect, useState } from 'react';
 import { randomInteger } from 'remeda';
 import { WordsAll } from './components/WordsAll';
 import { Definitions } from './components/Definitions';
-import { useGetWord } from './hooks/useGetWord';
+import { useWord } from './hooks/useWord';
 import { useMutationAddWord } from './hooks/useMutationAddWord';
 import { useQueryGetWordsAll } from './hooks/useQueryGetWordsAll';
 import { useMutationTrainingGuess } from './hooks/useMutationTrainingGuess';
@@ -26,7 +26,7 @@ export default function Main() {
     const [wordToTrainNext, setWordToTrainNext] = useState<string | null>(null);
 
     const addWordMutation = useMutationAddWord();
-    const wordCurrent = useGetWord(textSourceSubmitted);
+    const wordCurrent = useWord(textSourceSubmitted);
     const isFetchingWordCurrent = !wordCurrent && !!textSourceSubmitted;
 
     const { data: stats } = useQueryGetGuessStats(textSourceSubmitted);

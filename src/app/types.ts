@@ -1,6 +1,6 @@
 export type WordData = {
     word: string;
-    results: {
+    results?: {
         definition: string;
         partOfSpeech: string | null;
         synonyms?: string[];
