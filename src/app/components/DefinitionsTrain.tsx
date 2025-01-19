@@ -32,13 +32,13 @@ export function DefinitionsTrain({
     // Calculate prevailing partOfSpeech and get the first matching definition
     const { prevailingPos, correctDefinition } = useMemo(() => {
         // Count occurrences of each partOfSpeech
-        const posCount = (results || []).reduce(
+        const posCount = (results || []).reduce<Record<string, number>>(
             (acc, result) => {
                 const pos = result.partOfSpeech || 'unknown';
                 acc[pos] = (acc[pos] || 0) + 1;
                 return acc;
             },
-            {} as Record<string, number>,
+            {}
         );
 
         // Find the most common partOfSpeech
@@ -69,13 +69,13 @@ export function DefinitionsTrain({
         const allDefinitions =
             wordsAll?.flatMap(word => {
                 // First, find the prevailing pos for this word
-                const posCount = (word.raw.results || []).reduce(
+                const posCount = (word.raw.results || []).reduce<Record<string, number>>(
                     (acc, result) => {
                         const pos = result.partOfSpeech || 'unknown';
                         acc[pos] = (acc[pos] || 0) + 1;
                         return acc;
                     },
-                    {} as Record<string, number>,
+                    {}
                 );
 
                 const wordPrevailingPos = Object.entries(posCount).reduce(
