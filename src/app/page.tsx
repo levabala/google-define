@@ -4,7 +4,8 @@ import React, { useLayoutEffect, useState } from 'react';
 import { randomInteger } from 'remeda';
 import { WordsAll } from './components/WordsAll';
 import { Definitions } from './components/Definitions';
-import { useQueryGetWord, fetchGetWord } from './hooks/useQueryGetWord';
+import { useQueryGetWord } from './hooks/useQueryGetWord';
+import { useMutationAddWord } from './hooks/useMutationAddWord';
 import { queryClient } from './providers';
 import { useQueryGetWordsAll } from './hooks/useQueryGetWordsAll';
 import { useMutationTrainingGuess } from './hooks/useMutationTrainingGuess';
@@ -24,8 +25,19 @@ export default function Main() {
     const [wordToTrain, setWordToTrain] = useState<WordData | null>(null);
     const [wordToTrainNext, setWordToTrainNext] = useState<string | null>(null);
 
+    const addWordMutation = useMutationAddWord();
     const { data: wordCurrent, isFetching: isFetchingWordCurrent } =
         useQueryGetWord(textSourceSubmitted);
+
+    // Handle adding new words
+    useLayoutEffect(() => {
+        if (textSourceSubmitted && !wordCurrent && !isFetchingWordCurrent) {
+            addWordMutation.mutate({
+                word: textSourceSubmitted,
+                initialStatus: addNextToLearn ? 'TO_LEARN' : undefined
+            });
+        }
+    }, [textSourceSubmitted, wordCurrent, isFetchingWordCurrent, addNextToLearn, addWordMutation]);
     const { data: stats } = useQueryGetGuessStats(textSourceSubmitted);
     const { data: recentGuesses } =
         useQueryGetRecentGuesses(textSourceSubmitted);
