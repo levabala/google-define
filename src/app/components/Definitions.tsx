@@ -17,12 +17,8 @@ export function Definitions({
     onWordClick,
     isLoading,
 }: DefinitionsProps) {
-    if (isLoading) {
-        return (
-            <div className="flex justify-center items-center h-32">
-                <div className="round-spinner"></div>
-            </div>
-        );
+    if (!results || isLoading) {
+        return <Spinner />;
     }
 
     return (
