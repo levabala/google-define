@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, mock, afterEach } from 'bun:test';
-import { jest } from '@jest/globals';
 import { ai, callHistory } from './ai';
 
 // Mock OpenAI
