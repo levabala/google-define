@@ -2,8 +2,8 @@ import { OpenAI } from "openai";
 import throttle from "lodash.throttle";
 
 // Rate limiting configuration
-const MINUTE_LIMIT = 30; // Max calls per minute
-const HOUR_LIMIT = 200; // Max calls per hour
+export const MINUTE_LIMIT = 30; // Max calls per minute
+export const HOUR_LIMIT = 200; // Max calls per hour
 
 // Track call history (exported for testing)
 export const callHistory: number[] = [];

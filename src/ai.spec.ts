@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, mock, afterEach, setSystemTime } from 'bun:test';
-import { ai, callHistory } from './ai';
+import { ai, callHistory, MINUTE_LIMIT, HOUR_LIMIT } from './ai';
 
 // Mock OpenAI
 mock.module('openai', () => {
