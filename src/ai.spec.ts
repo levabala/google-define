@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, mock } from 'bun:test';
+import { describe, it, expect, beforeEach, mock, afterEach } from 'bun:test';
 import { ai, callHistory } from './ai';
 
 // Mock OpenAI
@@ -23,19 +23,24 @@ describe('AI Rate Limiting', () => {
     beforeEach(() => {
         // Reset call history before each test
         callHistory.length = 0;
+        // Enable fake timers
+        Bun.useFakeTimers();
+    });
+
+    afterEach(() => {
+        // Restore real timers
+        Bun.useRealTimers();
     });
 
     it('should allow calls within rate limits', async () => {
-        // Make 29 calls (1 under the minute limit) with proper timing
-        const promises = [];
+        // Make 29 calls (1 under the minute limit)
         for (let i = 0; i < 29; i++) {
-            promises.push(ai({
+            await ai({
                 model: 'gpt-3.5-turbo',
                 messages: [],
-            }));
-            await new Promise(resolve => setTimeout(resolve, 500));
+            });
+            Bun.advanceTimersByTime(500); // Advance time by 500ms
         }
-        await Promise.all(promises);
     });
 
     it('should throw error when minute limit is exceeded', async () => {
@@ -45,6 +50,7 @@ describe('AI Rate Limiting', () => {
                 model: 'gpt-3.5-turbo',
                 messages: [],
             });
+            Bun.advanceTimersByTime(500); // Advance time by 500ms
         }
 
         // 31st call should fail
@@ -63,6 +69,7 @@ describe('AI Rate Limiting', () => {
                 model: 'gpt-3.5-turbo',
                 messages: [],
             });
+            Bun.advanceTimersByTime(500); // Advance time by 500ms
         }
 
         // 201st call should fail
@@ -82,19 +89,19 @@ describe('AI Rate Limiting', () => {
             model: 'gpt-3.5-turbo',
             messages: [],
         });
-        await new Promise(resolve => setTimeout(resolve, 500));
+        Bun.advanceTimersByTime(500);
         await ai({
             model: 'gpt-3.5-turbo',
             messages: [],
         });
-        await new Promise(resolve => setTimeout(resolve, 500));
+        Bun.advanceTimersByTime(500);
         await ai({
             model: 'gpt-3.5-turbo',
             messages: [],
         });
 
-        const duration = Date.now() - start;
-        expect(duration).toBeGreaterThanOrEqual(1000 - 1); // 2 intervals of 500ms with some tolerance
+        // Verify throttle timing
+        expect(Bun.now() - start).toBe(1000); // 2 intervals of 500ms
     });
 
     it('should allow calls after rate limit window passes', async () => {
@@ -107,18 +114,14 @@ describe('AI Rate Limiting', () => {
         }
 
         // Fast forward time by 61 seconds
-        const originalDateNow = Date.now;
-        Date.now = () => originalDateNow() + 61000;
+        Bun.advanceTimersByTime(61000);
 
         // Should allow new calls
-        expect(
+        await expect(
             ai({
                 model: 'gpt-3.5-turbo',
                 messages: [],
             })
         ).resolves.toBeDefined();
-
-        // Restore original Date.now
-        Date.now = originalDateNow;
     });
 });
