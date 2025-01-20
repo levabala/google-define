@@ -44,7 +44,7 @@ export function PronunciationButton({ word, className }: Props) {
 
                 console.log('Transcript:', transcript);
 
-                await pronunciationMutation.mutateAsync<DBPronounciationInput>({
+                await pronunciationMutation.mutateAsync({
                     word,
                     recognised_text: transcript,
                     success,
