@@ -51,6 +51,12 @@ export const DBPronounciationSchema = z.object({
     success: z.boolean(),
 });
 
+export const TrainingGuessSchema = z.object({
+    word: z.string(),
+    success: z.boolean(),
+    definition: z.string(),
+});
+
 export const TrainingGuessParamsSchema = z.object({
     word: z.string(),
     success: z.boolean(),

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { WordStats, DBPronounciation } from '../types';
+import { WordStats, TrainingGuess } from '../types';
 
 export function useMutationTrainingGuess() {
     const queryClient = useQueryClient();
@@ -9,7 +9,7 @@ export function useMutationTrainingGuess() {
             word,
             success,
             definition,
-        }: DBPronounciation) => {
+        }: TrainingGuess) => {
             const response = await fetch('/api/training/guess', {
                 method: 'POST',
                 headers: {

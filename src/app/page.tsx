@@ -149,7 +149,7 @@ export default function Main() {
                         trainingGuessMutation.mutate({
                             word: textSourceSubmitted,
                             success: true,
-                            definition,
+                            definition: definition,
                         });
                     }}
                     onFailure={definition => {
@@ -157,7 +157,7 @@ export default function Main() {
                         trainingGuessMutation.mutate({
                             word: textSourceSubmitted,
                             success: false,
-                            definition,
+                            definition: definition,
                         });
                     }}
                     onNext={() => {
