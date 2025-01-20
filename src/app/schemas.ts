@@ -48,17 +48,29 @@ export const WordResultSchema = z.object({
 export const WordDataSchema = z.object({
     word: z.string(),
     results: z.array(WordResultSchema).optional(),
-    syllables: z.object({
-        count: z.number(),
-        list: z.array(z.string()),
-    }),
-    pronunciation: z.object({
-        all: z.string(),
-    }),
-    frequency: z.number(),
+    syllables: z
+        .object({
+            count: z.number(),
+            list: z.array(z.string()),
+        })
+        .optional(),
+    pronunciation: z
+        .string()
+        .or(
+            z.object({
+                all: z.string(),
+            }),
+        )
+        .optional(),
+    frequency: z.number().optional(),
 });
 
-export const WordStatusSchema = z.enum(['NONE', 'TO_LEARN', 'LEARNED', 'HIDDEN']);
+export const WordStatusSchema = z.enum([
+    'NONE',
+    'TO_LEARN',
+    'LEARNED',
+    'HIDDEN',
+]);
 export const MarkWordStatusSchema = z.enum(['TO_LEARN', 'LEARNED', 'HIDDEN']);
 
 export const DBWordSchema = z.object({
@@ -100,20 +112,6 @@ export const WordStatsSchema = z.object({
     successful: z.number(),
     failed: z.number(),
     ratio: z.number(),
-});
-
-// Response Schemas
-export const WordOneResponseSchema = z.object({
-    word: z.string(),
-    results: z.array(WordResultSchema).optional(),
-    syllables: z.object({
-        count: z.number(),
-        list: z.array(z.string()),
-    }),
-    pronunciation: z.object({
-        all: z.string(),
-    }),
-    frequency: z.number(),
 });
 
 export const WordsAllResponseSchema = z.array(DBWordSchema);

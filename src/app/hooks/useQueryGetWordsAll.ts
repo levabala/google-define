@@ -9,9 +9,12 @@ export function useQueryGetWordsAll() {
             const res = await fetch('/api/words/all').catch(() => null);
 
             const data = await res?.json();
+            console.log(data);
             const validated = WordsAllResponseSchema.parse(data);
             return validated;
         },
+        retry: false,
+        throwOnError: true,
         staleTime: Infinity,
         refetchOnWindowFocus: false,
         refetchOnMount: false,
