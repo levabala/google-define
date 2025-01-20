@@ -95,7 +95,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             .from('word')
             .update({ 
                 raw: JSON.stringify({
-                    ...JSON.parse(wordDataCached.raw),
+                    ...JSON.parse(updatedWordData.raw),
                     ai_definition: aiDefinition
                 }) 
             })
