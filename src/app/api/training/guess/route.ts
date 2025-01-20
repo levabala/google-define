@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/db';
 import { getUser } from '@/auth';
+import { WordStats } from '@/app/types';
 
 export async function GET(req: NextRequest) {
     const word = req.nextUrl.searchParams.get('word');
