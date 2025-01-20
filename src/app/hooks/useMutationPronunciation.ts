@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '../providers';
-import { WordStats, DBPronounciation, DBPronounciationInput } from '../types';
+import { WordStats, DBPronounciationInput } from '../types';
 
 type MutationContext = {
     previousStats: WordStats | undefined;

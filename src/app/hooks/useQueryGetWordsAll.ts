@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { DBWord } from '../types';
 
 export function useQueryGetWordsAll() {
     return useQuery({
@@ -8,9 +7,8 @@ export function useQueryGetWordsAll() {
             console.log('refetch all!');
             const res = await fetch('/api/words/all').catch(() => null);
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const data = await res?.json();
-            return data.map((word: any) => {
+            return data.map((word: { raw: string }) => {
                 word.raw = JSON.parse(word.raw);
                 return word;
             });

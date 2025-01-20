@@ -21,7 +21,7 @@ export function useMutationAddWord() {
             });
             return response.json();
         },
-        onSuccess: (data, { word, initialStatus }) => {
+        onSuccess: (data, { initialStatus }) => {
             updateWordsAllCache(queryClient, words => [
                 ...words,
                 {

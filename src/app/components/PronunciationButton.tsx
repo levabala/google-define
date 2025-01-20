@@ -1,5 +1,4 @@
 import { useMutationPronunciation } from '../hooks/useMutationPronunciation';
-import type { DBPronounciationInput } from '../types';
 import { useState } from 'react';
 import { cn } from '../../utils/cn';
 import { toast } from 'react-toastify';
