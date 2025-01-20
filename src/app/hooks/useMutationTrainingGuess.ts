@@ -1,9 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { WordStats } from '../types';
-import { z } from 'zod';
-import { TrainingGuessParamsSchema } from '../schemas';
-
-type TrainingGuessParams = z.infer<typeof TrainingGuessParamsSchema>;
+import { WordStats, DBPronounciation } from '../types';
 
 export function useMutationTrainingGuess() {
     const queryClient = useQueryClient();
@@ -13,7 +9,7 @@ export function useMutationTrainingGuess() {
             word,
             success,
             definition,
-        }: TrainingGuessParams) => {
+        }: DBPronounciation) => {
             const response = await fetch('/api/training/guess', {
                 method: 'POST',
                 headers: {

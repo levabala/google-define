@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { z } from 'zod';
-import { DBWordSchema } from '../schemas';
+import { DBWord } from '../types';
 
 export function useQueryGetWordsAll() {
     return useQuery({
@@ -11,7 +10,7 @@ export function useQueryGetWordsAll() {
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const data = await res?.json();
-            return z.array(DBWordSchema).parse(data.map((word: any) => {
+            return data.map((word: any) => {
                 word.raw = JSON.parse(word.raw);
                 return word;
             }));

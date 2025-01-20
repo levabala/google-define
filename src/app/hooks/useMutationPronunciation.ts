@@ -1,10 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '../providers';
-import { WordStats } from '../types';
-import { z } from 'zod';
-import { PronunciationDataSchema } from '../schemas';
-
-type PronunciationData = z.infer<typeof PronunciationDataSchema>;
+import { WordStats, DBPronounciation } from '../types';
 
 type MutationContext = {
     previousStats: WordStats | undefined;
@@ -13,7 +9,7 @@ type MutationContext = {
 
 export function useMutationPronunciation() {
     return useMutation({
-        mutationFn: async (data: PronunciationData) => {
+        mutationFn: async (data: DBPronounciation) => {
             const response = await fetch('/api/training/pronounce', {
                 method: 'POST',
                 headers: {
@@ -24,7 +20,7 @@ export function useMutationPronunciation() {
             return response.json();
         },
         onMutate: async (
-            newData: PronunciationData,
+            newData: DBPronounciation,
         ): Promise<MutationContext> => {
             // Cancel outgoing refetches
             await queryClient.cancelQueries({
