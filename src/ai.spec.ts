@@ -1,17 +1,16 @@
 import { describe, it, expect, beforeEach, mock } from 'bun:test';
 import { ai, callHistory } from './ai';
-import OpenAI from 'openai';
 
 // Mock OpenAI
 mock.module('openai', () => {
     return {
-        default: mock.fn().mockImplementation(() => ({
+        default: {
             chat: {
                 completions: {
-                    create: mock.fn().mockResolvedValue({})
-                }
-            }
-        }))
+                    create: {},
+                },
+            },
+        },
     };
 });
 
@@ -24,10 +23,12 @@ describe('AI Rate Limiting', () => {
     it('should allow calls within rate limits', async () => {
         // Make 29 calls (1 under the minute limit)
         for (let i = 0; i < 29; i++) {
-            await expect(ai({
-                model: 'gpt-3.5-turbo',
-                messages: []
-            })).resolves.not.toThrow();
+            expect(
+                await ai({
+                    model: 'gpt-3.5-turbo',
+                    messages: [],
+                }),
+            ).resolves.not.toThrow();
         }
     });
 
@@ -36,15 +37,17 @@ describe('AI Rate Limiting', () => {
         for (let i = 0; i < 30; i++) {
             await ai({
                 model: 'gpt-3.5-turbo',
-                messages: []
+                messages: [],
             });
         }
 
         // 31st call should fail
-        await expect(ai({
-            model: 'gpt-3.5-turbo',
-            messages: []
-        })).rejects.toThrow('Rate limit exceeded');
+        expect(
+            await ai({
+                model: 'gpt-3.5-turbo',
+                messages: [],
+            }),
+        ).rejects.toThrow('Rate limit exceeded');
     });
 
     it('should throw error when hour limit is exceeded', async () => {
@@ -52,32 +55,34 @@ describe('AI Rate Limiting', () => {
         for (let i = 0; i < 200; i++) {
             await ai({
                 model: 'gpt-3.5-turbo',
-                messages: []
+                messages: [],
             });
         }
 
         // 201st call should fail
-        await expect(ai({
-            model: 'gpt-3.5-turbo',
-            messages: []
-        })).rejects.toThrow('Rate limit exceeded');
+        expect(
+            await ai({
+                model: 'gpt-3.5-turbo',
+                messages: [],
+            }),
+        ).rejects.toThrow('Rate limit exceeded');
     });
 
     it('should throttle calls to 500ms', async () => {
         const start = Date.now();
-        
+
         // Make 3 calls
         await ai({
             model: 'gpt-3.5-turbo',
-            messages: []
+            messages: [],
         });
         await ai({
             model: 'gpt-3.5-turbo',
-            messages: []
+            messages: [],
         });
         await ai({
             model: 'gpt-3.5-turbo',
-            messages: []
+            messages: [],
         });
 
         const duration = Date.now() - start;
@@ -89,7 +94,7 @@ describe('AI Rate Limiting', () => {
         for (let i = 0; i < 30; i++) {
             await ai({
                 model: 'gpt-3.5-turbo',
-                messages: []
+                messages: [],
             });
         }
 
@@ -98,11 +103,13 @@ describe('AI Rate Limiting', () => {
         Date.now = () => originalDateNow() + 61000;
 
         // Should allow new calls
-        await expect(ai({
-            model: 'gpt-3.5-turbo',
-            messages: []
-        })).resolves.not.toThrow();
-        
+        expect(
+            await ai({
+                model: 'gpt-3.5-turbo',
+                messages: [],
+            }),
+        ).resolves.not.toThrow();
+
         // Restore original Date.now
         Date.now = originalDateNow;
     });
