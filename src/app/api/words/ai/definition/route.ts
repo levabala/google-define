@@ -15,7 +15,28 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     try {
-        // Query AI for definition
+        // Check if we already have the AI definition
+        const supabase = await createClient();
+        const user = await getUser(req);
+
+        const { data: wordDataDB } = await supabase
+            .from('word')
+            .select()
+            .eq('word', word)
+            .eq('user', user);
+
+        const wordDataCached = wordDataDB?.[0];
+        
+        if (!wordDataCached) {
+            throw new Error('Word not found in database');
+        }
+
+        const existingData = JSON.parse(wordDataCached.raw);
+        if (existingData.ai_definition) {
+            return NextResponse.json(existingData.ai_definition, { status: 200 });
+        }
+
+        // Query AI for definition if we don't have it
         const aiResponse = await ai({
             messages: [
                 { 
