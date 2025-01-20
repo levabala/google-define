@@ -45,7 +45,7 @@ export default function Main() {
     useLayoutEffect(() => {
         if (isTraining && wordCurrent && !isFetchingWordCurrent && wordsAll) {
             const wordsToLearn = wordsAll.filter(
-                (word: z.infer<typeof DBWordSchema>) =>
+                (word: DBWord) =>
                     word.word !== textSourceCurrent &&
                     word.status === 'TO_LEARN',
             );
@@ -114,7 +114,7 @@ export default function Main() {
                 textSourceSubmitted={textSourceSubmitted}
                 setTextSourceSubmitted={async (text) => {
                     setTextSourceSubmitted(text);
-                    if (text && !wordsAll?.some((w: { word: string }) => w.word === text)) {
+                    if (text && !wordsAll?.some((w: DBWord) => w.word === text)) {
                         await addWordMutation.mutateAsync({
                             word: text,
                             initialStatus: addNextToLearn ? 'TO_LEARN' : undefined
