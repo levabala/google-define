@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/db';
 import { getUser } from '@/auth';
 import { WordData } from '@/app/types';
-// import { ai } from '@/ai';
+import { ai } from '@/ai';
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
     const { word } = await req.json();
@@ -15,12 +15,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     try {
-        // ai.call({
-        //     messages: [
-        //         { role: 'system', content: 'You are a helpful assistant.' },
-        //     ],
-        //     model: 'deepseek-chat',
-        // });
+        const res = await ai({
+            messages: [
+                { role: 'system', content: 'You are a helpful assistant.' },
+            ],
+            model: 'deepseek-chat',
+        });
+        console.log({ res });
 
         console.warn('------------- wordsapi is hit');
         const response = await fetch(
