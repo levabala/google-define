@@ -53,7 +53,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         const dbrecord = await supabase.from('word').insert({
             word: data.word,
             raw: JSON.stringify(data),
-            status: initialStatus || 'NONE',
+            status: 'NONE',
             user,
         });
 

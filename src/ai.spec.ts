@@ -4,13 +4,13 @@ import { ai, callHistory } from './ai';
 // Mock OpenAI
 mock.module('openai', () => {
     return {
-        default: {
-            chat: {
+        default: class {
+            chat = {
                 completions: {
-                    create: {},
-                },
-            },
-        },
+                    create: () => Promise.resolve({})
+                }
+            }
+        }
     };
 });
 
