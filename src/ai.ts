@@ -9,11 +9,11 @@ const openai = new OpenAI({
 // In-memory rate limiting
 const callHistory: number[] = [];
 const MINUTE_LIMIT = 30; // Max calls per minute
-const HOUR_LIMIT = 1000; // Max calls per hour
+const HOUR_LIMIT = 200; // Max calls per hour
 
-function checkRateLimit(): { allowed: boolean, retryAfter?: number } {
+function checkRateLimit(): { allowed: boolean; retryAfter?: number } {
     const now = Date.now();
-    
+
     // Remove old entries
     while (callHistory.length > 0 && callHistory[0] < now - 3600000) {
         callHistory.shift();
@@ -25,7 +25,8 @@ function checkRateLimit(): { allowed: boolean, retryAfter?: number } {
 
     // Check limits
     if (minuteCount >= MINUTE_LIMIT) {
-        const retryAfter = 60000 - (now - callHistory[callHistory.length - MINUTE_LIMIT]);
+        const retryAfter =
+            60000 - (now - callHistory[callHistory.length - MINUTE_LIMIT]);
         return { allowed: false, retryAfter };
     }
     if (hourCount >= HOUR_LIMIT) {
@@ -38,15 +39,23 @@ function checkRateLimit(): { allowed: boolean, retryAfter?: number } {
     return { allowed: true };
 }
 
+type CreateParams = Parameters<typeof openai.chat.completions.create>;
+
 function callAIInternal(
-    ...args: Parameters<typeof openai.chat.completions.create>
+    ...args: CreateParams
 ) {
     const { allowed, retryAfter } = checkRateLimit();
     if (!allowed) {
-        throw new Error(`Rate limit exceeded. Try again in ${Math.ceil((retryAfter || 0)/1000)} seconds`);
+        throw new Error(
+            `Rate limit exceeded. Try again in ${Math.ceil((retryAfter || 0) / 1000)} seconds`,
+        );
     }
 
     return openai.chat.completions.create(...args);
 }
 
-export const ai = funnel(callAIInternal, { minGapMs: 500, triggerAt: 'start' });
+export const ai = funnel(callAIInternal, {
+    minGapMs: 500,
+    triggerAt: 'start',
+    reducer: (_, args: CreateParams) => args,
+});
