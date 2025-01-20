@@ -6,6 +6,7 @@ import {
     WordStatsSchema,
     DBPronounciationSchema,
     TrainingGuessSchema,
+    AIDefinitionSchema,
 } from './schemas';
 
 export type WordData = z.infer<typeof WordDataSchema>;

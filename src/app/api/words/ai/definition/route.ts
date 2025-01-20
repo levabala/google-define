@@ -32,7 +32,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         });
 
         // Parse and validate AI response
-        const aiDefinition: AIDefinition = JSON.parse(aiResponse.choices[0].message.content);
+        // Handle both streaming and non-streaming responses
+        const content = 'choices' in aiResponse 
+            ? aiResponse.choices[0].message.content
+            : await (async () => {
+                let result = '';
+                for await (const chunk of aiResponse) {
+                    result += chunk.choices[0]?.delta?.content || '';
+                }
+                return result;
+            })();
+            
+        const aiDefinition: AIDefinition = JSON.parse(content);
 
         // Save to Supabase
         const supabase = await createClient();
@@ -42,7 +53,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         const { error } = await supabase
             .from('word')
             .update({ 
-                ai_definition: aiDefinition 
+                raw: JSON.stringify({
+                    ...JSON.parse(wordDataCached.raw),
+                    ai_definition: aiDefinition
+                }) 
             })
             .eq('word', word)
             .eq('user', user);
