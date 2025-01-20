@@ -10,8 +10,8 @@ const openai = new OpenAI({
 const MINUTE_LIMIT = 30; // Max calls per minute
 const HOUR_LIMIT = 200; // Max calls per hour
 
-// Track call history
-const callHistory: number[] = [];
+// Track call history (exported for testing)
+export const callHistory: number[] = [];
 
 function checkRateLimit(): { allowed: boolean; retryAfter?: number } {
     const now = Date.now();
