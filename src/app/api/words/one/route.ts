@@ -33,7 +33,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             );
         }
 
-        return NextResponse.json(JSON.parse(wordDataCached.raw), {
+        const wordData = JSON.parse(wordDataCached.raw);
+        const validated = WordOneResponseSchema.parse(wordData);
+        return NextResponse.json(validated, {
             status: 200,
         });
     } catch (error) {
@@ -67,7 +69,8 @@ export async function PUT(req: NextRequest): Promise<NextResponse> {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true }, { status: 200 });
+    const validated = SuccessResponseSchema.parse({ success: true });
+    return NextResponse.json(validated, { status: 200 });
 }
 
 export async function DELETE(req: NextRequest): Promise<NextResponse> {

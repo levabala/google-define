@@ -8,7 +8,8 @@ export function useMutationDeleteWord() {
             const response = await fetch(`/api/words/one?word=${word}`, {
                 method: 'DELETE',
             });
-            return response.json();
+            const data = await response.json();
+            return SuccessResponseSchema.parse(data);
         },
         onSuccess: (data, word) => {
             updateWordsAllCache(queryClient, words =>

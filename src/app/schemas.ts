@@ -70,3 +70,27 @@ export const PronunciationDataSchema = z.object({
 });
 
 export const MarkWordStatusSchema = z.enum(['TO_LEARN', 'LEARNED', 'HIDDEN']);
+
+// API Response Schemas
+export const WordOneResponseSchema = z.object({
+    word: z.string(),
+    results: z.array(WordResultSchema).optional(),
+    syllables: z.object({
+        count: z.number(),
+        list: z.array(z.string()),
+    }),
+    pronunciation: z.object({
+        all: z.string(),
+    }),
+    frequency: z.number(),
+});
+
+export const WordsAllResponseSchema = z.array(DBWordSchema);
+
+export const SuccessResponseSchema = z.object({
+    success: z.boolean(),
+});
+
+export const ErrorResponseSchema = z.object({
+    error: z.string(),
+});
