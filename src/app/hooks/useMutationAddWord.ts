@@ -21,13 +21,10 @@ export function useMutationAddWord() {
             });
             return response.json();
         },
-        onSuccess: (data, { initialStatus }) => {
+        onSuccess: (data) => {
             updateWordsAllCache(queryClient, words => [
                 ...words,
-                {
-                    ...data,
-                    status: initialStatus || 'NONE',
-                },
+                data,
             ]);
         },
     });
