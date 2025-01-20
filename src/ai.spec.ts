@@ -67,8 +67,8 @@ describe('AI Rate Limiting', () => {
                 model: 'gpt-3.5-turbo',
                 messages: [],
             });
-            // Advance time by 1 second between calls
-            setSystemTime(Date.now() + 1000);
+            // Advance time by 10 seconds between calls to spread them over the hour
+            setSystemTime(Date.now() + 10000);
         }
 
         // 201st call should fail
