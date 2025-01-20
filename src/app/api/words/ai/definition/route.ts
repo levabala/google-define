@@ -43,11 +43,28 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
                 return result;
             })();
             
+        if (!content) {
+            throw new Error('No content received from AI');
+        }
+
         const aiDefinition: AIDefinition = JSON.parse(content);
 
         // Save to Supabase
         const supabase = await createClient();
         const user = await getUser(req);
+
+        // Get existing word data
+        const { data: wordDataDB } = await supabase
+            .from('word')
+            .select()
+            .eq('word', word)
+            .eq('user', user);
+
+        const wordDataCached = wordDataDB?.[0];
+        
+        if (!wordDataCached) {
+            throw new Error('Word not found in database');
+        }
 
         // Update existing word record with AI definition
         const { error } = await supabase
