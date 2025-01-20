@@ -42,12 +42,12 @@ describe('AI Rate Limiting', () => {
         }
 
         // 31st call should fail
-        expect(
+        await expect(
             ai({
                 model: 'gpt-3.5-turbo',
                 messages: [],
             })
-        ).rejects.toThrow('Rate limit exceeded');
+        ).rejects.toMatch(/Rate limit exceeded/i);
     });
 
     it('should throw error when hour limit is exceeded', async () => {
@@ -60,12 +60,12 @@ describe('AI Rate Limiting', () => {
         }
 
         // 201st call should fail
-        expect(
+        await expect(
             ai({
                 model: 'gpt-3.5-turbo',
                 messages: [],
             })
-        ).rejects.toThrow('Rate limit exceeded');
+        ).rejects.toMatch(/Rate limit exceeded/i);
     });
 
     it('should throttle calls to 500ms', async () => {
