@@ -13,7 +13,7 @@ import { useQueryGetGuessStats } from './hooks/useQueryGetGuessStats';
 import { useQueryGetRecentGuesses } from './hooks/useQueryGetRecentGuesses';
 import { StatsDisplay } from './components/StatsDisplay';
 import { WordControls } from './components/WordControls';
-import { WordData, DBWord } from './types';
+import { WordData, DBWord, WordStats } from './types';
 import { Spinner } from './components/Spinner';
 
 export default function Main() {
