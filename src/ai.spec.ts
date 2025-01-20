@@ -42,7 +42,7 @@ describe('AI Rate Limiting', () => {
         }
 
         // 31st call should fail
-        await expect(
+        expect(
             ai({
                 model: 'gpt-3.5-turbo',
                 messages: [],
@@ -60,7 +60,7 @@ describe('AI Rate Limiting', () => {
         }
 
         // 201st call should fail
-        await expect(
+        expect(
             ai({
                 model: 'gpt-3.5-turbo',
                 messages: [],
