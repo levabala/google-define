@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, mock, afterEach } from 'bun:test';
+import { describe, it, expect, beforeEach, mock, afterEach, setSystemTime } from 'bun:test';
 import { ai, callHistory } from './ai';
 
 // Mock OpenAI
@@ -23,13 +23,13 @@ describe('AI Rate Limiting', () => {
     beforeEach(() => {
         // Reset call history before each test
         callHistory.length = 0;
-        // Enable fake timers
-        jest.useFakeTimers();
+        // Start with current time
+        setSystemTime(Date.now());
     });
 
     afterEach(() => {
-        // Restore real timers
-        jest.useRealTimers();
+        // Restore real time
+        setSystemTime();
     });
 
     it('should allow calls within rate limits', async () => {
@@ -39,7 +39,7 @@ describe('AI Rate Limiting', () => {
                 model: 'gpt-3.5-turbo',
                 messages: [],
             });
-            jest.advanceTimersByTime(500); // Advance time by 500ms
+            setSystemTime(Date.now() + 500); // Advance time by 500ms
         }
     });
 
@@ -50,7 +50,7 @@ describe('AI Rate Limiting', () => {
                 model: 'gpt-3.5-turbo',
                 messages: [],
             });
-            jest.advanceTimersByTime(500); // Advance time by 500ms
+            setSystemTime(Date.now() + 500); // Advance time by 500ms
         }
 
         // 31st call should fail
@@ -69,7 +69,7 @@ describe('AI Rate Limiting', () => {
                 model: 'gpt-3.5-turbo',
                 messages: [],
             });
-            jest.advanceTimersByTime(500); // Advance time by 500ms
+            setSystemTime(Date.now() + 500); // Advance time by 500ms
         }
 
         // 201st call should fail
@@ -89,12 +89,12 @@ describe('AI Rate Limiting', () => {
             model: 'gpt-3.5-turbo',
             messages: [],
         });
-        jest.advanceTimersByTime(500);
+        setSystemTime(Date.now() + 500);
         await ai({
             model: 'gpt-3.5-turbo',
             messages: [],
         });
-        jest.advanceTimersByTime(500);
+        setSystemTime(Date.now() + 500);
         await ai({
             model: 'gpt-3.5-turbo',
             messages: [],
@@ -114,7 +114,7 @@ describe('AI Rate Limiting', () => {
         }
 
         // Fast forward time by 61 seconds
-        jest.advanceTimersByTime(61000);
+        setSystemTime(Date.now() + 61000);
 
         // Should allow new calls
         await expect(
