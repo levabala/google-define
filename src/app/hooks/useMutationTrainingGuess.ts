@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { WordStats, TrainingGuess } from '../types';
+import { SuccessResponseSchema } from '../schemas';
 
 export function useMutationTrainingGuess() {
     const queryClient = useQueryClient();
@@ -17,7 +18,8 @@ export function useMutationTrainingGuess() {
                 },
                 body: JSON.stringify({ word, success, definition }),
             });
-            return response.json();
+            const result = await response.json();
+            return SuccessResponseSchema.parse(result);
         },
         onMutate: async ({ word, success }) => {
             // Cancel any outgoing refetches

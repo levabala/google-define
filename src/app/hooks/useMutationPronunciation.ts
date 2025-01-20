@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '../providers';
 import { WordStats, DBPronounciationInput } from '../types';
+import { SuccessResponseSchema } from '../schemas';
 
 type MutationContext = {
     previousStats: WordStats | undefined;
@@ -17,7 +18,8 @@ export function useMutationPronunciation() {
                 },
                 body: JSON.stringify(data),
             });
-            return response.json();
+            const result = await response.json();
+            return SuccessResponseSchema.parse(result);
         },
         onMutate: async (
             newData: DBPronounciationInput,
