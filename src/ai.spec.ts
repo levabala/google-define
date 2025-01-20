@@ -1,14 +1,14 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, mock } from 'bun:test';
 import { ai, callHistory } from './ai';
 import OpenAI from 'openai';
 
 // Mock OpenAI
-vi.mock('openai', () => {
+mock.module('openai', () => {
     return {
-        default: vi.fn().mockImplementation(() => ({
+        default: mock.fn().mockImplementation(() => ({
             chat: {
                 completions: {
-                    create: vi.fn().mockResolvedValue({})
+                    create: mock.fn().mockResolvedValue({})
                 }
             }
         }))
@@ -94,14 +94,16 @@ describe('AI Rate Limiting', () => {
         }
 
         // Fast forward time by 61 seconds
-        vi.useFakeTimers();
-        vi.advanceTimersByTime(61000);
+        const originalDateNow = Date.now;
+        Date.now = () => originalDateNow() + 61000;
 
         // Should allow new calls
         await expect(ai({
             model: 'gpt-3.5-turbo',
             messages: []
         })).resolves.not.toThrow();
-        vi.useRealTimers();
+        
+        // Restore original Date.now
+        Date.now = originalDateNow;
     });
 });
