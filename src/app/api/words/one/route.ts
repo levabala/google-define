@@ -17,7 +17,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     try {
         const supabase = await createClient();
         const user = await getUser(req);
-        
+
         const { data: wordDataDB } = await supabase
             .from('word')
             .select()
@@ -126,19 +126,21 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
         const data = (await response.json()) as WordData;
 
-        if (data) {
-            const supabase = await createClient();
-            const user = await getUser(req);
-            
-            await supabase.from('word').insert({
-                word: data.word,
-                raw: JSON.stringify(data),
-                status: initialStatus || 'NONE',
-                user,
-            });
+        if (!data) {
+            throw new Error('no such word in the dictionary');
         }
 
-        return NextResponse.json(data, { status: 200 });
+        const supabase = await createClient();
+        const user = await getUser(req);
+
+        const dbrecord = await supabase.from('word').insert({
+            word: data.word,
+            raw: JSON.stringify(data),
+            status: initialStatus || 'NONE',
+            user,
+        });
+
+        return NextResponse.json(dbrecord, { status: 200 });
     } catch (error) {
         return NextResponse.json(
             { error: (error as Error).message || 'Unknown error occurred' },
