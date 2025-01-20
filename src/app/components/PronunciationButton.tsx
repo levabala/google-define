@@ -1,4 +1,5 @@
 import { useMutationPronunciation } from '../hooks/useMutationPronunciation';
+import type { DBPronounciationInput } from '../types';
 import { useState } from 'react';
 import { cn } from '../../utils/cn';
 import { toast } from 'react-toastify';
@@ -43,7 +44,7 @@ export function PronunciationButton({ word, className }: Props) {
 
                 console.log('Transcript:', transcript);
 
-                await pronunciationMutation.mutateAsync({
+                await pronunciationMutation.mutateAsync<DBPronounciationInput>({
                     word,
                     recognised_text: transcript,
                     success,
