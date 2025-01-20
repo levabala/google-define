@@ -1,8 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '../providers';
 import { WordStats } from '../types';
-
+import { z } from 'zod';
 import { PronunciationDataSchema } from '../schemas';
+
+type PronunciationData = z.infer<typeof PronunciationDataSchema>;
 
 type MutationContext = {
     previousStats: WordStats | undefined;

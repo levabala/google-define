@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { WordStats } from '../types';
-
+import { z } from 'zod';
 import { TrainingGuessParamsSchema } from '../schemas';
+
+type TrainingGuessParams = z.infer<typeof TrainingGuessParamsSchema>;
 
 export function useMutationTrainingGuess() {
     const queryClient = useQueryClient();

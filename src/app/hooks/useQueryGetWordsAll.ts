@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { z } from 'zod';
 import { DBWordSchema } from '../schemas';
 
 export function useQueryGetWordsAll() {

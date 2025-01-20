@@ -1,7 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '../providers';
 import { updateWordsAllCache } from '../helpers/updateWordsAllCache';
+import { z } from 'zod';
 import { MarkWordStatusSchema } from '../schemas';
+
+type MarkWordStatus = z.infer<typeof MarkWordStatusSchema>;
 
 export function useMutationMarkWord() {
     return useMutation({
