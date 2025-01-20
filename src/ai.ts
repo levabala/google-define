@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { funnel } from 'remeda';
+import throttle from 'lodash.throttle';
 
 const openai = new OpenAI({
     baseURL: 'https://api.deepseek.com',
@@ -41,7 +41,7 @@ function checkRateLimit(): { allowed: boolean; retryAfter?: number } {
 
 type CreateParams = Parameters<typeof openai.chat.completions.create>;
 
-function callAIInternal(
+async function callAIInternal(
     ...args: CreateParams
 ) {
     const { allowed, retryAfter } = checkRateLimit();
@@ -54,8 +54,5 @@ function callAIInternal(
     return openai.chat.completions.create(...args);
 }
 
-export const ai = funnel(callAIInternal, {
-    minGapMs: 500,
-    triggerAt: 'start',
-    reducer: (_, args: CreateParams) => args,
-});
+// Throttle to 1 call every 500ms
+export const ai = throttle(callAIInternal, 500, { leading: true, trailing: false });
