@@ -48,9 +48,11 @@ async function callAIInternal(...args: CreateParams) {
 
     const { allowed, retryAfter } = checkRateLimit();
     if (!allowed) {
-        throw new Error(
+        const error = new Error(
             `Rate limit exceeded. Try again in ${Math.ceil((retryAfter || 0) / 1000)} seconds`,
         );
+        error.name = 'RateLimitError';
+        throw error;
     }
 
     return await openai.chat.completions.create(...args);
