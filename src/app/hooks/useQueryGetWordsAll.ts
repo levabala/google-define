@@ -1,4 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
+import { WordsAllResponseSchema } from '@/app/schemas';
+import type { DBWord } from '@/app/types';
 
 export function useQueryGetWordsAll() {
     return useQuery({
@@ -9,7 +11,7 @@ export function useQueryGetWordsAll() {
 
             const data = await res?.json();
             const validated = WordsAllResponseSchema.parse(data);
-            return validated.map((word) => {
+            return validated.map((word: DBWord) => {
                 word.raw = JSON.parse(word.raw);
                 return word;
             });

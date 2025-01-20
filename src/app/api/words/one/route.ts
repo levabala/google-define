@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/db';
 import { WordData } from '@/app/types';
 import { getUser } from '@/auth';
+import { WordOneResponseSchema, SuccessResponseSchema } from '@/app/schemas';
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
     const { searchParams } = new URL(req.url);

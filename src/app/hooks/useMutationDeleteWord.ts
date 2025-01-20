@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '../providers';
 import { updateWordsAllCache } from '../helpers/updateWordsAllCache';
+import { SuccessResponseSchema } from '@/app/schemas';
 
 export function useMutationDeleteWord() {
     return useMutation({

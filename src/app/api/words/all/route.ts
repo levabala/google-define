@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/db';
 import { getUser } from '@/auth';
+import { WordsAllResponseSchema } from '@/app/schemas';
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
     try {
