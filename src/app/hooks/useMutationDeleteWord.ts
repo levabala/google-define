@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '../providers';
+import { updateWordsAllCache } from '../helpers/updateWordsAllCache';
 
 export function useMutationDeleteWord() {
     return useMutation({

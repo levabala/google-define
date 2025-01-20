@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '../providers';
 import { WordStatus } from '../types';
+import { updateWordsAllCache } from '../helpers/updateWordsAllCache';
 
 export function useMutationAddWord() {
     return useMutation({
