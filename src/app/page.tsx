@@ -14,7 +14,7 @@ import { useQueryGetRecentGuesses } from './hooks/useQueryGetRecentGuesses';
 import { StatsDisplay } from './components/StatsDisplay';
 import { WordControls } from './components/WordControls';
 import { z } from 'zod';
-import { WordData } from './types';
+import { WordData, DBWord } from './types';
 import { DBWordSchema } from './schemas';
 import { Spinner } from './components/Spinner';
 
