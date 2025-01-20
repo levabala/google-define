@@ -26,7 +26,13 @@ export function useMutationAddWord() {
                 ...words,
                 {
                     word,
-                    raw: { word },
+                    raw: {
+                        word,
+                        syllables: { count: 0, list: [] },
+                        pronunciation: { all: '' },
+                        frequency: 0,
+                        results: []
+                    },
                     status: initialStatus || 'NONE',
                     created_at: new Date().toISOString(),
                 },
