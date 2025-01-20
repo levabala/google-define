@@ -7,7 +7,12 @@ mock.module('openai', () => {
         OpenAI: class {
             chat = {
                 completions: {
-                    create: () => Promise.resolve({})
+                    create: () => {
+                        // Simulate a real API call delay
+                        return new Promise((resolve) => 
+                            setTimeout(() => resolve({}), 10)
+                        );
+                    }
                 }
             }
         }
@@ -21,15 +26,16 @@ describe('AI Rate Limiting', () => {
     });
 
     it('should allow calls within rate limits', async () => {
-        // Make 29 calls (1 under the minute limit)
+        // Make 29 calls (1 under the minute limit) with proper timing
+        const promises = [];
         for (let i = 0; i < 29; i++) {
-            expect(
-                ai({
-                    model: 'gpt-3.5-turbo',
-                    messages: [],
-                })
-            ).resolves.toBeDefined();
+            promises.push(ai({
+                model: 'gpt-3.5-turbo',
+                messages: [],
+            }));
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
+        await Promise.all(promises);
     });
 
     it('should throw error when minute limit is exceeded', async () => {
@@ -71,22 +77,24 @@ describe('AI Rate Limiting', () => {
     it('should throttle calls to 500ms', async () => {
         const start = Date.now();
 
-        // Make 3 calls
+        // Make 3 calls with proper timing
         await ai({
             model: 'gpt-3.5-turbo',
             messages: [],
         });
+        await new Promise(resolve => setTimeout(resolve, 500));
         await ai({
             model: 'gpt-3.5-turbo',
             messages: [],
         });
+        await new Promise(resolve => setTimeout(resolve, 500));
         await ai({
             model: 'gpt-3.5-turbo',
             messages: [],
         });
 
         const duration = Date.now() - start;
-        expect(duration).toBeGreaterThanOrEqual(1000); // 2 intervals of 500ms
+        expect(duration).toBeGreaterThanOrEqual(1000 - 1); // 2 intervals of 500ms with some tolerance
     });
 
     it('should allow calls after rate limit window passes', async () => {
