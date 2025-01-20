@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { WordsAllResponseSchema } from '@/app/schemas';
-import type { DBWord } from '@/app/types';
 
 export function useQueryGetWordsAll() {
     return useQuery({
