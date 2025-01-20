@@ -23,7 +23,7 @@ describe('AI Rate Limiting', () => {
     it('should allow calls within rate limits', async () => {
         // Make 29 calls (1 under the minute limit)
         for (let i = 0; i < 29; i++) {
-            await expect(
+            expect(
                 ai({
                     model: 'gpt-3.5-turbo',
                     messages: [],
@@ -42,7 +42,7 @@ describe('AI Rate Limiting', () => {
         }
 
         // 31st call should fail
-        await expect(
+        expect(
             ai({
                 model: 'gpt-3.5-turbo',
                 messages: [],
@@ -60,7 +60,7 @@ describe('AI Rate Limiting', () => {
         }
 
         // 201st call should fail
-        await expect(
+        expect(
             ai({
                 model: 'gpt-3.5-turbo',
                 messages: [],
@@ -103,7 +103,7 @@ describe('AI Rate Limiting', () => {
         Date.now = () => originalDateNow() + 61000;
 
         // Should allow new calls
-        await expect(
+        expect(
             ai({
                 model: 'gpt-3.5-turbo',
                 messages: [],
