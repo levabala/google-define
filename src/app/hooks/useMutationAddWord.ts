@@ -25,16 +25,8 @@ export function useMutationAddWord() {
             updateWordsAllCache(queryClient, words => [
                 ...words,
                 {
-                    word,
-                    raw: {
-                        word,
-                        syllables: { count: 0, list: [] },
-                        pronunciation: { all: '' },
-                        frequency: 0,
-                        results: []
-                    },
+                    ...data,
                     status: initialStatus || 'NONE',
-                    created_at: new Date().toISOString(),
                 },
             ]);
         },
