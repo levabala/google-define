@@ -13,7 +13,9 @@ import { useQueryGetGuessStats } from './hooks/useQueryGetGuessStats';
 import { useQueryGetRecentGuesses } from './hooks/useQueryGetRecentGuesses';
 import { StatsDisplay } from './components/StatsDisplay';
 import { WordControls } from './components/WordControls';
+import { z } from 'zod';
 import { WordData } from './types';
+import { DBWordSchema } from './schemas';
 import { Spinner } from './components/Spinner';
 
 export default function Main() {
@@ -43,7 +45,7 @@ export default function Main() {
     useLayoutEffect(() => {
         if (isTraining && wordCurrent && !isFetchingWordCurrent && wordsAll) {
             const wordsToLearn = wordsAll.filter(
-                (word: { word: string }) =>
+                (word: z.infer<typeof DBWordSchema>) =>
                     word.word !== textSourceCurrent &&
                     word.status === 'TO_LEARN',
             );
