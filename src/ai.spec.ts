@@ -63,13 +63,14 @@ describe('AI Rate Limiting', () => {
     });
 
     it('should throw error when hour limit is exceeded', async () => {
-        // Make 200 calls to hit the hour limit
+        // Make 200 calls spread over 59 minutes
         for (let i = 0; i < 200; i++) {
             await ai({
                 model: 'gpt-3.5-turbo',
                 messages: [],
             });
-            setSystemTime(Date.now() + 500); // Advance time by 500ms
+            // Advance time by 17.7 seconds between calls (200 calls * 17.7s = ~59 minutes)
+            setSystemTime(Date.now() + 17700);
         }
 
         // 201st call should fail

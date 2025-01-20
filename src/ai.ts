@@ -20,13 +20,13 @@ function checkRateLimit(): { allowed: boolean; retryAfter?: number } {
     const minuteCount = callHistory.filter((t) => t > now - 60000).length;
 
     // Check limits
+    if (callHistory.length >= HOUR_LIMIT) {
+        const retryAfter = 3600000 - (now - callHistory[0]);
+        return { allowed: false, retryAfter };
+    }
     if (minuteCount >= MINUTE_LIMIT) {
         const retryAfter =
             60000 - (now - callHistory[callHistory.length - MINUTE_LIMIT]);
-        return { allowed: false, retryAfter };
-    }
-    if (callHistory.length >= HOUR_LIMIT) {
-        const retryAfter = 3600000 - (now - callHistory[0]);
         return { allowed: false, retryAfter };
     }
 
