@@ -114,6 +114,12 @@ export const WordStatsSchema = z.object({
     ratio: z.number(),
 });
 
+export const AIDefinitionSchema = z.object({
+    definition: z.string(),
+    partOfSpeech: z.string().optional(),
+    examples: z.array(z.string()).optional(),
+});
+
 export const WordsAllResponseSchema = z.array(DBWordSchema);
 export const SuccessResponseSchema = z.object({ success: z.boolean() });
 export const ErrorResponseSchema = z.object({ error: z.string() });

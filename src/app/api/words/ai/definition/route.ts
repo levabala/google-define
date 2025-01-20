@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/db';
 import { getUser } from '@/auth';
-import { WordData } from '@/app/types';
+import { AIDefinition } from '@/app/types';
 import { ai } from '@/ai';
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
@@ -9,56 +9,49 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     if (!word) {
         return NextResponse.json(
-            { error: `Error: the word is invalid` },
+            { error: 'Error: the word is invalid' },
             { status: 400 },
         );
     }
 
     try {
-        const res = await ai({
+        // Query AI for definition
+        const aiResponse = await ai({
             messages: [
-                { role: 'system', content: 'You are a helpful assistant.' },
+                { 
+                    role: 'system', 
+                    content: 'You are an English dictionary assistant. Provide a clear definition, part of speech, and 2 example sentences in JSON format.'
+                },
+                {
+                    role: 'user',
+                    content: `Define the word "${word}" in JSON format with these fields: definition (string), partOfSpeech (string), examples (array of 2 strings)`
+                }
             ],
             model: 'deepseek-chat',
+            response_format: { type: 'json_object' }
         });
-        console.log({ res });
 
-        console.warn('------------- wordsapi is hit');
-        const response = await fetch(
-            `https://wordsapiv1.p.rapidapi.com/words/${word}`,
-            {
-                method: 'GET',
-                headers: {
-                    'x-rapidapi-host': 'wordsapiv1.p.rapidapi.com',
-                    'x-rapidapi-key': process.env.RAPID_WORDSAPI_KEY as string,
-                },
-            },
-        );
+        // Parse and validate AI response
+        const aiDefinition: AIDefinition = JSON.parse(aiResponse.choices[0].message.content);
 
-        if (!response.ok) {
-            return NextResponse.json(
-                { error: `Error fetching word data: ${response.statusText}` },
-                { status: response.status },
-            );
-        }
-
-        const data = (await response.json()) as WordData;
-
-        if (!data) {
-            throw new Error('no such word in the dictionary');
-        }
-
+        // Save to Supabase
         const supabase = await createClient();
         const user = await getUser(req);
 
-        const dbrecord = await supabase.from('word').insert({
-            word: data.word,
-            raw: JSON.stringify(data),
-            status: 'NONE',
-            user,
-        });
+        // Update existing word record with AI definition
+        const { error } = await supabase
+            .from('word')
+            .update({ 
+                ai_definition: aiDefinition 
+            })
+            .eq('word', word)
+            .eq('user', user);
 
-        return NextResponse.json(dbrecord, { status: 200 });
+        if (error) {
+            throw new Error(`Database error: ${error.message}`);
+        }
+
+        return NextResponse.json(aiDefinition, { status: 200 });
     } catch (error) {
         return NextResponse.json(
             { error: (error as Error).message || 'Unknown error occurred' },

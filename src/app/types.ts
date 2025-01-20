@@ -14,4 +14,5 @@ export type DBWord = z.infer<typeof DBWordSchema>;
 export type WordStats = z.infer<typeof WordStatsSchema>;
 export type DBPronounciation = z.infer<typeof DBPronounciationSchema>;
 export type DBPronounciationInput = Omit<DBPronounciation, 'created_at'>;
+export type AIDefinition = z.infer<typeof AIDefinitionSchema>;
 export type TrainingGuess = z.infer<typeof TrainingGuessSchema>;
