@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, mock, afterEach, setSystemTime } from 'bun:test';
-import { ai, callHistory, MINUTE_LIMIT, HOUR_LIMIT } from './ai';
+import { ai, callHistory, MINUTE_LIMIT, HOUR_LIMIT, THROTTLE_MS } from './ai';
 
 // Mock OpenAI
 mock.module('openai', () => {
@@ -37,7 +37,7 @@ describe('AI Rate Limiting', () => {
                 model: 'gpt-3.5-turbo',
                 messages: [],
             });
-            setSystemTime(Date.now() + 500); // Advance time by 500ms
+            setSystemTime(Date.now() + THROTTLE_MS);
         }
     });
 
@@ -52,7 +52,7 @@ describe('AI Rate Limiting', () => {
         }
 
         // 31st call should fail
-        await expect(
+        expect(
             ai({
                 model: 'gpt-3.5-turbo',
                 messages: [],
@@ -72,7 +72,7 @@ describe('AI Rate Limiting', () => {
         }
 
         // 201st call should fail
-        await expect(
+        expect(
             ai({
                 model: 'gpt-3.5-turbo',
                 messages: [],
@@ -116,7 +116,7 @@ describe('AI Rate Limiting', () => {
         setSystemTime(Date.now() + 61000);
 
         // Should allow new calls
-        await expect(
+        expect(
             ai({
                 model: 'gpt-3.5-turbo',
                 messages: [],
