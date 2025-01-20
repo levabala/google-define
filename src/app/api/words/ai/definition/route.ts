@@ -15,7 +15,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     try {
-        // Check if we already have the AI definition
+        // Check if word exists in database
         const supabase = await createClient();
         const user = await getUser(req);
 
@@ -28,15 +28,35 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         const wordDataCached = wordDataDB?.[0];
         
         if (!wordDataCached) {
+            // Word not found, fetch from Words API first
+            const response = await fetch(`/api/words/one`, {
+                method: 'POST',
+                body: JSON.stringify({ word }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch word data');
+            }
+        }
+
+        // Check if we already have an AI definition
+        const { data: updatedWordData } = await supabase
+            .from('word')
+            .select()
+            .eq('word', word)
+            .eq('user', user)
+            .single();
+
+        if (!updatedWordData) {
             throw new Error('Word not found in database');
         }
 
-        const existingData = JSON.parse(wordDataCached.raw);
+        const existingData = JSON.parse(updatedWordData.raw);
         if (existingData.ai_definition) {
             return NextResponse.json(existingData.ai_definition, { status: 200 });
         }
 
-        // Query AI for definition if we don't have it
+        // Query AI for definition since we don't have it
         const aiResponse = await ai({
             messages: [
                 { 
