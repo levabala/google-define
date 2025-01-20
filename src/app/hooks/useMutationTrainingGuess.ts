@@ -1,11 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { WordStats } from '../types';
 
-type TrainingGuessParams = {
-    word: string;
-    success: boolean;
-    definition: string;
-};
+import { TrainingGuessParamsSchema } from '../schemas';
 
 export function useMutationTrainingGuess() {
     const queryClient = useQueryClient();

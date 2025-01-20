@@ -1,48 +1,14 @@
-export type WordData = {
-    word: string;
-    results?: {
-        definition: string;
-        partOfSpeech: string | null;
-        synonyms?: string[];
-        instanceOf?: string[];
-        hasInstances?: string[];
-        typeOf?: string[];
-        hasTypes?: string[];
-        examples?: string[];
-        hasCategories?: string[];
-        hasParts?: string[];
-        derivation?: string[];
-        partOf?: string[];
-    }[];
-    syllables: {
-        count: number;
-        list: string[];
-    };
-    pronunciation: {
-        all: string;
-    };
-    frequency: number;
-};
+import { z } from 'zod';
+import {
+    WordDataSchema,
+    WordStatusSchema,
+    DBWordSchema,
+    WordStatsSchema,
+    DBPronounciationSchema,
+} from './schemas';
 
-export type WordStatus = 'NONE' | 'TO_LEARN' | 'LEARNED' | 'HIDDEN';
-
-export type DBWord = {
-    word: string;
-    raw: WordData;
-    status: WordStatus;
-    created_at: string;
-};
-
-export type WordStats = {
-    total: number;
-    successful: number;
-    failed: number;
-    ratio: number;
-};
-
-export type DBPronounciation = {
-    word: string;
-    recognised_text: string;
-    created_at: string;
-    success: boolean;
-}
+export type WordData = z.infer<typeof WordDataSchema>;
+export type WordStatus = z.infer<typeof WordStatusSchema>;
+export type DBWord = z.infer<typeof DBWordSchema>;
+export type WordStats = z.infer<typeof WordStatsSchema>;
+export type DBPronounciation = z.infer<typeof DBPronounciationSchema>;

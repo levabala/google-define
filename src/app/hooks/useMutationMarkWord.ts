@@ -1,8 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '../providers';
 import { updateWordsAllCache } from '../helpers/updateWordsAllCache';
-
-type MarkWordStatus = 'TO_LEARN' | 'LEARNED' | 'HIDDEN';
+import { MarkWordStatusSchema } from '../schemas';
 
 export function useMutationMarkWord() {
     return useMutation({

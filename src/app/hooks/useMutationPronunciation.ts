@@ -2,11 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '../providers';
 import { WordStats } from '../types';
 
-type PronunciationData = {
-    word: string;
-    recognised_text: string;
-    success: boolean;
-};
+import { PronunciationDataSchema } from '../schemas';
 
 type MutationContext = {
     previousStats: WordStats | undefined;

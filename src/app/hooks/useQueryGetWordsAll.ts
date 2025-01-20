@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { DBWord } from '../types';
+import { DBWordSchema } from '../schemas';
 
 export function useQueryGetWordsAll() {
     return useQuery({
@@ -9,11 +9,11 @@ export function useQueryGetWordsAll() {
             const res = await fetch('/api/words/all').catch(() => null);
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            return (await res?.json()).map((word: any) => {
+            const data = await res?.json();
+            return z.array(DBWordSchema).parse(data.map((word: any) => {
                 word.raw = JSON.parse(word.raw);
-
-                return word as DBWord;
-            }) as DBWord[];
+                return word;
+            }));
         },
         staleTime: Infinity,
         refetchOnWindowFocus: false,
