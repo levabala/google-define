@@ -74,8 +74,6 @@ export default function Main() {
         wordsAll,
     ]);
 
-    console.log({ wordToTrain, wordCurrent, wordsAll });
-
     return (
         <div className="flex flex-col gap-1">
             <div className="flex gap-4 items-start">

@@ -41,8 +41,6 @@ export function PronunciationButton({ word, className }: Props) {
                     .trim();
                 const success = transcript === word.toLowerCase();
 
-                console.log('Transcript:', transcript);
-
                 await pronunciationMutation.mutateAsync({
                     word,
                     recognised_text: transcript,

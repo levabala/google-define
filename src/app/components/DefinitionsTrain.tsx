@@ -215,8 +215,6 @@ export function DefinitionsTrain({
         }
     }, [hasAnswered, definitionChoices]);
 
-    console.log('DefinitionsTrain', word);
-
     return (
         <div className={`flex flex-col gap-1 transition-opacity duration-300`}>
             <div className="flex">
