@@ -4,10 +4,10 @@ import { ai, callHistory } from './ai';
 // Mock OpenAI
 mock.module('openai', () => {
     return {
-        default: class {
+        OpenAI: class {
             chat = {
                 completions: {
-                    create: () => Promise.resolve({})
+                    create: () => Promise.resolve()
                 }
             }
         }
@@ -24,7 +24,7 @@ describe('AI Rate Limiting', () => {
         // Make 29 calls (1 under the minute limit)
         for (let i = 0; i < 29; i++) {
             expect(
-                await ai({
+                ai({
                     model: 'gpt-3.5-turbo',
                     messages: [],
                 }),
@@ -43,7 +43,7 @@ describe('AI Rate Limiting', () => {
 
         // 31st call should fail
         expect(
-            await ai({
+            ai({
                 model: 'gpt-3.5-turbo',
                 messages: [],
             }),
@@ -61,7 +61,7 @@ describe('AI Rate Limiting', () => {
 
         // 201st call should fail
         expect(
-            await ai({
+            ai({
                 model: 'gpt-3.5-turbo',
                 messages: [],
             }),
@@ -104,7 +104,7 @@ describe('AI Rate Limiting', () => {
 
         // Should allow new calls
         expect(
-            await ai({
+            ai({
                 model: 'gpt-3.5-turbo',
                 messages: [],
             }),
