@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, mock, afterEach } from 'bun:test';
+import { jest } from '@jest/globals';
 import { ai, callHistory } from './ai';
 
 // Mock OpenAI
@@ -24,12 +25,12 @@ describe('AI Rate Limiting', () => {
         // Reset call history before each test
         callHistory.length = 0;
         // Enable fake timers
-        Bun.useFakeTimers();
+        jest.useFakeTimers();
     });
 
     afterEach(() => {
         // Restore real timers
-        Bun.useRealTimers();
+        jest.useRealTimers();
     });
 
     it('should allow calls within rate limits', async () => {
@@ -39,7 +40,7 @@ describe('AI Rate Limiting', () => {
                 model: 'gpt-3.5-turbo',
                 messages: [],
             });
-            Bun.advanceTimersByTime(500); // Advance time by 500ms
+            jest.advanceTimersByTime(500); // Advance time by 500ms
         }
     });
 
@@ -50,7 +51,7 @@ describe('AI Rate Limiting', () => {
                 model: 'gpt-3.5-turbo',
                 messages: [],
             });
-            Bun.advanceTimersByTime(500); // Advance time by 500ms
+            jest.advanceTimersByTime(500); // Advance time by 500ms
         }
 
         // 31st call should fail
@@ -69,7 +70,7 @@ describe('AI Rate Limiting', () => {
                 model: 'gpt-3.5-turbo',
                 messages: [],
             });
-            Bun.advanceTimersByTime(500); // Advance time by 500ms
+            jest.advanceTimersByTime(500); // Advance time by 500ms
         }
 
         // 201st call should fail
@@ -89,19 +90,19 @@ describe('AI Rate Limiting', () => {
             model: 'gpt-3.5-turbo',
             messages: [],
         });
-        Bun.advanceTimersByTime(500);
+        jest.advanceTimersByTime(500);
         await ai({
             model: 'gpt-3.5-turbo',
             messages: [],
         });
-        Bun.advanceTimersByTime(500);
+        jest.advanceTimersByTime(500);
         await ai({
             model: 'gpt-3.5-turbo',
             messages: [],
         });
 
         // Verify throttle timing
-        expect(Bun.now() - start).toBe(1000); // 2 intervals of 500ms
+        expect(Date.now() - start).toBe(1000); // 2 intervals of 500ms
     });
 
     it('should allow calls after rate limit window passes', async () => {
@@ -114,7 +115,7 @@ describe('AI Rate Limiting', () => {
         }
 
         // Fast forward time by 61 seconds
-        Bun.advanceTimersByTime(61000);
+        jest.advanceTimersByTime(61000);
 
         // Should allow new calls
         await expect(
