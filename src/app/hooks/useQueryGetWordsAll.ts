@@ -13,7 +13,7 @@ export function useQueryGetWordsAll() {
             return data.map((word: any) => {
                 word.raw = JSON.parse(word.raw);
                 return word;
-            }));
+            });
         },
         staleTime: Infinity,
         refetchOnWindowFocus: false,
