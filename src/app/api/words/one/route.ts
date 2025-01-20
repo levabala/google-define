@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/db';
-import { WordData } from '@/app/types';
 import { getUser } from '@/auth';
-import { WordOneResponseSchema, SuccessResponseSchema } from '@/app/schemas';
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
     const { searchParams } = new URL(req.url);
@@ -35,8 +33,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         }
 
         const wordData = JSON.parse(wordDataCached.raw);
-        const validated = WordOneResponseSchema.parse(wordData);
-        return NextResponse.json(validated, {
+        return NextResponse.json(wordData, {
             status: 200,
         });
     } catch (error) {
@@ -70,8 +67,7 @@ export async function PUT(req: NextRequest): Promise<NextResponse> {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    const validated = SuccessResponseSchema.parse({ success: true });
-    return NextResponse.json(validated, { status: 200 });
+    return NextResponse.json({ success: true }, { status: 200 });
 }
 
 export async function DELETE(req: NextRequest): Promise<NextResponse> {

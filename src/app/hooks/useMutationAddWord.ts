@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '../providers';
 import { WordStatus } from '../types';
 import { updateWordsAllCache } from '../helpers/updateWordsAllCache';
+import { DBWordSchema } from '../schemas';
 
 export function useMutationAddWord() {
     return useMutation({
@@ -19,7 +20,8 @@ export function useMutationAddWord() {
                 },
                 body: JSON.stringify({ word, initialStatus }),
             });
-            return response.json();
+            const data = await response.json();
+            return DBWordSchema.parse(data);
         },
         onSuccess: (data) => {
             updateWordsAllCache(queryClient, words => [
