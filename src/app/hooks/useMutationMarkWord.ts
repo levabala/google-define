@@ -15,8 +15,12 @@ export function useMutationMarkWord() {
             });
             return response.json();
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['dictionaryAll'] });
+        onSuccess: (data, { word, status }) => {
+            updateWordsAllCache(queryClient, words =>
+                words.map(w =>
+                    w.word === word ? { ...w, status } : w,
+                ),
+            );
         },
     });
 }

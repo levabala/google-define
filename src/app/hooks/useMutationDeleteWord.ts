@@ -9,8 +9,10 @@ export function useMutationDeleteWord() {
             });
             return response.json();
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['dictionaryAll'] });
+        onSuccess: (data, word) => {
+            updateWordsAllCache(queryClient, words =>
+                words.filter(w => w.word !== word),
+            );
         },
     });
 }

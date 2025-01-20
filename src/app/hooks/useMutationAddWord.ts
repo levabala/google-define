@@ -20,8 +20,16 @@ export function useMutationAddWord() {
             });
             return response.json();
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['dictionaryAll'] });
+        onSuccess: (data, { word, initialStatus }) => {
+            updateWordsAllCache(queryClient, words => [
+                ...words,
+                {
+                    word,
+                    raw: { word },
+                    status: initialStatus || 'NONE',
+                    created_at: new Date().toISOString(),
+                },
+            ]);
         },
     });
 }
