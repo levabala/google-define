@@ -7,7 +7,7 @@ mock.module('openai', () => {
         OpenAI: class {
             chat = {
                 completions: {
-                    create: () => Promise.resolve()
+                    create: () => Promise.resolve({})
                 }
             }
         }
