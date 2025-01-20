@@ -47,8 +47,8 @@ export const WordStatsSchema = z.object({
 export const DBPronounciationSchema = z.object({
     word: z.string(),
     recognised_text: z.string(),
-    created_at: z.string(),
     success: z.boolean(),
+    created_at: z.string().optional(),
 });
 
 export const TrainingGuessSchema = z.object({

@@ -47,7 +47,6 @@ export function PronunciationButton({ word, className }: Props) {
                     word,
                     recognised_text: transcript,
                     success,
-                    created_at: new Date().toISOString(),
                 });
 
                 if (success) {
