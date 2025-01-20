@@ -11,10 +11,7 @@ export function useQueryGetWordsAll() {
 
             const data = await res?.json();
             const validated = WordsAllResponseSchema.parse(data);
-            return validated.map((word: DBWord) => {
-                word.raw = JSON.parse(word.raw);
-                return word;
-            });
+            return validated;
         },
         staleTime: Infinity,
         refetchOnWindowFocus: false,
