@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "../providers";
 import type { DBWord } from "../types";
 import { AIDefinitionSchema } from "../schemas";
+import { updateWordsAllCache } from "../helpers/updateWordsAllCache";
 
 export function useMutationAIDefinition() {
     return useMutation({
@@ -17,8 +18,8 @@ export function useMutationAIDefinition() {
             return AIDefinitionSchema.parse(data);
         },
         onSuccess: async (data, word) => {
-            queryClient.setQueryData<DBWord[]>(["wordsAll"], (old) =>
-                old?.map((w) =>
+            updateWordsAllCache(queryClient, words =>
+                words.map(w =>
                     w.word === word
                         ? {
                               ...w,
