@@ -42,9 +42,11 @@ const mockWords: DBWord[] = [
 ];
 
 describe("all words", () => {
-    test("should be fetched and displayed, except the hidden ones", async () => {
+    let Wrapper: React.FC<{ children: React.ReactNode }>;
+    
+    beforeEach(() => {
         // Mock the fetch implementation
-        mockFetch.mockImplementationOnce(async () => {
+        mockFetch.mockImplementation(async () => {
             return new Response(JSON.stringify(mockWords), {
                 status: 200,
                 headers: {
@@ -53,8 +55,10 @@ describe("all words", () => {
             });
         });
 
-        const Wrapper = createWrapper();
+        Wrapper = createWrapper();
+    });
 
+    test("should be fetched and displayed, except the hidden ones", async () => {
         render(
             <Wrapper>
                 <Main />
@@ -73,18 +77,6 @@ describe("all words", () => {
     });
 
     test("should maintain status-based sorting order", async () => {
-        // Mock the fetch implementation
-        mockFetch.mockImplementationOnce(async () => {
-            return new Response(JSON.stringify(mockWords), {
-                status: 200,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-        });
-
-        const Wrapper = createWrapper();
-
         render(
             <Wrapper>
                 <Main />
