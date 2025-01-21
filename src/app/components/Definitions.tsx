@@ -24,7 +24,6 @@ export function Definitions({
                 <Definition
                     key={result.definition}
                     result={result}
-                    wordsAll={wordsAll}
                     textSourceSubmitted={textSourceSubmitted}
                     onWordClick={onWordClick}
                 />
