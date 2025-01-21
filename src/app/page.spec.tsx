@@ -41,7 +41,8 @@ const mockWords: DBWord[] = [
     }
 ];
 
-test("all words are fetched and displayed, except the hidden ones", async () => {
+describe("all words", () => {
+    test("should be fetched and displayed, except the hidden ones", async () => {
     // Mock the fetch implementation
     mockFetch.mockImplementationOnce(async () => {
         return new Response(JSON.stringify(mockWords), {
@@ -51,6 +52,36 @@ test("all words are fetched and displayed, except the hidden ones", async () => 
             }
         });
     });
+
+    test("should maintain status-based sorting order", async () => {
+        // Mock the fetch implementation
+        mockFetch.mockImplementationOnce(async () => {
+            return new Response(JSON.stringify(mockWords), {
+                status: 200,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        });
+
+        const Wrapper = createWrapper();
+        
+        render(
+            <Wrapper>
+                <Main />
+            </Wrapper>
+        );
+
+        // Wait for words to be loaded
+        await waitFor(() => {
+            const wordElements = screen.getAllByRole('listitem');
+            const displayedWords = wordElements.map(el => el.textContent);
+            
+            // Verify sorting order: TO_LEARN first, then LEARNED, alphabetically within each group
+            expect(displayedWords).toEqual(['apple', 'banana']);
+        });
+    });
+});
 
     const Wrapper = createWrapper();
     
