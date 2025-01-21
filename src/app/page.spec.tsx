@@ -187,16 +187,11 @@ describe("word definitions", () => {
                 screen.getByTestId("definitions-container"),
             ).toBeInTheDocument();
 
-            // Verify definitions content
-            expect(
-                screen.getByText(
-                    "The round fruit of a tree of the rose family",
-                ),
-            ).toBeInTheDocument();
-            expect(screen.getByText("noun")).toBeInTheDocument();
-            expect(
-                screen.getByText("I ate an apple for breakfast"),
-            ).toBeInTheDocument();
+            // Verify definitions content by checking the container's text content
+            const definitionContainer = screen.getByTestId('definitions-container');
+            expect(definitionContainer).toHaveTextContent(
+                /noun.*The round fruit of a tree of the rose family.*I ate an apple for breakfast/s
+            );
 
             // Verify word is in the query params
             expect(window.location.search).toContain("word=apple");
