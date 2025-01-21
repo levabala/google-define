@@ -6,7 +6,6 @@ import { WordsAll } from './components/WordsAll';
 import { Definitions } from './components/Definitions';
 import { useWord } from './hooks/useWord';
 import { useMutationAddWord } from './hooks/useMutationAddWord';
-import { useMutationAIDefinition } from './hooks/useMutationAIDefinition';
 import { useQueryGetWordsAll } from './hooks/useQueryGetWordsAll';
 import { useMutationTrainingGuess } from './hooks/useMutationTrainingGuess';
 import { DefinitionsTrain } from './components/DefinitionsTrain';
@@ -27,7 +26,6 @@ export default function Main() {
     const [wordToTrainNext, setWordToTrainNext] = useState<string | null>(null);
 
     const addWordMutation = useMutationAddWord();
-    const useMutationAIDefinition = useMutationAIDefinition();
     const wordCurrent = useWord(textSourceSubmitted);
     const isFetchingWordCurrent = !wordCurrent && !!textSourceSubmitted;
 
