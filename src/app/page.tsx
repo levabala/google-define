@@ -17,6 +17,7 @@ import { StatsDisplay } from './components/StatsDisplay';
 import { WordControls } from './components/WordControls';
 import { WordData, DBWord, WordStats } from './types';
 import { Spinner } from './components/Spinner';
+import { toast } from 'react-toastify';
 
 function Main() {
     const trainingGuessMutation = useMutationTrainingGuess();
