@@ -1,5 +1,6 @@
 import { describe, test, expect } from "bun:test";
-import { screen, render, waitFor } from "@testing-library/react";
+import { screen, render, waitFor, fireEvent } from "@testing-library/react";
+import { useQueryState } from 'nuqs';
 import { createWrapper } from "./test-utils";
 import { Main } from "./page";
 import { DBWord } from "./types";
@@ -189,6 +190,71 @@ describe("word definitions", () => {
             expect(definitionContainer).toHaveTextContent(
                 /noun.*The round fruit of a tree of the rose family.*I ate an apple for breakfast/,
             );
+        });
+    });
+});
+
+describe("word selection", () => {
+    test("clicking word in WordsAll updates current word and query param", async () => {
+        const Wrapper = createWrapper();
+        render(
+            <Wrapper>
+                <Main />
+            </Wrapper>,
+            {
+                wrapper: withNuqsTestingAdapter(),
+            },
+        );
+
+        // Wait for words to load
+        await waitFor(() => {
+            expect(screen.getByText("apple")).toBeInTheDocument();
+        });
+
+        // Click on a word
+        const appleWord = screen.getByText("apple");
+        fireEvent.click(appleWord);
+
+        // Verify query param was updated
+        await waitFor(() => {
+            expect(window.location.search).toContain("word=apple");
+        });
+
+        // Verify definitions loaded
+        await waitFor(() => {
+            expect(screen.getByTestId("definitions-container")).toBeInTheDocument();
+            expect(screen.getByText(/The round fruit of a tree of the rose family/)).toBeInTheDocument();
+        });
+    });
+
+    test("clicking word in Definitions updates current word and query param", async () => {
+        const Wrapper = createWrapper();
+        render(
+            <Wrapper>
+                <Main />
+            </Wrapper>,
+            {
+                wrapper: withNuqsTestingAdapter({ searchParams: new URLSearchParams({ word: "apple" }) }),
+            },
+        );
+
+        // Wait for definitions to load
+        await waitFor(() => {
+            expect(screen.getByTestId("definitions-container")).toBeInTheDocument();
+        });
+
+        // Find and click a word in the definition
+        const definitionWord = screen.getByText("fruit");
+        fireEvent.click(definitionWord);
+
+        // Verify query param was updated
+        await waitFor(() => {
+            expect(window.location.search).toContain("word=fruit");
+        });
+
+        // Verify new definitions loaded
+        await waitFor(() => {
+            expect(screen.getByTestId("definitions-container")).toBeInTheDocument();
         });
     });
 });
