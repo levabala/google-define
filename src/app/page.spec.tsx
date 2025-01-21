@@ -4,6 +4,7 @@ import { createWrapper } from "./test-utils";
 import { Main } from "./page";
 import { DBWord } from "./types";
 import { mockFetch } from "../testing-preload";
+import { beforeEach } from "bun:test";
 
 const mockWords: DBWord[] = [
     {
@@ -43,7 +44,7 @@ const mockWords: DBWord[] = [
 
 describe("all words", () => {
     let Wrapper: React.FC<{ children: React.ReactNode }>;
-    
+
     beforeEach(() => {
         // Mock the fetch implementation
         mockFetch.mockImplementation(async () => {
@@ -85,7 +86,7 @@ describe("all words", () => {
 
         // Wait for words to be loaded
         await waitFor(() => {
-            const wordElements = screen.getAllByRole("listitem");
+            const wordElements = screen.getAllByTestId("word");
             const displayedWords = wordElements.map((el) => el.textContent);
 
             // Verify sorting order: TO_LEARN first, then LEARNED, alphabetically within each group
