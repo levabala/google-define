@@ -2,6 +2,7 @@ import { Fragment } from 'react';
 import { Word } from './Word';
 import { Examples } from './Examples';
 import { DBWord, WordData } from '../types';
+import { useMutationAIDefinition } from '../hooks/useMutationAIDefinition';
 
 type DefinitionProps = {
     result: NonNullable<WordData['results']>[number];

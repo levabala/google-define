@@ -1,6 +1,7 @@
 import { Definition } from './Definition';
 import { DBWord } from '../types';
 import { WordData } from '../types';
+import { useMutationAIDefinition } from '../hooks/useMutationAIDefinition';
 
 type DefinitionsProps = {
     results: WordData['results'];
