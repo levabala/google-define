@@ -248,7 +248,7 @@ export function DefinitionsTrain({
                             word={word || ''}
                             useMutationAIDefinition={() => ({
                                 mutate: () => {},
-                                mutateAsync: async () => ({} as any),
+                                mutateAsync: async () => ({} as unknown),
                                 isPending: false,
                                 isSuccess: false,
                                 isError: false,
@@ -261,6 +261,8 @@ export function DefinitionsTrain({
                                 failureReason: null,
                                 isIdle: false,
                                 status: 'idle',
+                                isPaused: false,
+                                submittedAt: 0,
                             })}
                         />
                         <span
