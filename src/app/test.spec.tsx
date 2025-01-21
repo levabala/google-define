@@ -1,5 +1,6 @@
 import { test, expect } from "bun:test";
 import { screen, render } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import { ToggleSwitch } from "./components/ToggleSwitch";
 
 test("Can use Testing Library", () => {
