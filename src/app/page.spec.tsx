@@ -1,6 +1,5 @@
 import { describe, test, expect } from "bun:test";
 import { screen, render, waitFor, fireEvent } from "@testing-library/react";
-import { useQueryState } from 'nuqs';
 import { createWrapper } from "./test-utils";
 import { Main } from "./page";
 import { DBWord } from "./types";
