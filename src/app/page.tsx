@@ -26,7 +26,7 @@ export default function Main() {
     const [wordToTrainNext, setWordToTrainNext] = useState<string | null>(null);
 
     const addWordMutation = useMutationAddWord();
-    const mutationAIDefinition = useMutationAIDefinition();
+    const { mutate: generateAIDefinition, isPending: isGeneratingDefinition } = useMutationAIDefinition();
     const wordCurrent = useWord(textSourceSubmitted);
     const isFetchingWordCurrent = !wordCurrent && !!textSourceSubmitted;
 
@@ -176,7 +176,7 @@ export default function Main() {
                     textSourceSubmitted={textSourceSubmitted}
                     onWordClick={onWordClickCommon}
                     word={textSourceSubmitted}
-                    useMutationAIDefinition={mutationAIDefinition}
+                    useMutationAIDefinition={() => ({ mutate: generateAIDefinition, isPending: isGeneratingDefinition })}
                 />
             ) : null}
         </div>
