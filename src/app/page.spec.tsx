@@ -176,7 +176,7 @@ describe("word definitions", () => {
             </Wrapper>,
             {
                 wrapper: withNuqsTestingAdapter({
-                    searchParams: "?word=apple",
+                    searchParams: new URLSearchParams({ word: "apple" }),
                 }),
             },
         );
