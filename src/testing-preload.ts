@@ -10,6 +10,8 @@ mock.module("next/navigation", () => ({
         replace: () => {},
         refresh: () => {},
     }),
+    useSearchParams: () => new URLSearchParams(),
+    useParams: () => ({}),
 }));
 
 global.fetch = mockFetch;
