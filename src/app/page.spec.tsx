@@ -43,13 +43,32 @@ const mockWords: DBWord[] = [
 
 describe("all words", () => {
     test("should be fetched and displayed, except the hidden ones", async () => {
-    // Mock the fetch implementation
-    mockFetch.mockImplementationOnce(async () => {
-        return new Response(JSON.stringify(mockWords), {
-            status: 200,
-            headers: {
-                'Content-Type': 'application/json'
-            }
+        // Mock the fetch implementation
+        mockFetch.mockImplementationOnce(async () => {
+            return new Response(JSON.stringify(mockWords), {
+                status: 200,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        });
+
+        const Wrapper = createWrapper();
+        
+        render(
+            <Wrapper>
+                <Main />
+            </Wrapper>
+        );
+
+        // Wait for words to be loaded
+        await waitFor(() => {
+            // Check visible words
+            expect(screen.getByText('apple')).toBeInTheDocument();
+            expect(screen.getByText('banana')).toBeInTheDocument();
+            
+            // Check hidden word is not displayed
+            expect(screen.queryByText('cherry')).not.toBeInTheDocument();
         });
     });
 
@@ -83,21 +102,4 @@ describe("all words", () => {
     });
 });
 
-    const Wrapper = createWrapper();
-    
-    render(
-        <Wrapper>
-            <Main />
-        </Wrapper>
-    );
-
-    // Wait for words to be loaded
-    await waitFor(() => {
-        // Check visible words
-        expect(screen.getByText('apple')).toBeInTheDocument();
-        expect(screen.getByText('banana')).toBeInTheDocument();
-        
-        // Check hidden word is not displayed
-        expect(screen.queryByText('cherry')).not.toBeInTheDocument();
     });
-});
