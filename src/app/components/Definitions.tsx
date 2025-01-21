@@ -8,6 +8,7 @@ type DefinitionsProps = {
     onWordClick: (word: string, addToLearn?: boolean) => void;
     aiDefinition?: {
         definition: string;
+        partOfSpeech?: string;
         examples?: string[];
     };
     wordsAll?: DBWord[];

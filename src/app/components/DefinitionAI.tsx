@@ -14,6 +14,7 @@ type DefinitionAIProps = {
 
 export function DefinitionAI({
     definition,
+    partOfSpeech,
     examples,
     wordsAll,
     textSourceSubmitted,
