@@ -129,7 +129,7 @@ function Main() {
                                 initialStatus: addNextToLearn ? 'TO_LEARN' : undefined
                             });
                         }
-                    } catch (error) {
+                    } catch {
                         // Reset the submitted text on error
                         await setTextSourceSubmitted('');
                         setTextSourceCurrent('');

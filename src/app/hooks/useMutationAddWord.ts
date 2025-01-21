@@ -33,7 +33,7 @@ export function useMutationAddWord() {
                 data,
             ]);
         },
-        onError: (error) => {
+        onError: () => {
             toast.error('Failed to add word');
         },
     });
