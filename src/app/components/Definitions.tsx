@@ -20,15 +20,6 @@ export function Definitions({
 }: DefinitionsProps) {
     return (
         <div className="flex flex-col gap-2">
-            {results?.map((result) => (
-                <Definition
-                    key={result.definition}
-                    result={result}
-                    textSourceSubmitted={textSourceSubmitted}
-                    onWordClick={onWordClick}
-                />
-            ))}
-
             {aiDefinition && (
                 <div className="mt-4 p-2 bg-blue-900 rounded">
                     <div className="text-sm text-blue-300 mb-1 flex items-center gap-2">
@@ -47,6 +38,15 @@ export function Definitions({
                     )}
                 </div>
             )}
+            
+            {results?.map((result) => (
+                <Definition
+                    key={result.definition}
+                    result={result}
+                    textSourceSubmitted={textSourceSubmitted}
+                    onWordClick={onWordClick}
+                />
+            ))}
         </div>
     );
 }

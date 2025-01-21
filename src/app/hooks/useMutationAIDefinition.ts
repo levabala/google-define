@@ -13,7 +13,7 @@ export function useMutationAIDefinition() {
                 body: JSON.stringify({ word }),
             });
             const data = await response.json();
-            return data;
+            return AIDefinitionSchema.parse(data);
         },
         onSuccess: async (data, word) => {
             queryClient.setQueryData<DBWord[]>(["wordsAll"], (old) =>

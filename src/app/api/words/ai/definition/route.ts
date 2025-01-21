@@ -88,7 +88,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             throw new Error('No content received from AI');
         }
 
-        const aiDefinition: AIDefinition = JSON.parse(content);
+        const aiDefinition = AIDefinitionSchema.parse(JSON.parse(content));
 
         // Update existing word record with AI definition
         const { error } = await supabase
