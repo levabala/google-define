@@ -245,7 +245,6 @@ export function DefinitionsTrain({
                             onWordClick={onWordClick}
                             hideExamples
                             disableWordClick={mode === 'answer'}
-                            word={word || ''}
                         />
                         <span
                             className={`text-white font-bold whitespace-nowrap ${!hasAnswered ? 'invisible' : 'visible'}`}
