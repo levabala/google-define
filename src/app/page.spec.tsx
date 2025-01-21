@@ -40,6 +40,39 @@ const mockWords: DBWord[] = [
         ai_definition: null,
         created_at: new Date().toISOString(),
     },
+    {
+        word: "date",
+        status: "TO_LEARN",
+        raw: {
+            word: "date",
+            results: [],
+            pronunciation: { all: "dayt" },
+        },
+        ai_definition: null,
+        created_at: new Date().toISOString(),
+    },
+    {
+        word: "elderberry",
+        status: undefined,
+        raw: {
+            word: "elderberry",
+            results: [],
+            pronunciation: { all: "el-der-ber-ee" },
+        },
+        ai_definition: null,
+        created_at: new Date().toISOString(),
+    },
+    {
+        word: "fig",
+        status: "LEARNED",
+        raw: {
+            word: "fig",
+            results: [],
+            pronunciation: { all: "fig" },
+        },
+        ai_definition: null,
+        created_at: new Date().toISOString(),
+    },
 ];
 
 describe("all words", () => {
@@ -89,8 +122,18 @@ describe("all words", () => {
             const wordElements = screen.getAllByTestId("word");
             const displayedWords = wordElements.map((el) => el.textContent);
 
-            // Verify sorting order: TO_LEARN first, then LEARNED, alphabetically within each group
-            expect(displayedWords).toEqual(["apple", "banana"]);
+            // Verify sorting order: 
+            // 1. undefined status first (elderberry)
+            // 2. TO_LEARN next (apple, date)
+            // 3. LEARNED last (banana, fig)
+            // All alphabetically within their groups
+            expect(displayedWords).toEqual([
+                "elderberry", // undefined status
+                "apple",      // TO_LEARN
+                "date",       // TO_LEARN
+                "banana",     // LEARNED
+                "fig"         // LEARNED
+            ]);
         });
     });
 });
