@@ -171,10 +171,9 @@ export default function Main() {
             ) : wordCurrent ? (
                 <Definitions
                     results={wordCurrent.results}
-                    wordsAll={wordsAll}
                     textSourceSubmitted={textSourceSubmitted}
                     onWordClick={onWordClickCommon}
-                    word={textSourceSubmitted}
+                    aiDefinition={wordsAll?.find(w => w.word === textSourceSubmitted)?.ai_definition}
                 />
             ) : null}
         </div>

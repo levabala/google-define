@@ -5,10 +5,12 @@ import { WordData } from "../types";
 
 type DefinitionsProps = {
     results: WordData["results"];
-    wordsAll?: DBWord[];
     textSourceSubmitted: string | null;
     onWordClick: (word: string, addToLearn?: boolean) => void;
-    word: string;
+    aiDefinition?: {
+        definition: string;
+        examples?: string[];
+    };
 };
 
 export function Definitions({
@@ -30,7 +32,7 @@ export function Definitions({
                 />
             ))}
 
-            {wordsAll && (
+            {aiDefinition && (
                 <div className="mt-4 p-2 bg-blue-900 rounded">
                     <div className="text-sm text-blue-300 mb-1 flex items-center gap-2">
                         <span>AI Definition</span>
@@ -38,18 +40,10 @@ export function Definitions({
                             AI
                         </span>
                     </div>
-                    <p className="text-white">
-                        {wordsAll.find((w) => w.word === word)?.ai_definition
-                            ?.definition || "Generating AI definition..."}
-                    </p>
-                    {wordsAll.find((w) => w.word === word)?.ai_definition
-                        ?.examples && (
+                    <p className="text-white">{aiDefinition.definition}</p>
+                    {aiDefinition.examples && (
                         <Examples
-                            examples={
-                                wordsAll.find((w) => w.word === word)
-                                    ?.ai_definition?.examples || []
-                            }
-                            wordsAll={wordsAll}
+                            examples={aiDefinition.examples}
                             textSourceSubmitted={textSourceSubmitted}
                             onWordClick={onWordClick}
                         />
