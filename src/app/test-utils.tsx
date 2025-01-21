@@ -14,7 +14,9 @@ export const createWrapper = () => {
     const WrapperComponent = ({ children }: { children: ReactNode }) => (
         <QueryClientProvider client={queryClient}>
             <NuqsAdapter>
-                {children}
+                <div role="main">
+                    {children}
+                </div>
             </NuqsAdapter>
         </QueryClientProvider>
     );
