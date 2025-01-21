@@ -33,8 +33,6 @@ export default function Main() {
     const wordCurrent = useWord(textSourceSubmitted);
     const isFetchingWordCurrent = !wordCurrent && !!textSourceSubmitted;
 
-    console.log(wordCurrent);
-
     const { data: stats } = useQueryGetGuessStats(textSourceSubmitted) as {
         data: WordStats | undefined;
     };
