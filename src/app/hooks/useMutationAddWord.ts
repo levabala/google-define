@@ -3,6 +3,7 @@ import { queryClient } from '../providers';
 import { WordStatus } from '../types';
 import { updateWordsAllCache } from '../helpers/updateWordsAllCache';
 import { DBWordSchema } from '../schemas';
+import { toast } from 'react-toastify';
 
 export function useMutationAddWord() {
     return useMutation({
@@ -31,6 +32,9 @@ export function useMutationAddWord() {
                 ...words,
                 data,
             ]);
+        },
+        onError: (error) => {
+            toast.error('Failed to add word');
         },
     });
 }

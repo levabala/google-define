@@ -121,12 +121,18 @@ function Main() {
                 setTextSourceCurrent={setTextSourceCurrent}
                 textSourceSubmitted={textSourceSubmitted}
                 setTextSourceSubmitted={async (text) => {
-                    await setTextSourceSubmitted(text);
-                    if (text && !wordsAll?.some((w: DBWord) => w.word === text)) {
-                        await addWordMutation.mutateAsync({
-                            word: text,
-                            initialStatus: addNextToLearn ? 'TO_LEARN' : undefined
-                        });
+                    try {
+                        await setTextSourceSubmitted(text);
+                        if (text && !wordsAll?.some((w: DBWord) => w.word === text)) {
+                            await addWordMutation.mutateAsync({
+                                word: text,
+                                initialStatus: addNextToLearn ? 'TO_LEARN' : undefined
+                            });
+                        }
+                    } catch (error) {
+                        // Reset the submitted text on error
+                        await setTextSourceSubmitted('');
+                        setTextSourceCurrent('');
                     }
                 }}
                 isTraining={isTraining}
