@@ -108,6 +108,59 @@ const mockWords: DBWord[] = [
     },
 ];
 
+describe("word definitions", () => {
+    let Wrapper: React.FC<{ children: React.ReactNode }>;
+
+    beforeEach(() => {
+        // Mock the fetch implementation
+        mockFetch.mockImplementation(async (input: RequestInfo | URL) => {
+            const url = new URL(input.toString());
+            if (url.pathname === '/api/words/one') {
+                const word = url.searchParams.get('word');
+                const wordData = mockWords.find(w => w.word === word);
+                return new Response(JSON.stringify(wordData), {
+                    status: 200,
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+            }
+            
+            return new Response(JSON.stringify(mockWords), {
+                status: 200,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+        });
+
+        Wrapper = createWrapper();
+    });
+
+    test("should display definitions for word passed via query params", async () => {
+        // Set initial query param
+        window.history.pushState({}, '', '/?word=apple');
+        
+        render(
+            <Wrapper>
+                <Main />
+            </Wrapper>,
+        );
+
+        // Wait for definitions to load
+        await waitFor(() => {
+            // Verify word is displayed
+            expect(screen.getByText('apple')).toBeInTheDocument();
+            
+            // Verify definitions container is present
+            expect(screen.getByTestId('definitions-container')).toBeInTheDocument();
+            
+            // Verify word is in the query params
+            expect(window.location.search).toContain('word=apple');
+        });
+    });
+});
+
 describe("all words", () => {
     let Wrapper: React.FC<{ children: React.ReactNode }>;
 
