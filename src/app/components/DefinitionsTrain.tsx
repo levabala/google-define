@@ -31,12 +31,22 @@ export function DefinitionsTrain({
 
     // Calculate prevailing partOfSpeech and get the first matching definition
     const { prevailingPos, correctDefinition } = useMemo(() => {
-        if (!results || results.length === 0) {
+        // Create a combined array of regular and AI definitions
+        const allDefinitions = [
+            ...(results || []),
+            ...(word?.ai_definition ? [{
+                definition: word.ai_definition.definition,
+                partOfSpeech: word.ai_definition.partOfSpeech || 'unknown',
+                examples: word.ai_definition.examples || []
+            }] : [])
+        ];
+
+        if (allDefinitions.length === 0) {
             return { prevailingPos: 'unknown', correctDefinition: { definition: '', partOfSpeech: null } };
         }
 
         // Count occurrences of each partOfSpeech
-        const posCount = results.reduce<Record<string, number>>(
+        const posCount = allDefinitions.reduce<Record<string, number>>(
             (acc, result) => {
                 const pos = result.partOfSpeech || 'unknown';
                 acc[pos] = (acc[pos] || 0) + 1;
@@ -51,9 +61,9 @@ export function DefinitionsTrain({
         )[0];
 
         // Get first 3 definitions
-        const firstThreeDefinitions = results.slice(0, 3);
+        const firstThreeDefinitions = allDefinitions.slice(0, 3);
         if (firstThreeDefinitions.length === 0) {
-            return { prevailingPos, correctDefinition: results[0] };
+            return { prevailingPos, correctDefinition: allDefinitions[0] };
         }
 
         // Get definitions with the prevailing partOfSpeech
@@ -66,7 +76,7 @@ export function DefinitionsTrain({
         const correctDef = defsToChooseFrom[Math.floor(Math.random() * defsToChooseFrom.length)];
 
         return { prevailingPos, correctDefinition: correctDef };
-    }, [results]);
+    }, [results, word]);
 
     // Generate 4 random definitions plus the correct one
     const definitionChoices = useMemo(() => {
@@ -74,33 +84,47 @@ export function DefinitionsTrain({
             return [];
         }
 
-        // Get all definitions grouped by word
+        // Get all definitions grouped by word, including AI definitions
         const allDefinitions = wordsAll.flatMap(word => {
-            if (!word.raw.results || word.raw.results.length === 0) {
-                return [];
+            const definitions = [];
+            
+            // Add regular definitions
+            if (word.raw.results && word.raw.results.length > 0) {
+                // First, find the prevailing pos for this word
+                const posCount = word.raw.results.reduce<Record<string, number>>(
+                    (acc, result) => {
+                        const pos = result.partOfSpeech || 'unknown';
+                        acc[pos] = (acc[pos] || 0) + 1;
+                        return acc;
+                    },
+                    {}
+                );
+
+                const wordPrevailingPos = Object.entries(posCount).reduce(
+                    (a, b) => (b[1] > a[1] ? b : a),
+                )[0];
+
+                // Only return definitions that match the prevailing pos
+                definitions.push(...word.raw.results
+                    .filter(result => result.partOfSpeech === wordPrevailingPos)
+                    .map(result => ({
+                        ...result,
+                        fromWord: word.word,
+                    }))
+                );
             }
 
-            // First, find the prevailing pos for this word
-            const posCount = word.raw.results.reduce<Record<string, number>>(
-                (acc, result) => {
-                    const pos = result.partOfSpeech || 'unknown';
-                    acc[pos] = (acc[pos] || 0) + 1;
-                    return acc;
-                },
-                {}
-            );
+            // Add AI definition if it exists
+            if (word.ai_definition) {
+                definitions.push({
+                    definition: word.ai_definition.definition,
+                    partOfSpeech: word.ai_definition.partOfSpeech || 'unknown',
+                    examples: word.ai_definition.examples || [],
+                    fromWord: word.word
+                });
+            }
 
-            const wordPrevailingPos = Object.entries(posCount).reduce(
-                (a, b) => (b[1] > a[1] ? b : a),
-            )[0];
-
-            // Only return definitions that match the prevailing pos
-            return word.raw.results
-                .filter(result => result.partOfSpeech === wordPrevailingPos)
-                .map(result => ({
-                    ...result,
-                    fromWord: word.word,
-                }));
+            return definitions;
         });
 
         // First try to get definitions with matching partOfSpeech
