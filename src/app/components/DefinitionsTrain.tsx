@@ -1,12 +1,12 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { DBWord, WordData } from '../types';
+import { DBWord, WordData, AIDefinition } from '../types';
 import { Definition } from './Definition';
 import { ToggleSwitch } from './ToggleSwitch';
 
 type DefinitionsTrainProps = {
     results: WordData['results'];
     wordsAll?: DBWord[];
-    word: string | null;
+    word: WordData | null;
     onWordClick: (word: string, addToLearn?: boolean) => void;
     onSuccess?: (definition: string) => void;
     onFailure?: (definition: string) => void;
@@ -37,7 +37,8 @@ export function DefinitionsTrain({
             ...(word?.ai_definition ? [{
                 definition: word.ai_definition.definition,
                 partOfSpeech: word.ai_definition.partOfSpeech || 'unknown',
-                examples: word.ai_definition.examples || []
+                examples: word.ai_definition.examples || [],
+                fromWord: word.word
             }] : [])
         ];
 
