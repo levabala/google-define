@@ -40,24 +40,6 @@ export function Definition({
                     {wordIndex < array.length - 1 ? ' ' : ''}
                 </Fragment>
             ))}
-            {aiDefinition && (
-                <div className="mt-2 p-2 bg-blue-900 rounded">
-                    <div className="text-sm text-blue-300 mb-1 flex items-center gap-2">
-                        <span>AI Definition</span>
-                        <span className="bg-blue-700 text-white px-2 py-1 rounded text-xs">AI</span>
-                    </div>
-                    <p className="text-white">{aiDefinition.definition}</p>
-                    {aiDefinition.examples && aiDefinition.examples.length > 0 && (
-                        <Examples
-                            examples={aiDefinition.examples}
-                            wordsAll={wordsAll}
-                            textSourceSubmitted={textSourceSubmitted}
-                            onWordClick={onWordClick}
-                        />
-                    )}
-                </div>
-            )}
-            
 
             {!hideExamples && result.examples && result.examples.length > 0 && (
                 <Examples
