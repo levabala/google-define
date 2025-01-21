@@ -4,7 +4,9 @@ import { Examples } from './Examples';
 import { DBWord, WordData } from '../types';
 
 type DefinitionProps = {
-    result: NonNullable<WordData['results']>[number];
+    result: NonNullable<WordData['results']>[number] & {
+        source?: 'ai' | 'dictionary';
+    };
     wordsAll?: DBWord[];
     textSourceSubmitted: string | null;
     onWordClick: (word: string, addToLearn?: boolean) => void;
@@ -23,7 +25,13 @@ export function Definition({
     return (
         <div className="text-white">
             {result.partOfSpeech && (
-                <span className="font-bold">{result.partOfSpeech}: </span>
+                <span 
+                    className="font-bold"
+                    style={{ color: result.source === 'ai' ? '#60a5fa' : 'inherit' }}
+                    title={result.source === 'ai' ? 'AI-generated definition' : undefined}
+                >
+                    {result.partOfSpeech}: 
+                </span>
             )}
             {result.definition.split(' ').map((word: string, wordIndex: number, array: string[]) => (
                 <Fragment key={`${word}-${wordIndex}`}>
