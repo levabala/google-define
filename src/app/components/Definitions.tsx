@@ -16,6 +16,8 @@ export function Definitions({
     wordsAll,
     textSourceSubmitted,
     onWordClick,
+    word,
+    useMutationAIDefinition,
 }: DefinitionsProps) {
     return (
         <div className="flex flex-col gap-2">

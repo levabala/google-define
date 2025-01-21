@@ -33,7 +33,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             );
         }
 
-        const wordData = JSON.parse(wordDataCached.raw);
+        const wordData = JSON.parse(wordDataCached.raw as string);
         return NextResponse.json(wordData, {
             status: 200,
         });
@@ -149,7 +149,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
-        return NextResponse.json({ ...dbrecord, raw: JSON.parse(dbrecord.raw) }, { status: 200 });
+        return NextResponse.json({ ...dbrecord, raw: JSON.parse(dbrecord.raw as string) }, { status: 200 });
     } catch (error) {
         return NextResponse.json(
             { error: (error as Error).message || "Unknown error occurred" },

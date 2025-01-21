@@ -51,7 +51,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             throw new Error('Word not found in database');
         }
 
-        const existingData = JSON.parse(updatedWordData.raw);
+        const existingData = JSON.parse(updatedWordData.raw as string);
         if (existingData.ai_definition) {
             return NextResponse.json(existingData.ai_definition, { status: 200 });
         }
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             .from('word')
             .update({ 
                 raw: JSON.stringify({
-                    ...JSON.parse(updatedWordData.raw),
+                    ...JSON.parse(updatedWordData.raw as string),
                     ai_definition: aiDefinition
                 }) 
             })

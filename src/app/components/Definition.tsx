@@ -11,7 +11,7 @@ type DefinitionProps = {
     hideExamples?: boolean;
     disableWordClick?: boolean;
     word: string;
-    useMutationAIDefinition: () => ReturnType<typeof useMutationAIDefinition>;
+    useMutationAIDefinition: () => ReturnType<typeof useMutationAIDefinition>
 };
 
 export function Definition({
@@ -24,7 +24,7 @@ export function Definition({
     word,
     useMutationAIDefinition,
 }: DefinitionProps) {
-    const aiDefinition = result.ai_definition;
+    const aiDefinition = wordsAll?.find(w => w.word === word)?.raw.ai_definition;
     const mutation = useMutationAIDefinition();
     return (
         <div className="text-white">

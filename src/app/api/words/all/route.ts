@@ -18,7 +18,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             return NextResponse.json({ error: 'No words found' }, { status: 404 });
         }
 
-        return NextResponse.json(data.map(w => ({...w, raw: JSON.parse(w.raw)})), { status: 200 });
+        return NextResponse.json(data.map(w => ({...w, raw: JSON.parse(w.raw as string)})), { status: 200 });
     } catch (error) {
         return NextResponse.json(
             { error: (error as Error).message || 'Unknown error occurred' },

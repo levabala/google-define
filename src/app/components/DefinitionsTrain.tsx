@@ -245,7 +245,7 @@ export function DefinitionsTrain({
                             onWordClick={onWordClick}
                             hideExamples
                             disableWordClick={mode === 'answer'}
-                            word={textSourceSubmitted || ''}
+                            word={word || ''}
                             useMutationAIDefinition={() => ({
                                 mutate: () => {},
                                 isPending: false
