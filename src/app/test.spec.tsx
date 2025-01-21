@@ -12,5 +12,5 @@ test("Can use Testing Library", () => {
         />,
     );
     const myComponent = screen.getByText("asd");
-    expect(myComponent).toBeInTheDocument();
+    expect(myComponent).toBeTruthy();
 });

@@ -1,5 +1,6 @@
 import { test, expect } from "bun:test";
 import { screen, render, waitFor } from "@testing-library/react";
+import { withNuqsTestingAdapter } from 'nuqs/adapters/testing';
 import { createWrapper } from './test-utils';
 import Page from './page';
 import { DBWord } from './types';
@@ -57,7 +58,13 @@ test("all words are fetched and displayed, except the hidden ones", async () => 
     render(
         <Wrapper>
             <Page />
-        </Wrapper>
+        </Wrapper>,
+        {
+            wrapper: withNuqsTestingAdapter({
+                searchParams: '',
+                onUrlUpdate: () => {}
+            })
+        }
     );
 
     // Wait for words to be loaded
