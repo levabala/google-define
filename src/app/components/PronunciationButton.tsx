@@ -93,6 +93,7 @@ export function PronunciationButton({ word, className }: Props) {
             )}
             onClick={handleRecording}
             disabled={status === 'recording'}
+            data-testid="pronunciation-button"
             title={
                 status === 'idle'
                     ? 'Record pronunciation'

@@ -16,7 +16,7 @@ export function Examples({
     onWordClick,
 }: ExamplesProps) {
     return (
-        <div className="ml-4">
+        <div className="ml-4" data-testid="examples-container">
             {examples.map((example, index) => (
                 <div key={index} className="text-sm text-gray-400">
                     •{' '}

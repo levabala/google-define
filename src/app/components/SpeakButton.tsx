@@ -21,6 +21,7 @@ export function SpeakButton({ text, className }: Props) {
             )}
             title="Speak word"
             type="button"
+            data-testid="speak-button"
         >
             🔊
         </button>

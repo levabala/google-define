@@ -241,7 +241,7 @@ export function DefinitionsTrain({
     }, [hasAnswered, definitionChoices]);
 
     return (
-        <div className={`flex flex-col gap-1 transition-opacity duration-300`}>
+        <div className={`flex flex-col gap-1 transition-opacity duration-300`} data-testid="definitions-train">
             <div className="flex">
                 <ToggleSwitch
                     checked={mode === 'word'}

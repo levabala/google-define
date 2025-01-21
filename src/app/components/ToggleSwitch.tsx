@@ -20,6 +20,7 @@ export function ToggleSwitch({ checked, onChange, leftLabel, rightLabel }: Props
                 type="button"
                 role="switch"
                 aria-checked={checked}
+                data-testid="toggle-switch"
             >
                 <span
                     className={`

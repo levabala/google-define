@@ -37,7 +37,7 @@ export function StatsDisplay({ stats, word, isLoading, recentGuesses }: Props) {
     if (!stats) return null;
 
     return (
-        <div className="text-white text-sm flex flex-wrap gap-x-3 gap-y-1 items-baseline">
+        <div className="text-white text-sm flex flex-wrap gap-x-3 gap-y-1 items-baseline" data-testid="stats-display">
             <span className="opacity-70">Stats:</span>
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                 <div

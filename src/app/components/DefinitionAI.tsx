@@ -26,6 +26,7 @@ export function DefinitionAI({
     };
 
     return (
+        <div data-testid="definition-ai">
         <Definition
             result={result}
             wordsAll={wordsAll}

@@ -13,6 +13,7 @@ export function Checkbox({ checked, onChange, label }: Props) {
                     className="sr-only peer"
                     checked={checked}
                     onChange={(e) => onChange(e.target.checked)}
+                    data-testid="checkbox-input"
                 />
                 <div className="w-4 h-4 border border-gray-500 peer-checked:bg-blue-500 peer-checked:border-blue-500 rounded transition-colors">
                     {checked && (

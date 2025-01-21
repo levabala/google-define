@@ -39,7 +39,7 @@ export function WordsAll({
     return (
         <div>
             <h2 className="text-white mb-2">my words:</h2>
-            <div className="flex flex-wrap gap-2 text-white">
+            <div className="flex flex-wrap gap-2 text-white" data-testid="words-all-container">
                 {(isLoading || !words ? mockWords : words)
                     .filter(
                         word =>
