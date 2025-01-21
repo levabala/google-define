@@ -1,4 +1,10 @@
-export type Json = string;
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   public: {
@@ -107,6 +113,7 @@ export type Database = {
       }
       word: {
         Row: {
+          ai_definition: Json | null
           created_at: string
           raw: Json
           status: Database["public"]["Enums"]["word_status"]
@@ -114,6 +121,7 @@ export type Database = {
           word: string
         }
         Insert: {
+          ai_definition?: Json | null
           created_at?: string
           raw: Json
           status?: Database["public"]["Enums"]["word_status"]
@@ -121,6 +129,7 @@ export type Database = {
           word: string
         }
         Update: {
+          ai_definition?: Json | null
           created_at?: string
           raw?: Json
           status?: Database["public"]["Enums"]["word_status"]
