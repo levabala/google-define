@@ -15,7 +15,7 @@ import { useQueryGetGuessStats } from './hooks/useQueryGetGuessStats';
 import { useQueryGetRecentGuesses } from './hooks/useQueryGetRecentGuesses';
 import { StatsDisplay } from './components/StatsDisplay';
 import { WordControls } from './components/WordControls';
-import { WordData, DBWord, WordStats } from './types';
+import { DBWord, WordStats } from './types';
 import { Spinner } from './components/Spinner';
 import { toast } from 'react-toastify';
 
@@ -28,7 +28,7 @@ function Main() {
     });
     const [isTraining, setIsTraining] = useState(false);
     const [addNextToLearn, setAddNextToLearn] = useState(false);
-    const [wordToTrain, setWordToTrain] = useState<WordData | null>(null);
+    const [wordToTrain, setWordToTrain] = useState<DBWord | null>(null);
     const [wordToTrainNext, setWordToTrainNext] = useState<string | null>(null);
 
     const addWordMutation = useMutationAddWord();

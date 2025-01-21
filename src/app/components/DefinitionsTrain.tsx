@@ -34,10 +34,10 @@ export function DefinitionsTrain({
         // Create a combined array of regular and AI definitions
         const allDefinitions = [
             ...(results || []),
-            ...(word?.raw.ai_definition ? [{
-                definition: word.raw.ai_definition.definition,
-                partOfSpeech: word.raw.ai_definition.partOfSpeech || 'unknown',
-                examples: word.raw.ai_definition.examples || [],
+            ...(word?.ai_definition ? [{
+                definition: word.ai_definition.definition,
+                partOfSpeech: word.ai_definition.partOfSpeech || 'unknown',
+                examples: word.ai_definition.examples || [],
                 fromWord: word.word
             }] : [])
         ];
@@ -131,11 +131,11 @@ export function DefinitionsTrain({
         // First try to get definitions with matching partOfSpeech
         const matchingDefinitions = allDefinitions.filter(
             def =>
-                def.fromWord !== word &&
+                def.fromWord !== word.word &&
                 def.partOfSpeech === prevailingPos &&
                 !def.definition
                     .toLowerCase()
-                    .includes(word?.toLowerCase() || ''),
+                    .includes(word?.word.toLowerCase() || ''),
         );
 
         // If we don't have enough matching definitions, include other parts of speech
@@ -148,11 +148,11 @@ export function DefinitionsTrain({
             // Get all other definitions (regardless of partOfSpeech)
             const otherPosDefinitions = allDefinitions.filter(
                 def =>
-                    def.fromWord !== word &&
+                    def.fromWord !== word.word &&
                     def.partOfSpeech !== prevailingPos &&
                     !def.definition
                         .toLowerCase()
-                        .includes(word?.toLowerCase() || ''),
+                        .includes(word?.word.toLowerCase() || ''),
             );
 
             // Combine matching and non-matching definitions
@@ -171,7 +171,7 @@ export function DefinitionsTrain({
         const choices = [...randomDefinitions];
         choices.splice(correctIndex, 0, {
             ...correctDefinition,
-            fromWord: word as string,
+            fromWord: word.word,
         });
 
         return choices;
