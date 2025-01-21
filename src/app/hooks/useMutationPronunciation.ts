@@ -18,6 +18,9 @@ export function useMutationPronunciation() {
                 },
                 body: JSON.stringify(data),
             });
+            if (!response.ok) {
+                throw new Error('Failed to submit pronunciation');
+            }
             const result = await response.json();
             return SuccessResponseSchema.parse(result);
         },

@@ -13,6 +13,9 @@ export function useMutationAIDefinition() {
                 },
                 body: JSON.stringify({ word }),
             });
+            if (!response.ok) {
+                throw new Error('Failed to get AI definition');
+            }
             const data = await response.json();
             return AIDefinitionSchema.parse(data);
         },

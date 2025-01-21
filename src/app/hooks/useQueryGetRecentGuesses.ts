@@ -14,11 +14,9 @@ export function useQueryGetRecentGuesses(word: string) {
             );
             url.searchParams.set('word', word);
             const res = await fetch(url);
-
             if (!res.ok) {
                 throw new Error('Failed to fetch recent guesses');
             }
-
             const data = await res.json();
             return RecentGuessesSchema.parse(data);
         },

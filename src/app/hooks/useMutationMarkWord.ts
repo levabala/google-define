@@ -13,6 +13,9 @@ export function useMutationMarkWord() {
                 },
                 body: JSON.stringify({ word, status }),
             });
+            if (!response.ok) {
+                throw new Error('Failed to mark word');
+            }
             return response.json();
         },
         onSuccess: (data, { word, status }) => {

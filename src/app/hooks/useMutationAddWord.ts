@@ -20,6 +20,9 @@ export function useMutationAddWord() {
                 },
                 body: JSON.stringify({ word, initialStatus }),
             });
+            if (!response.ok) {
+                throw new Error('Failed to add word');
+            }
             const data = await response.json();
             return DBWordSchema.parse(data);
         },

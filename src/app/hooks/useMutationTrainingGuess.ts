@@ -18,6 +18,9 @@ export function useMutationTrainingGuess() {
                 },
                 body: JSON.stringify({ word, success, definition }),
             });
+            if (!response.ok) {
+                throw new Error('Failed to submit training guess');
+            }
             const result = await response.json();
             return SuccessResponseSchema.parse(result);
         },

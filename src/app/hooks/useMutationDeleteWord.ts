@@ -9,6 +9,9 @@ export function useMutationDeleteWord() {
             const response = await fetch(`/api/words/one?word=${word}`, {
                 method: 'DELETE',
             });
+            if (!response.ok) {
+                throw new Error('Failed to delete word');
+            }
             const data = await response.json();
             return SuccessResponseSchema.parse(data);
         },
