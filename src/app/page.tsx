@@ -19,11 +19,8 @@ import { Spinner } from './components/Spinner';
 
 export default function Main() {
     const trainingGuessMutation = useMutationTrainingGuess();
-    const [textSourceCurrent, setTextSourceCurrent] = useQueryState('current', {
-        defaultValue: '',
-        clearOnDefault: true,
-    });
-    const [textSourceSubmitted, setTextSourceSubmitted] = useQueryState('submitted', {
+    const [textSourceCurrent, setTextSourceCurrent] = useState('');
+    const [textSourceSubmitted, setTextSourceSubmitted] = useQueryState('word', {
         defaultValue: '',
         clearOnDefault: true,
     });
@@ -96,7 +93,8 @@ export default function Main() {
                     isLoading={!wordsAll}
                     currentWord={textSourceSubmitted}
                     onWordClick={word => {
-                        setTextSourceCurrent(word).then(() => setTextSourceSubmitted(word));
+                        setTextSourceCurrent(word);
+                        setTextSourceSubmitted(word);
                     }}
                 />
                 <button
@@ -177,7 +175,8 @@ export default function Main() {
                             return;
                         }
 
-                        setTextSourceCurrent(wordToTrainNext).then(() => setTextSourceSubmitted(wordToTrainNext));
+                        setTextSourceCurrent(wordToTrainNext);
+                        setTextSourceSubmitted(wordToTrainNext);
                     }}
                 />
             ) : wordCurrent ? (
