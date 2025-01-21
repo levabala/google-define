@@ -58,13 +58,7 @@ test("all words are fetched and displayed, except the hidden ones", async () => 
     render(
         <Wrapper>
             <Page />
-        </Wrapper>,
-        {
-            wrapper: withNuqsTestingAdapter({
-                searchParams: '',
-                onUrlUpdate: () => {}
-            })
-        }
+        </Wrapper>
     );
 
     // Wait for words to be loaded
