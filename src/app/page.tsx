@@ -161,7 +161,7 @@ function Main() {
                 <DefinitionsTrain
                     results={wordToTrain.results}
                     wordsAll={wordsAll}
-                    word={wordToTrain.word}
+                    word={wordToTrain}
                     onWordClick={(word, addToLearn) => {
                         onWordClickCommon(word, addToLearn);
                         setIsTraining(false);

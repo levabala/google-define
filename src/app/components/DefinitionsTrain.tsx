@@ -1,12 +1,12 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { DBWord, WordData, AIDefinition } from '../types';
+import { DBWord } from '../types';
 import { Definition } from './Definition';
 import { ToggleSwitch } from './ToggleSwitch';
 
 type DefinitionsTrainProps = {
-    results: WordData['results'];
+    results: DBWord['raw']['results'];
     wordsAll?: DBWord[];
-    word: WordData | null;
+    word: DBWord | null;
     onWordClick: (word: string, addToLearn?: boolean) => void;
     onSuccess?: (definition: string) => void;
     onFailure?: (definition: string) => void;
@@ -34,10 +34,10 @@ export function DefinitionsTrain({
         // Create a combined array of regular and AI definitions
         const allDefinitions = [
             ...(results || []),
-            ...(word?.ai_definition ? [{
-                definition: word.ai_definition.definition,
-                partOfSpeech: word.ai_definition.partOfSpeech || 'unknown',
-                examples: word.ai_definition.examples || [],
+            ...(word?.raw.ai_definition ? [{
+                definition: word.raw.ai_definition.definition,
+                partOfSpeech: word.raw.ai_definition.partOfSpeech || 'unknown',
+                examples: word.raw.ai_definition.examples || [],
                 fromWord: word.word
             }] : [])
         ];
@@ -250,7 +250,7 @@ export function DefinitionsTrain({
                     rightLabel="Word Mode"
                 />
             </div>
-            <div className="text-m font-bold text-white">{word} is:</div>
+            <div className="text-m font-bold text-white">{word?.word} is:</div>
             {definitionChoices.map((def, index) => (
                 <button
                     key={`${def.definition}-${index}`}
@@ -266,7 +266,7 @@ export function DefinitionsTrain({
                         <Definition
                             result={def}
                             wordsAll={wordsAll}
-                            textSourceSubmitted={word}
+                            textSourceSubmitted={word?.word || null}
                             onWordClick={onWordClick}
                             hideExamples
                             disableWordClick={mode === 'answer'}
