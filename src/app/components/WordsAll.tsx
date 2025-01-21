@@ -47,7 +47,11 @@ export function WordsAll({
                             word.status !== 'HIDDEN',
                     )
                     .map((wordObj, i) => (
-                        <div role="listitem" data-testid="word-list-item">
+                        <div 
+                            key={typeof wordObj === 'string' ? i : wordObj.word}
+                            role="listitem" 
+                            data-testid={`word-list-item-${typeof wordObj === 'string' ? wordObj : wordObj.word}`}
+                        >
                             <Word
                                 key={typeof wordObj === 'string' ? i : wordObj.word}
                                 word={
