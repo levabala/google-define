@@ -52,6 +52,23 @@ export function WordsAll({
                             typeof word === 'string' ||
                             word.status !== 'HIDDEN',
                     )
+                    .sort((a, b) => {
+                        // Sort by status priority: NONE -> TO_LEARN -> LEARNED
+                        const statusOrder = { 
+                            NONE: 0, 
+                            TO_LEARN: 1, 
+                            LEARNED: 2 
+                        };
+                        
+                        const wordA = typeof a === 'string' ? { word: a, status: 'NONE' } : a;
+                        const wordB = typeof b === 'string' ? { word: b, status: 'NONE' } : b;
+                        
+                        const statusA = statusOrder[wordA.status as keyof typeof statusOrder] || 0;
+                        const statusB = statusOrder[wordB.status as keyof typeof statusOrder] || 0;
+                        
+                        if (statusA !== statusB) return statusA - statusB;
+                        return wordA.word.localeCompare(wordB.word);
+                    })
                     .map((wordObj, i) => (
                         <div 
                             key={typeof wordObj === 'string' ? wordObj : wordObj.word}
