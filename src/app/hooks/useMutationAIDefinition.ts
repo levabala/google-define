@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "../providers";
 import type { DBWord } from "../types";
+import { AIDefinitionSchema } from "../schemas";
 
 export function useMutationAIDefinition() {
     return useMutation({

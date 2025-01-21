@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/db';
 import { getUser } from '@/auth';
-import { AIDefinition } from '@/app/types';
+import { AIDefinitionSchema } from '@/app/schemas';
 import { ai } from '@/ai';
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
