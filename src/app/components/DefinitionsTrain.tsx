@@ -248,7 +248,19 @@ export function DefinitionsTrain({
                             word={word || ''}
                             useMutationAIDefinition={() => ({
                                 mutate: () => {},
-                                isPending: false
+                                mutateAsync: async () => ({} as any),
+                                isPending: false,
+                                isSuccess: false,
+                                isError: false,
+                                data: undefined,
+                                error: null,
+                                variables: undefined,
+                                reset: () => {},
+                                context: undefined,
+                                failureCount: 0,
+                                failureReason: null,
+                                isIdle: false,
+                                status: 'idle',
                             })}
                         />
                         <span
