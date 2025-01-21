@@ -26,7 +26,6 @@ function Main() {
         defaultValue: '',
         clearOnDefault: true,
     });
-    const [hasMissingWordError, setHasMissingWordError] = useState(false);
     const [isTraining, setIsTraining] = useState(false);
     const [addNextToLearn, setAddNextToLearn] = useState(false);
     const [wordToTrain, setWordToTrain] = useState<WordData | null>(null);
@@ -38,19 +37,8 @@ function Main() {
 
     useLayoutEffect(() => {
         if (textSourceSubmitted && !wordCurrent && !isFetchingWordCurrent) {
-            setHasMissingWordError(true);
+            setTextSourceCurrent(textSourceSubmitted);
             toast.error(`Word "${textSourceSubmitted}" not found`);
-        } else {
-            setHasMissingWordError(false);
-        }
-    }, [textSourceSubmitted, wordCurrent, isFetchingWordCurrent, setHasMissingWordError]);
-
-    useLayoutEffect(() => {
-        if (textSourceSubmitted && !wordCurrent && !isFetchingWordCurrent) {
-            setHasMissingWordError(true);
-            toast.error(`Word "${textSourceSubmitted}" not found`);
-        } else {
-            setHasMissingWordError(false);
         }
     }, [textSourceSubmitted, wordCurrent, isFetchingWordCurrent]);
 
@@ -137,7 +125,7 @@ function Main() {
             </div>
 
             <WordControls
-                textSourceCurrent={hasMissingWordError ? textSourceSubmitted : textSourceCurrent}
+                textSourceCurrent={textSourceCurrent}
                 setTextSourceCurrent={setTextSourceCurrent}
                 textSourceSubmitted={textSourceSubmitted}
                 setTextSourceSubmitted={async (text) => {
