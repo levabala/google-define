@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { useQueryState } from 'nuqs';
 import { randomInteger } from 'remeda';
 import { WordsAll } from './components/WordsAll';
@@ -81,6 +81,11 @@ export default function Main() {
         wordCurrent,
         wordToTrain,
         wordsAll,
+        setTextSourceCurrent,
+        setTextSourceSubmitted,
+        setIsTraining,
+        setWordToTrain,
+        setWordToTrainNext,
     ]);
 
     return (
