@@ -7,9 +7,11 @@ export function updateWordsAllCache(
     queryClient: QueryClient,
     updater: (words: DBWord[]) => DBWord[],
 ) {
-    queryClient.setQueryData<DBWord[]>(['dictionaryAll'], old => {
+    queryClient.setQueryData<DBWord[]>(['wordsAll'], old => {
         if (!old) return old;
         const updated = updater(old);
-        return z.array(DBWordSchema).parse(updated);
+        // Sort words alphabetically by their word property
+        const sorted = updated.sort((a, b) => a.word.localeCompare(b.word));
+        return z.array(DBWordSchema).parse(sorted);
     });
 }
