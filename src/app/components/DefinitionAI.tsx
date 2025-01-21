@@ -20,7 +20,7 @@ export function DefinitionAI({
 }: DefinitionAIProps) {
     const result = {
         definition,
-        partOfSpeech,
+        partOfSpeech: partOfSpeech ?? null,
         examples,
         source: 'ai' as const,
     };
