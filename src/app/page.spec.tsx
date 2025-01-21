@@ -1,4 +1,4 @@
-import { test, expect } from "bun:test";
+import { test, expect, vi } from "bun:test";
 import { screen, render, waitFor } from "@testing-library/react";
 import { createWrapper } from './test-utils';
 import Page from './page';
@@ -42,12 +42,12 @@ const mockWords: DBWord[] = [
 
 test("all words are fetched and displayed, except the hidden ones", async () => {
     // Mock the fetch implementation
-    global.fetch = jest.fn(() =>
+    global.fetch = vi.fn(() =>
         Promise.resolve({
             ok: true,
             json: () => Promise.resolve(mockWords),
         })
-    ) as jest.Mock;
+    );
 
     const Wrapper = createWrapper();
     

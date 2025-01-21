@@ -10,9 +10,11 @@ export const createWrapper = () => {
         },
     });
     
-    return ({ children }: { children: ReactNode }) => (
+    const WrapperComponent = ({ children }: { children: ReactNode }) => (
         <QueryClientProvider client={queryClient}>
             {children}
         </QueryClientProvider>
     );
+    WrapperComponent.displayName = 'TestWrapper';
+    return WrapperComponent;
 };
