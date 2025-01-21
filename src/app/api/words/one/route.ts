@@ -136,12 +136,20 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         const supabase = await createClient();
         const user = await getUser(req);
 
-        const dbrecord = await supabase.from("word").insert({
-            word: data.word,
-            raw: JSON.stringify(data),
-            status: initialStatus || "NONE",
-            user,
-        });
+        const { data: dbrecord, error } = await supabase
+            .from("word")
+            .insert({
+                word: data.word,
+                raw: JSON.stringify(data),
+                status: initialStatus || "NONE",
+                user,
+            })
+            .select()
+            .single();
+
+        if (error) {
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
 
         console.log({ dbrecord });
 
