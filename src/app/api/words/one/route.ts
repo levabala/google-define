@@ -127,8 +127,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
         const data = (await response.json()) as WordData;
 
-        console.log({ data });
-
         if (!data) {
             throw new Error("no such word in the dictionary");
         }
@@ -151,9 +149,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
-        console.log({ dbrecord });
-
-        return NextResponse.json(dbrecord, { status: 200 });
+        return NextResponse.json({ ...dbrecord, raw: JSON.parse(dbrecord.raw) }, { status: 200 });
     } catch (error) {
         return NextResponse.json(
             { error: (error as Error).message || "Unknown error occurred" },
