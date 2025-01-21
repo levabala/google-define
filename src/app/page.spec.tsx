@@ -1,4 +1,4 @@
-import { test, expect } from "bun:test";
+import { describe, test, expect } from "bun:test";
 import { screen, render, waitFor } from "@testing-library/react";
 import { createWrapper } from './test-utils';
 import { Main } from './page';
