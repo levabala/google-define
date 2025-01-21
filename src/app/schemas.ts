@@ -48,6 +48,11 @@ export const WordResultSchema = z.object({
 export const WordDataSchema = z.object({
     word: z.string(),
     results: z.array(WordResultSchema).optional(),
+    ai_definition: z.object({
+        definition: z.string(),
+        partOfSpeech: z.string().optional(),
+        examples: z.array(z.string()).optional(),
+    }).optional(),
     syllables: z
         .object({
             count: z.number(),

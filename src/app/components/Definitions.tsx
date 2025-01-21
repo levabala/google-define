@@ -7,6 +7,8 @@ type DefinitionsProps = {
     wordsAll?: DBWord[];
     textSourceSubmitted: string | null;
     onWordClick: (word: string, addToLearn?: boolean) => void;
+    word: string;
+    useMutationAIDefinition: () => ReturnType<typeof useMutationAIDefinition>;
 };
 
 export function Definitions({
@@ -24,6 +26,8 @@ export function Definitions({
                     wordsAll={wordsAll}
                     textSourceSubmitted={textSourceSubmitted}
                     onWordClick={onWordClick}
+                    word={word}
+                    useMutationAIDefinition={useMutationAIDefinition}
                 />
             ))}
         </div>

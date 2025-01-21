@@ -3,7 +3,7 @@ import { WordsAllResponseSchema } from '@/app/schemas';
 
 export function useQueryGetWordsAll() {
     return useQuery({
-        queryKey: ['dictionaryAll'],
+        queryKey: ['wordsAll'],
         queryFn: async () => {
             const res = await fetch('/api/words/all').catch(() => null);
 
