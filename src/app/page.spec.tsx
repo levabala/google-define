@@ -73,6 +73,39 @@ const mockWords: DBWord[] = [
         ai_definition: null,
         created_at: new Date().toISOString(),
     },
+    {
+        word: "grape",
+        status: "NONE",
+        raw: {
+            word: "grape",
+            results: [],
+            pronunciation: { all: "grayp" },
+        },
+        ai_definition: null,
+        created_at: new Date().toISOString(),
+    },
+    {
+        word: "honeydew",
+        status: "TO_LEARN",
+        raw: {
+            word: "honeydew",
+            results: [],
+            pronunciation: { all: "huhn-ee-doo" },
+        },
+        ai_definition: null,
+        created_at: new Date().toISOString(),
+    },
+    {
+        word: "kiwi",
+        status: "LEARNED",
+        raw: {
+            word: "kiwi",
+            results: [],
+            pronunciation: { all: "kee-wee" },
+        },
+        ai_definition: null,
+        created_at: new Date().toISOString(),
+    },
 ];
 
 describe("all words", () => {
@@ -128,11 +161,14 @@ describe("all words", () => {
             // 3. LEARNED last (banana, fig)
             // All alphabetically within their groups
             expect(displayedWords).toEqual([
-                "elderberry", // undefined status
+                "elderberry", // NONE (alphabetically first)
+                "grape",      // NONE
                 "apple",      // TO_LEARN
                 "date",       // TO_LEARN
+                "honeydew",   // TO_LEARN
                 "banana",     // LEARNED
-                "fig"         // LEARNED
+                "fig",        // LEARNED
+                "kiwi"        // LEARNED
             ]);
         });
     });
