@@ -21,16 +21,15 @@ export function DefinitionAI({
     onWordClick,
 }: DefinitionAIProps) {
     return (
-        <div className="mt-4 p-2 outline outline-blue-900 rounded">
-            <div className="text-sm text-blue-300 mb-1 flex items-center gap-2">
-                <span className="bg-blue-700 text-white px-2 py-1 rounded text-xs">
-                    AI
+        <div className="text-white">
+            {partOfSpeech && (
+                <span 
+                    className="font-bold text-blue-400"
+                    title="AI-generated definition"
+                >
+                    {partOfSpeech}: 
                 </span>
-            </div>
-            <div className="text-white">
-                {partOfSpeech && (
-                    <span className="font-bold">{partOfSpeech}: </span>
-                )}
+            )}
                 {definition.split(' ').map((word, index, array) => (
                     <Fragment key={`${word}-${index}`}>
                         <Word
@@ -42,10 +41,10 @@ export function DefinitionAI({
                         {index < array.length - 1 ? ' ' : ''}
                     </Fragment>
                 ))}
-            </div>
             {examples && (
                 <Examples
                     examples={examples}
+                    wordsAll={wordsAll}
                     textSourceSubmitted={textSourceSubmitted}
                     onWordClick={onWordClick}
                 />
