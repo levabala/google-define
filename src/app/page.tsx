@@ -119,8 +119,8 @@ export default function Main() {
                 setTextSourceCurrent={setTextSourceCurrent}
                 textSourceSubmitted={textSourceSubmitted}
                 setTextSourceSubmitted={async (text) => {
-                    setTextSourceSubmitted(text).then(() => {
-                        if (text && !wordsAll?.some((w: DBWord) => w.word === text)) {
+                    await setTextSourceSubmitted(text);
+                    if (text && !wordsAll?.some((w: DBWord) => w.word === text)) {
                         await addWordMutation.mutateAsync({
                             word: text,
                             initialStatus: addNextToLearn ? 'TO_LEARN' : undefined
