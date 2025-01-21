@@ -61,7 +61,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             messages: [
                 { 
                     role: 'system', 
-                    content: 'You are an English dictionary assistant. Provide a clear definition, part of speech, and 2 example sentences in JSON format.'
+                    content: 'You are an English dictionary assistant. Provide a clear definition that does not use the target word or any of its derivatives, along with its part of speech and 2 example sentences in JSON format. The definition should be understandable without knowing the target word.'
                 },
                 {
                     role: 'user',
