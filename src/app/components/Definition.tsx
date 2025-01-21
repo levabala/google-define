@@ -2,7 +2,6 @@ import { Fragment } from 'react';
 import { Word } from './Word';
 import { Examples } from './Examples';
 import { DBWord, WordData } from '../types';
-import { useMutationAIDefinition } from '../hooks/useMutationAIDefinition';
 
 type DefinitionProps = {
     result: NonNullable<WordData['results']>[number];
@@ -12,7 +11,6 @@ type DefinitionProps = {
     hideExamples?: boolean;
     disableWordClick?: boolean;
     word: string;
-    useMutationAIDefinition: () => ReturnType<typeof useMutationAIDefinition>
 };
 
 export function Definition({
@@ -26,7 +24,6 @@ export function Definition({
     useMutationAIDefinition,
 }: DefinitionProps) {
     const aiDefinition = wordsAll?.find(w => w.word === word)?.raw.ai_definition;
-    const mutation = useMutationAIDefinition();
     return (
         <div className="text-white">
             {result.partOfSpeech && (
@@ -62,15 +59,6 @@ export function Definition({
                 </div>
             )}
             
-            {!aiDefinition && textSourceSubmitted === word && (
-                <button
-                    onClick={() => mutation.mutate(word)}
-                    className="mt-2 text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
-                    disabled={mutation.isPending}
-                >
-                    {mutation.isPending ? 'Generating...' : 'Generate AI Definition'}
-                </button>
-            )}
 
             {!hideExamples && result.examples && result.examples.length > 0 && (
                 <Examples

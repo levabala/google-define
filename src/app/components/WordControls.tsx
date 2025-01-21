@@ -2,6 +2,7 @@ import { ButtonDelete } from './ButtonDelete';
 import { ButtonLearned } from './ButtonLearned';
 import { ButtonToLearn } from './ButtonToLearn';
 import { SpeakButton } from './SpeakButton';
+import { useMutationAIDefinition } from '../hooks/useMutationAIDefinition';
 import { ToggleSwitch } from './ToggleSwitch';
 import { PronunciationButton } from './PronunciationButton';
 import { DBWord } from '../types';
@@ -25,6 +26,7 @@ export function WordControls({
     setIsTraining,
     wordsAll,
 }: Props) {
+    const mutation = useMutationAIDefinition();
     return (
         <form
             className="mt-2 flex flex-wrap items-center gap-3 w-full"
@@ -66,6 +68,13 @@ export function WordControls({
                         setTextSourceSubmitted={setTextSourceSubmitted}
                         className="flex-shrink-0"
                     />
+                    <button
+                        onClick={() => textSourceSubmitted && mutation.mutate(textSourceSubmitted)}
+                        className="flex-shrink-0 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                        disabled={mutation.isPending}
+                    >
+                        {mutation.isPending ? 'Generating AI...' : 'AI Definition'}
+                    </button>
                 </div>
             )}
 
