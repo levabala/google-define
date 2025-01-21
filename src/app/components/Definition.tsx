@@ -23,7 +23,7 @@ export function Definition({
     disableWordClick,
 }: DefinitionProps) {
     return (
-        <div className="text-white">
+        <div className="text-white" data-testid={`definition-${result.partOfSpeech || 'unknown'}`}>
             {result.partOfSpeech && (
                 <span 
                     className="font-bold"

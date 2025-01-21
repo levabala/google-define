@@ -48,6 +48,7 @@ export function Word({
                 matchedWord ? '' : 'text-gray-400'
             } ${currentWord?.toLowerCase() === word.toLowerCase() ? 'underline' : ''}`}
             style={{ minWidth: '1rem' }}
+            data-testid={`word-${word.toLowerCase()}`}
         >
             {word}
         </span>

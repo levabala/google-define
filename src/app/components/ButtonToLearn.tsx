@@ -37,6 +37,7 @@ export function ButtonToLearn({
                     : 'bg-yellow-600 hover:bg-yellow-700',
                 className
             )}
+            data-testid="to-learn-button"
         >
             To Learn
         </button>

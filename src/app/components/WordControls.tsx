@@ -41,8 +41,13 @@ export function WordControls({
                     value={textSourceCurrent}
                     onChange={e => setTextSourceCurrent(e.target.value)}
                     className="bg-gray-800 text-white border border-gray-500 focus-visible:outline-gray-800"
+                    data-testid="word-input"
                 />
-                <button type="submit" className="bg-gray-300 p-1">
+                <button 
+                    type="submit" 
+                    className="bg-gray-300 p-1"
+                    data-testid="search-button"
+                >
                     Search
                 </button>
             </div>
