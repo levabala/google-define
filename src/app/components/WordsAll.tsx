@@ -47,19 +47,21 @@ export function WordsAll({
                             word.status !== 'HIDDEN',
                     )
                     .map((wordObj, i) => (
-                        <Word
-                            key={typeof wordObj === 'string' ? i : wordObj.word}
-                            word={
-                                typeof wordObj === 'string'
-                                    ? wordObj
-                                    : wordObj.word
-                            }
-                            allWords={words}
-                            currentWord={currentWord}
-                            small
-                            onClick={onWordClick}
-                            isLoading={isLoading || !words}
-                        />
+                        <div role="listitem" data-testid="word-list-item">
+                            <Word
+                                key={typeof wordObj === 'string' ? i : wordObj.word}
+                                word={
+                                    typeof wordObj === 'string'
+                                        ? wordObj
+                                        : wordObj.word
+                                }
+                                allWords={words}
+                                currentWord={currentWord}
+                                small
+                                onClick={onWordClick}
+                                isLoading={isLoading || !words}
+                            />
+                        </div>
                     ))}
             </div>
         </div>

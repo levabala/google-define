@@ -241,7 +241,11 @@ export function DefinitionsTrain({
     }, [hasAnswered, definitionChoices]);
 
     return (
-        <div className={`flex flex-col gap-1 transition-opacity duration-300`} data-testid="definitions-train">
+        <div 
+            className={`flex flex-col gap-1 transition-opacity duration-300`} 
+            data-testid="definitions-train"
+            role="list"
+        >
             <div className="flex">
                 <ToggleSwitch
                     checked={mode === 'word'}
@@ -255,6 +259,8 @@ export function DefinitionsTrain({
                 <button
                     key={`${def.definition}-${index}`}
                     onClick={() => mode === 'answer' && handleSelect(index)}
+                    data-testid={`definition-choice-${index}`}
+                    role="listitem"
                     className={`${getButtonClass(index)} transition-all duration-300 text-white ${
                         mode === 'word'
                             ? 'cursor-default border-gray-700'
