@@ -12,7 +12,14 @@ const mockWords: DBWord[] = [
         status: "TO_LEARN",
         raw: {
             word: "apple",
-            results: [],
+            results: [
+                {
+                    definition: "The round fruit of a tree of the rose family, which typically has thin red or green skin and crisp flesh.",
+                    partOfSpeech: "noun",
+                    synonyms: ["pome", "malus"],
+                    examples: ["I ate an apple for breakfast", "The orchard grows over 50 varieties of apples"]
+                }
+            ],
             pronunciation: { all: "ap-uhl" },
         },
         ai_definition: null,
@@ -162,8 +169,10 @@ describe("word definitions", () => {
             // Verify word is displayed
             expect(screen.getByText('apple')).toBeInTheDocument();
             
-            // Verify definitions container is present
-            expect(screen.getByTestId('definitions-container')).toBeInTheDocument();
+            // Verify definitions content
+            expect(screen.getByText('The round fruit of a tree of the rose family')).toBeInTheDocument();
+            expect(screen.getByText('noun')).toBeInTheDocument();
+            expect(screen.getByText('I ate an apple for breakfast')).toBeInTheDocument();
             
             // Verify word is in the query params
             expect(window.location.search).toContain('word=apple');
