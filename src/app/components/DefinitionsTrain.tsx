@@ -259,7 +259,7 @@ export function DefinitionsTrain({
                                 context: undefined,
                                 failureCount: 0,
                                 failureReason: null,
-                                isIdle: false,
+                                isIdle: true,
                                 status: 'idle',
                                 isPaused: false,
                                 submittedAt: 0,
