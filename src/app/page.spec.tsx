@@ -53,7 +53,7 @@ const mockWords: DBWord[] = [
     },
     {
         word: "elderberry",
-        status: undefined,
+        status: "NONE",
         raw: {
             word: "elderberry",
             results: [],
