@@ -28,16 +28,22 @@ export function WordsAll({
         'preview',
         'text',
         'content',
-        'mock',
-        'data',
-        'state',
-        'preview',
-        'text',
-        'content',
+        'example2',
+        'test2',
+        'loading2',
+        'placeholder2',
+        'word2',
+        'sample2',
+        'mock2',
+        'data2',
+        'state2',
+        'preview2',
+        'text2',
+        'content2',
     ];
 
     return (
-        <div>
+        <div data-testid="words-all">
             <h2 className="text-white mb-2">my words:</h2>
             <div className="flex flex-wrap gap-2 text-white" data-testid="words-all-container">
                 {(isLoading || !words ? mockWords : words)
@@ -48,7 +54,7 @@ export function WordsAll({
                     )
                     .map((wordObj, i) => (
                         <div 
-                            key={typeof wordObj === 'string' ? i : wordObj.word}
+                            key={typeof wordObj === 'string' ? wordObj : wordObj.word}
                             role="listitem" 
                             data-testid={`word-list-item-${typeof wordObj === 'string' ? wordObj : wordObj.word}`}
                         >
