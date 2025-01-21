@@ -123,7 +123,7 @@ describe("all words", () => {
             const displayedWords = wordElements.map((el) => el.textContent);
 
             // Verify sorting order: 
-            // 1. undefined status first (elderberry)
+            // 1. NONE status first (elderberry)
             // 2. TO_LEARN next (apple, date)
             // 3. LEARNED last (banana, fig)
             // All alphabetically within their groups

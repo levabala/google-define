@@ -60,11 +60,11 @@ export function WordsAll({
                             LEARNED: 2 
                         };
                         
-                        const wordA = typeof a === 'string' ? { word: a, status: 'NONE' } : a;
-                        const wordB = typeof b === 'string' ? { word: b, status: 'NONE' } : b;
+                        const wordA = typeof a === 'string' ? { word: a, status: 'NONE' } : { ...a, status: a.status || 'NONE' };
+                        const wordB = typeof b === 'string' ? { word: b, status: 'NONE' } : { ...b, status: b.status || 'NONE' };
                         
-                        const statusA = statusOrder[wordA.status as keyof typeof statusOrder] || 0;
-                        const statusB = statusOrder[wordB.status as keyof typeof statusOrder] || 0;
+                        const statusA = statusOrder[wordA.status as keyof typeof statusOrder];
+                        const statusB = statusOrder[wordB.status as keyof typeof statusOrder];
                         
                         if (statusA !== statusB) return statusA - statusB;
                         return wordA.word.localeCompare(wordB.word);
