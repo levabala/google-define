@@ -1,6 +1,7 @@
 import { afterEach, expect, mock } from "bun:test";
 
 import * as matchers from "@testing-library/jest-dom/matchers";
+import { cleanup } from "@testing-library/react";
 
 expect.extend(matchers);
 
@@ -22,5 +23,6 @@ global.fetch = mockFetch;
 mock.module("node-fetch", () => mockFetch);
 
 afterEach(() => {
+    cleanup();
     mockFetch.mockReset();
 });

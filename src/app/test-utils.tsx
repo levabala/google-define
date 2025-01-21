@@ -1,6 +1,5 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactNode } from 'react';
-import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactNode } from "react";
 
 export const createWrapper = () => {
     const queryClient = new QueryClient({
@@ -10,16 +9,12 @@ export const createWrapper = () => {
             },
         },
     });
-    
+
     const WrapperComponent = ({ children }: { children: ReactNode }) => (
         <QueryClientProvider client={queryClient}>
-            <NuqsAdapter>
-                <div role="main">
-                    {children}
-                </div>
-            </NuqsAdapter>
+            <div role="main">{children}</div>
         </QueryClientProvider>
     );
-    WrapperComponent.displayName = 'TestWrapper';
+    WrapperComponent.displayName = "TestWrapper";
     return WrapperComponent;
 };
