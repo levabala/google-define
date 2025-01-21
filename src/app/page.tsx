@@ -27,7 +27,6 @@ function Main() {
         clearOnDefault: true,
     });
     const [hasMissingWordError, setHasMissingWordError] = useState(false);
-    const [hasMissingWordError, setHasMissingWordError] = useState(false);
     const [isTraining, setIsTraining] = useState(false);
     const [addNextToLearn, setAddNextToLearn] = useState(false);
     const [wordToTrain, setWordToTrain] = useState<WordData | null>(null);
@@ -44,7 +43,7 @@ function Main() {
         } else {
             setHasMissingWordError(false);
         }
-    }, [textSourceSubmitted, wordCurrent, isFetchingWordCurrent]);
+    }, [textSourceSubmitted, wordCurrent, isFetchingWordCurrent, setHasMissingWordError]);
 
     useLayoutEffect(() => {
         if (textSourceSubmitted && !wordCurrent && !isFetchingWordCurrent) {
