@@ -339,4 +339,87 @@ describe("scenarios", () => {
             });
         });
     });
+
+    describe("adding new words", () => {
+        test("should add new word, update words-all, and maintain sorting", async () => {
+            const Wrapper = createWrapper();
+            render(
+                <Wrapper>
+                    <Main />
+                </Wrapper>,
+                {
+                    wrapper: withNuqsTestingAdapter(),
+                },
+            );
+
+            // Wait for initial words to load
+            await waitFor(() => {
+                expect(screen.getByText("apple")).toBeInTheDocument();
+            });
+
+            // Mock the add word endpoint
+            mockFetch.mockImplementation(async (input: RequestInfo | URL) => {
+                const urlStr = input.toString();
+                const path = urlStr.startsWith("/")
+                    ? urlStr
+                    : new URL(urlStr).pathname;
+
+                if (path === "/api/words/one" && urlStr.includes("word=zucchini")) {
+                    const newWord: DBWord = {
+                        word: "zucchini",
+                        status: "NONE",
+                        raw: {
+                            word: "zucchini",
+                            results: [
+                                {
+                                    definition: "A summer squash",
+                                    partOfSpeech: "noun",
+                                    examples: ["I grew zucchini in my garden"],
+                                },
+                            ],
+                            pronunciation: { all: "zoo-kee-nee" },
+                        },
+                        ai_definition: null,
+                        created_at: new Date().toISOString(),
+                    };
+                    return new Response(JSON.stringify(newWord), {
+                        status: 200,
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
+                }
+
+                return new Response(null, { status: 404 });
+            });
+
+            // Find the input and add button
+            const input = screen.getByPlaceholderText("Enter a word");
+            const addButton = screen.getByRole("button", { name: /add/i });
+
+            // Add a new word
+            fireEvent.change(input, { target: { value: "zucchini" } });
+            fireEvent.click(addButton);
+
+            // Wait for new word to appear in words-all
+            await waitFor(() => {
+                expect(screen.getByText("zucchini")).toBeInTheDocument();
+            });
+
+            // Verify definitions loaded
+            await waitFor(() => {
+                const definitionContainer = screen.getByTestId(
+                    "definitions-container",
+                );
+                expect(definitionContainer).toHaveTextContent(
+                    /noun.*A summer squash.*I grew zucchini in my garden/,
+                );
+            });
+
+            // Verify sorting order - zucchini should be first since it's NONE status
+            const wordElements = screen.getAllByTestId("word");
+            const displayedWords = wordElements.map((el) => el.textContent);
+            expect(displayedWords[0]).toBe("zucchini");
+        });
+    });
 });
