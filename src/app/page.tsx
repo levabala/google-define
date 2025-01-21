@@ -25,6 +25,7 @@ function Main() {
         defaultValue: '',
         clearOnDefault: true,
     });
+    const [hasMissingWordError, setHasMissingWordError] = useState(false);
     const [isTraining, setIsTraining] = useState(false);
     const [addNextToLearn, setAddNextToLearn] = useState(false);
     const [wordToTrain, setWordToTrain] = useState<WordData | null>(null);
@@ -33,6 +34,15 @@ function Main() {
     const addWordMutation = useMutationAddWord();
     const wordCurrent = useWord(textSourceSubmitted);
     const isFetchingWordCurrent = !wordCurrent && !!textSourceSubmitted;
+
+    useLayoutEffect(() => {
+        if (textSourceSubmitted && !wordCurrent && !isFetchingWordCurrent) {
+            setHasMissingWordError(true);
+            toast.error(`Word "${textSourceSubmitted}" not found`);
+        } else {
+            setHasMissingWordError(false);
+        }
+    }, [textSourceSubmitted, wordCurrent, isFetchingWordCurrent]);
 
     const { data: stats } = useQueryGetGuessStats(textSourceSubmitted) as {
         data: WordStats | undefined;
@@ -117,7 +127,7 @@ function Main() {
             </div>
 
             <WordControls
-                textSourceCurrent={textSourceCurrent}
+                textSourceCurrent={hasMissingWordError ? textSourceSubmitted : textSourceCurrent}
                 setTextSourceCurrent={setTextSourceCurrent}
                 textSourceSubmitted={textSourceSubmitted}
                 setTextSourceSubmitted={async (text) => {
