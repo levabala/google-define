@@ -394,8 +394,8 @@ describe("scenarios", () => {
             });
 
             // Find the input and add button
-            const input = screen.getByPlaceholderText("Enter a word");
-            const addButton = screen.getByRole("button", { name: /add/i });
+            const input = screen.getByTestId("word-input");
+            const addButton = screen.getByTestId("search-button");
 
             // Add a new word
             fireEvent.change(input, { target: { value: "zucchini" } });
