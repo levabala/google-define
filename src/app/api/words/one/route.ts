@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/db';
-import { getUser } from '@/auth';
-import { WordData } from '@/app/types';
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/utils/db";
+import { getUser } from "@/auth";
+import { WordData } from "@/app/types";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
     const { searchParams } = new URL(req.url);
-    const word = searchParams.get('word');
+    const word = searchParams.get("word");
 
     if (!word) {
         return NextResponse.json(
@@ -19,16 +19,16 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const user = await getUser(req);
 
         const { data: wordDataDB } = await supabase
-            .from('word')
+            .from("word")
             .select()
-            .eq('word', word)
-            .eq('user', user);
+            .eq("word", word)
+            .eq("user", user);
 
         const wordDataCached = wordDataDB?.[0];
 
         if (!wordDataCached) {
             return NextResponse.json(
-                { error: 'Word not found' },
+                { error: "Word not found" },
                 { status: 404 },
             );
         }
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         });
     } catch (error) {
         return NextResponse.json(
-            { error: (error as Error).message || 'Unknown error occurred' },
+            { error: (error as Error).message || "Unknown error occurred" },
             { status: 500 },
         );
     }
@@ -48,9 +48,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 export async function PUT(req: NextRequest): Promise<NextResponse> {
     const { word, status } = await req.json();
 
-    if (!word || !['TO_LEARN', 'LEARNED'].includes(status)) {
+    if (!word || !["TO_LEARN", "LEARNED"].includes(status)) {
         return NextResponse.json(
-            { error: 'Invalid word or status' },
+            { error: "Invalid word or status" },
             { status: 400 },
         );
     }
@@ -59,10 +59,10 @@ export async function PUT(req: NextRequest): Promise<NextResponse> {
 
     const user = await getUser(req);
     const { error } = await supabase
-        .from('word')
+        .from("word")
         .update({ status })
-        .eq('word', word)
-        .eq('user', user);
+        .eq("word", word)
+        .eq("user", user);
 
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -73,20 +73,20 @@ export async function PUT(req: NextRequest): Promise<NextResponse> {
 
 export async function DELETE(req: NextRequest): Promise<NextResponse> {
     const { searchParams } = new URL(req.url);
-    const word = searchParams.get('word');
+    const word = searchParams.get("word");
 
     if (!word) {
-        return NextResponse.json({ error: 'Invalid word' }, { status: 400 });
+        return NextResponse.json({ error: "Invalid word" }, { status: 400 });
     }
 
     const supabase = await createClient();
 
     const user = await getUser(req);
     const { error } = await supabase
-        .from('word')
-        .update({ status: 'HIDDEN' })
-        .eq('word', word)
-        .eq('user', user);
+        .from("word")
+        .update({ status: "HIDDEN" })
+        .eq("word", word)
+        .eq("user", user);
 
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -106,14 +106,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     try {
-        console.warn('------------- wordsapi is hit');
+        console.warn("------------- wordsapi is hit");
         const response = await fetch(
             `https://wordsapiv1.p.rapidapi.com/words/${word}`,
             {
-                method: 'GET',
+                method: "GET",
                 headers: {
-                    'x-rapidapi-host': 'wordsapiv1.p.rapidapi.com',
-                    'x-rapidapi-key': process.env.RAPID_WORDSAPI_KEY as string,
+                    "x-rapidapi-host": "wordsapiv1.p.rapidapi.com",
+                    "x-rapidapi-key": process.env.RAPID_WORDSAPI_KEY as string,
                 },
             },
         );
@@ -127,24 +127,28 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
         const data = (await response.json()) as WordData;
 
+        console.log({ data });
+
         if (!data) {
-            throw new Error('no such word in the dictionary');
+            throw new Error("no such word in the dictionary");
         }
 
         const supabase = await createClient();
         const user = await getUser(req);
 
-        const dbrecord = await supabase.from('word').insert({
+        const dbrecord = await supabase.from("word").insert({
             word: data.word,
             raw: JSON.stringify(data),
-            status: initialStatus || 'NONE',
+            status: initialStatus || "NONE",
             user,
         });
+
+        console.log({ dbrecord });
 
         return NextResponse.json(dbrecord, { status: 200 });
     } catch (error) {
         return NextResponse.json(
-            { error: (error as Error).message || 'Unknown error occurred' },
+            { error: (error as Error).message || "Unknown error occurred" },
             { status: 500 },
         );
     }
