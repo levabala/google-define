@@ -99,7 +99,5 @@ describe("all words", () => {
             // Verify sorting order: TO_LEARN first, then LEARNED, alphabetically within each group
             expect(displayedWords).toEqual(['apple', 'banana']);
         });
-    });
-});
 
     });
