@@ -1,44 +1,44 @@
 import { describe, test, expect } from "bun:test";
 import { screen, render, waitFor } from "@testing-library/react";
-import { createWrapper } from './test-utils';
-import { Main } from './page';
-import { DBWord } from './types';
-import { mockFetch } from '../testing-preload';
+import { createWrapper } from "./test-utils";
+import { Main } from "./page";
+import { DBWord } from "./types";
+import { mockFetch } from "../testing-preload";
 
 const mockWords: DBWord[] = [
     {
-        word: 'apple',
-        status: 'TO_LEARN',
+        word: "apple",
+        status: "TO_LEARN",
         raw: {
-            word: 'apple',
+            word: "apple",
             results: [],
-            pronunciation: { all: 'ap-uhl' }
+            pronunciation: { all: "ap-uhl" },
         },
         ai_definition: null,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
     },
     {
-        word: 'banana',
-        status: 'LEARNED',
+        word: "banana",
+        status: "LEARNED",
         raw: {
-            word: 'banana',
+            word: "banana",
             results: [],
-            pronunciation: { all: 'buh-nan-uh' }
+            pronunciation: { all: "buh-nan-uh" },
         },
         ai_definition: null,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
     },
     {
-        word: 'cherry',
-        status: 'HIDDEN',
+        word: "cherry",
+        status: "HIDDEN",
         raw: {
-            word: 'cherry',
+            word: "cherry",
             results: [],
-            pronunciation: { all: 'cher-ee' }
+            pronunciation: { all: "cher-ee" },
         },
         ai_definition: null,
-        created_at: new Date().toISOString()
-    }
+        created_at: new Date().toISOString(),
+    },
 ];
 
 describe("all words", () => {
@@ -48,27 +48,27 @@ describe("all words", () => {
             return new Response(JSON.stringify(mockWords), {
                 status: 200,
                 headers: {
-                    'Content-Type': 'application/json'
-                }
+                    "Content-Type": "application/json",
+                },
             });
         });
 
         const Wrapper = createWrapper();
-        
+
         render(
             <Wrapper>
                 <Main />
-            </Wrapper>
+            </Wrapper>,
         );
 
         // Wait for words to be loaded
         await waitFor(() => {
             // Check visible words
-            expect(screen.getByText('apple')).toBeInTheDocument();
-            expect(screen.getByText('banana')).toBeInTheDocument();
-            
+            expect(screen.getByText("apple")).toBeInTheDocument();
+            expect(screen.getByText("banana")).toBeInTheDocument();
+
             // Check hidden word is not displayed
-            expect(screen.queryByText('cherry')).not.toBeInTheDocument();
+            expect(screen.queryByText("cherry")).not.toBeInTheDocument();
         });
     });
 
@@ -78,26 +78,26 @@ describe("all words", () => {
             return new Response(JSON.stringify(mockWords), {
                 status: 200,
                 headers: {
-                    'Content-Type': 'application/json'
-                }
+                    "Content-Type": "application/json",
+                },
             });
         });
 
         const Wrapper = createWrapper();
-        
+
         render(
             <Wrapper>
                 <Main />
-            </Wrapper>
+            </Wrapper>,
         );
 
         // Wait for words to be loaded
         await waitFor(() => {
-            const wordElements = screen.getAllByRole('listitem');
-            const displayedWords = wordElements.map(el => el.textContent);
-            
-            // Verify sorting order: TO_LEARN first, then LEARNED, alphabetically within each group
-            expect(displayedWords).toEqual(['apple', 'banana']);
-        });
+            const wordElements = screen.getAllByRole("listitem");
+            const displayedWords = wordElements.map((el) => el.textContent);
 
+            // Verify sorting order: TO_LEARN first, then LEARNED, alphabetically within each group
+            expect(displayedWords).toEqual(["apple", "banana"]);
+        });
     });
+});
