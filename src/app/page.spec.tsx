@@ -60,9 +60,6 @@ test("all words are fetched and displayed, except the hidden ones", async () => 
         </Wrapper>
     );
 
-    // Print snapshot of rendered HTML
-    console.log(document.documentElement.outerHTML);
-
     // Wait for words to be loaded
     await waitFor(() => {
         // Check visible words
