@@ -5,6 +5,7 @@ import { Main } from "./page";
 import { DBWord } from "./types";
 import { mockFetch } from "../testing-preload";
 import { beforeEach } from "bun:test";
+import { withNuqsTestingAdapter } from "nuqs/adapters/testing";
 
 const mockWords: DBWord[] = [
     {
@@ -14,11 +15,15 @@ const mockWords: DBWord[] = [
             word: "apple",
             results: [
                 {
-                    definition: "The round fruit of a tree of the rose family, which typically has thin red or green skin and crisp flesh.",
+                    definition:
+                        "The round fruit of a tree of the rose family, which typically has thin red or green skin and crisp flesh.",
                     partOfSpeech: "noun",
                     synonyms: ["pome", "malus"],
-                    examples: ["I ate an apple for breakfast", "The orchard grows over 50 varieties of apples"]
-                }
+                    examples: [
+                        "I ate an apple for breakfast",
+                        "The orchard grows over 50 varieties of apples",
+                    ],
+                },
             ],
             pronunciation: { all: "ap-uhl" },
         },
@@ -123,13 +128,15 @@ describe("word definitions", () => {
         mockFetch.mockImplementation(async (input: RequestInfo | URL) => {
             // Handle both string and URL inputs
             const urlStr = input.toString();
-            const path = urlStr.startsWith('/') ? urlStr : new URL(urlStr).pathname;
-            
-            if (path === '/api/words/one') {
+            const path = urlStr.startsWith("/")
+                ? urlStr
+                : new URL(urlStr).pathname;
+
+            if (path === "/api/words/one") {
                 // Parse query params from string URL
-                const params = new URLSearchParams(urlStr.split('?')[1] || '');
-                const word = params.get('word');
-                const wordData = mockWords.find(w => w.word === word);
+                const params = new URLSearchParams(urlStr.split("?")[1] || "");
+                const word = params.get("word");
+                const wordData = mockWords.find((w) => w.word === word);
                 return new Response(JSON.stringify(wordData), {
                     status: 200,
                     headers: {
@@ -137,8 +144,8 @@ describe("word definitions", () => {
                     },
                 });
             }
-            
-            if (path === '/api/words/all') {
+
+            if (path === "/api/words/all") {
                 return new Response(JSON.stringify(mockWords), {
                     status: 200,
                     headers: {
@@ -156,26 +163,43 @@ describe("word definitions", () => {
 
     test("should display definitions for word passed via query params", async () => {
         // Set initial query param
-        window.history.pushState({}, '', '/?word=apple');
-        
+        window.history.pushState({}, "", "/?word=apple");
+
+        // render(
+        //     <Wrapper>
+        //         <Main />
+        //     </Wrapper>,
+        // );
         render(
             <Wrapper>
                 <Main />
             </Wrapper>,
+            {
+                wrapper: withNuqsTestingAdapter({
+                    searchParams: "?word=apple",
+                }),
+            },
         );
 
         // Wait for definitions to load
         await waitFor(() => {
-            // Verify word is displayed
-            expect(screen.getByText('apple')).toBeInTheDocument();
-            
+            expect(
+                screen.getByTestId("definitions-container"),
+            ).toBeInTheDocument();
+
             // Verify definitions content
-            expect(screen.getByText('The round fruit of a tree of the rose family')).toBeInTheDocument();
-            expect(screen.getByText('noun')).toBeInTheDocument();
-            expect(screen.getByText('I ate an apple for breakfast')).toBeInTheDocument();
-            
+            expect(
+                screen.getByText(
+                    "The round fruit of a tree of the rose family",
+                ),
+            ).toBeInTheDocument();
+            expect(screen.getByText("noun")).toBeInTheDocument();
+            expect(
+                screen.getByText("I ate an apple for breakfast"),
+            ).toBeInTheDocument();
+
             // Verify word is in the query params
-            expect(window.location.search).toContain('word=apple');
+            expect(window.location.search).toContain("word=apple");
         });
     });
 });
@@ -227,20 +251,20 @@ describe("all words", () => {
             const wordElements = screen.getAllByTestId("word");
             const displayedWords = wordElements.map((el) => el.textContent);
 
-            // Verify sorting order: 
+            // Verify sorting order:
             // 1. NONE status first (elderberry)
             // 2. TO_LEARN next (apple, date)
             // 3. LEARNED last (banana, fig)
             // All alphabetically within their groups
             expect(displayedWords).toEqual([
                 "elderberry", // NONE (alphabetically first)
-                "grape",      // NONE
-                "apple",      // TO_LEARN
-                "date",       // TO_LEARN
-                "honeydew",   // TO_LEARN
-                "banana",     // LEARNED
-                "fig",        // LEARNED
-                "kiwi"        // LEARNED
+                "grape", // NONE
+                "apple", // TO_LEARN
+                "date", // TO_LEARN
+                "honeydew", // TO_LEARN
+                "banana", // LEARNED
+                "fig", // LEARNED
+                "kiwi", // LEARNED
             ]);
         });
     });
