@@ -21,7 +21,6 @@ export function Definition({
     hideExamples,
     disableWordClick,
     word,
-    useMutationAIDefinition,
 }: DefinitionProps) {
     const aiDefinition = wordsAll?.find(w => w.word === word)?.raw.ai_definition;
     return (

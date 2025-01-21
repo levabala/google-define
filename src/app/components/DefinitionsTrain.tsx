@@ -246,24 +246,6 @@ export function DefinitionsTrain({
                             hideExamples
                             disableWordClick={mode === 'answer'}
                             word={word || ''}
-                            useMutationAIDefinition={() => ({
-                                mutate: () => {},
-                                mutateAsync: async () => ({} as unknown),
-                                isPending: false,
-                                isSuccess: false,
-                                isError: false,
-                                data: undefined,
-                                error: null,
-                                variables: undefined,
-                                reset: () => {},
-                                context: undefined,
-                                failureCount: 0,
-                                failureReason: null,
-                                isIdle: true,
-                                status: 'idle',
-                                isPaused: false,
-                                submittedAt: 0,
-                            })}
                         />
                         <span
                             className={`text-white font-bold whitespace-nowrap ${!hasAnswered ? 'invisible' : 'visible'}`}

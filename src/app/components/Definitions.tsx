@@ -1,7 +1,6 @@
 import { Definition } from './Definition';
 import { DBWord } from '../types';
 import { WordData } from '../types';
-import { useMutationAIDefinition } from '../hooks/useMutationAIDefinition';
 
 type DefinitionsProps = {
     results: WordData['results'];
@@ -17,7 +16,6 @@ export function Definitions({
     textSourceSubmitted,
     onWordClick,
     word,
-    useMutationAIDefinition,
 }: DefinitionsProps) {
     return (
         <div className="flex flex-col gap-2">
