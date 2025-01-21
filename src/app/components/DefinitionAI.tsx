@@ -27,11 +27,12 @@ export function DefinitionAI({
 
     return (
         <div data-testid="definition-ai">
-        <Definition
-            result={result}
-            wordsAll={wordsAll}
-            textSourceSubmitted={textSourceSubmitted}
-            onWordClick={onWordClick}
-        />
+            <Definition
+                result={result}
+                wordsAll={wordsAll}
+                textSourceSubmitted={textSourceSubmitted}
+                onWordClick={onWordClick}
+            />
+        </div>
     );
 }

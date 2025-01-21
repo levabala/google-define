@@ -35,13 +35,14 @@ export function ButtonLearned({
                 });
             }}
             disabled={isLearned}
-            className={cn('px-2 py-1 text-white rounded', 
-            data-testid="learned-button"
+            className={cn(
+                'px-2 py-1 text-white rounded', 
                 isLearned
                     ? 'bg-green-800 cursor-not-allowed ring-2 ring-green-400'
                     : 'bg-green-600 hover:bg-green-700',
                 className
             )}
+            data-testid="learned-button"
         >
             Learned
         </button>
