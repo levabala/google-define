@@ -1,21 +1,8 @@
 import { afterEach, mock } from "bun:test";
-import { NextRouter } from "next/router";
 
 export const mockFetch = mock();
 
-// Mock Next.js router and navigation
-mock.module("next/router", () => ({
-    useRouter: () => ({
-        pathname: "/",
-        route: "/",
-        query: {},
-        asPath: "/",
-        push: () => {},
-        replace: () => {},
-        refresh: () => {},
-    }) as NextRouter,
-}));
-
+// Mock Next.js navigation
 mock.module("next/navigation", () => ({
     usePathname: () => "/",
     useRouter: () => ({

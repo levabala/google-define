@@ -1,6 +1,5 @@
 import { test, expect } from "bun:test";
 import { screen, render, waitFor } from "@testing-library/react";
-import { withNuqsTestingAdapter } from 'nuqs/adapters/testing';
 import { createWrapper } from './test-utils';
 import Page from './page';
 import { DBWord } from './types';
