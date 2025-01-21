@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import React, { useLayoutEffect, useState } from 'react';
 import { useQueryState } from 'nuqs';
 import { randomInteger } from 'remeda';
@@ -17,7 +18,7 @@ import { WordControls } from './components/WordControls';
 import { WordData, DBWord, WordStats } from './types';
 import { Spinner } from './components/Spinner';
 
-export default function Main() {
+function Main() {
     const trainingGuessMutation = useMutationTrainingGuess();
     const [textSourceCurrent, setTextSourceCurrent] = useState('');
     const [textSourceSubmitted, setTextSourceSubmitted] = useQueryState('word', {
@@ -189,3 +190,7 @@ export default function Main() {
         </div>
     );
 }
+
+export default dynamic(() => Promise.resolve(Main), { 
+    ssr: false 
+});
