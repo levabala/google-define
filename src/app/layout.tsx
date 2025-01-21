@@ -1,22 +1,23 @@
-import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
-import { Providers } from './providers';
-import './globals.css';
-import { Toast } from './toast';
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Providers } from "./providers";
+import "./globals.css";
+import { Toast } from "./toast";
 
 const geistSans = Geist({
-    variable: '--font-geist-sans',
-    subsets: ['latin'],
+    variable: "--font-geist-sans",
+    subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-    variable: '--font-geist-mono',
-    subsets: ['latin'],
+    variable: "--font-geist-mono",
+    subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-    title: 'Define',
-    description: 'Define - personal dictionary',
+    title: "Define",
+    description: "Define - personal dictionary",
 };
 
 export default function RootLayout({
@@ -29,7 +30,9 @@ export default function RootLayout({
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black p-1`}
             >
-                <Providers>{children}</Providers>
+                <NuqsAdapter>
+                    <Providers>{children}</Providers>
+                </NuqsAdapter>
                 <Toast />
             </body>
         </html>
