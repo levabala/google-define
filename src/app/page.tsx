@@ -29,6 +29,8 @@ export default function Main() {
     const wordCurrent = useWord(textSourceSubmitted);
     const isFetchingWordCurrent = !wordCurrent && !!textSourceSubmitted;
 
+    console.log(wordCurrent);
+
     const { data: stats } = useQueryGetGuessStats(textSourceSubmitted) as {
         data: WordStats | undefined;
     };
@@ -170,10 +172,10 @@ export default function Main() {
                 />
             ) : wordCurrent ? (
                 <Definitions
-                    results={wordCurrent.results}
+                    results={wordCurrent.raw.results}
                     textSourceSubmitted={textSourceSubmitted}
                     onWordClick={onWordClickCommon}
-                    aiDefinition={wordsAll?.find(w => w.word === textSourceSubmitted)?.ai_definition ?? undefined}
+                    aiDefinition={wordCurrent.ai_definition || undefined}
                 />
             ) : null}
         </div>
