@@ -1,6 +1,8 @@
+import { Fragment } from 'react';
 import { Definition } from "./Definition";
 import { Examples } from "./Examples";
-import { WordData } from "../types";
+import { Word } from "./Word";
+import { WordData, DBWord } from "../types";
 
 type DefinitionsProps = {
     results: WordData["results"];
@@ -10,6 +12,7 @@ type DefinitionsProps = {
         definition: string;
         examples?: string[];
     };
+    wordsAll?: DBWord[];
 };
 
 export function Definitions({
@@ -17,6 +20,7 @@ export function Definitions({
     textSourceSubmitted,
     onWordClick,
     aiDefinition,
+    wordsAll,
 }: DefinitionsProps) {
     return (
         <div className="flex flex-col gap-2">
@@ -28,7 +32,19 @@ export function Definitions({
                             AI
                         </span>
                     </div>
-                    <p className="text-white">{aiDefinition.definition}</p>
+                    <div className="text-white">
+                        {aiDefinition.definition.split(' ').map((word, index, array) => (
+                            <Fragment key={`${word}-${index}`}>
+                                <Word
+                                    word={word}
+                                    allWords={wordsAll}
+                                    currentWord={textSourceSubmitted}
+                                    onClick={onWordClick}
+                                />
+                                {index < array.length - 1 ? ' ' : ''}
+                            </Fragment>
+                        ))}
+                    </div>
                     {aiDefinition.examples && (
                         <Examples
                             examples={aiDefinition.examples}

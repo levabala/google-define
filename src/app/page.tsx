@@ -176,6 +176,7 @@ export default function Main() {
                     textSourceSubmitted={textSourceSubmitted}
                     onWordClick={onWordClickCommon}
                     aiDefinition={wordCurrent.ai_definition || undefined}
+                    wordsAll={wordsAll}
                 />
             ) : null}
         </div>
