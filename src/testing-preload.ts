@@ -4,13 +4,14 @@ import { NextRouter } from "next/router";
 export const mockFetch = mock();
 
 // Mock Next.js router
-mock.module('next/router', () => ({
-  useRouter: () => ({
-    pathname: '/',
-    route: '/',
-    query: {},
-    asPath: '/',
-  } as NextRouter),
+mock.module("next/router", () => ({
+    useRouter: () =>
+        ({
+            pathname: "/",
+            route: "/",
+            query: {},
+            asPath: "/",
+        }) as NextRouter,
 }));
 
 global.fetch = mockFetch;
