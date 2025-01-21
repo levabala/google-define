@@ -165,11 +165,6 @@ describe("word definitions", () => {
         // Set initial query param
         window.history.pushState({}, "", "/?word=apple");
 
-        // render(
-        //     <Wrapper>
-        //         <Main />
-        //     </Wrapper>,
-        // );
         render(
             <Wrapper>
                 <Main />
