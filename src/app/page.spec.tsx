@@ -114,9 +114,14 @@ describe("word definitions", () => {
     beforeEach(() => {
         // Mock the fetch implementation
         mockFetch.mockImplementation(async (input: RequestInfo | URL) => {
-            const url = new URL(input.toString());
-            if (url.pathname === '/api/words/one') {
-                const word = url.searchParams.get('word');
+            // Handle both string and URL inputs
+            const urlStr = input.toString();
+            const path = urlStr.startsWith('/') ? urlStr : new URL(urlStr).pathname;
+            
+            if (path === '/api/words/one') {
+                // Parse query params from string URL
+                const params = new URLSearchParams(urlStr.split('?')[1] || '');
+                const word = params.get('word');
                 const wordData = mockWords.find(w => w.word === word);
                 return new Response(JSON.stringify(wordData), {
                     status: 200,
@@ -126,12 +131,17 @@ describe("word definitions", () => {
                 });
             }
             
-            return new Response(JSON.stringify(mockWords), {
-                status: 200,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+            if (path === '/api/words/all') {
+                return new Response(JSON.stringify(mockWords), {
+                    status: 200,
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+            }
+
+            // Default response for other endpoints
+            return new Response(null, { status: 404 });
         });
 
         Wrapper = createWrapper();
