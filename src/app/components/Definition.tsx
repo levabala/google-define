@@ -30,7 +30,7 @@ export function Definition({
                     style={{ color: result.source === 'ai' ? '#60a5fa' : 'inherit' }}
                     title={result.source === 'ai' ? 'AI-generated definition' : undefined}
                 >
-                    {result.partOfSpeech}: 
+                    {result.partOfSpeech}:{' '}
                 </span>
             )}
             {result.definition.split(' ').map((word: string, wordIndex: number, array: string[]) => (
