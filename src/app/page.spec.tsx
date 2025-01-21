@@ -42,12 +42,14 @@ const mockWords: DBWord[] = [
 
 test("all words are fetched and displayed, except the hidden ones", async () => {
     // Mock the fetch implementation
-    global.fetch = mock(() =>
-        Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve(mockWords),
-        })
-    );
+    mockFetch.mockImplementationOnce(async () => {
+        return new Response(JSON.stringify(mockWords), {
+            status: 200,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    });
 
     const Wrapper = createWrapper();
     
