@@ -10,7 +10,6 @@ type DefinitionProps = {
     onWordClick: (word: string, addToLearn?: boolean) => void;
     hideExamples?: boolean;
     disableWordClick?: boolean;
-    word: string;
 };
 
 export function Definition({
@@ -20,7 +19,6 @@ export function Definition({
     onWordClick,
     hideExamples,
     disableWordClick,
-    word,
 }: DefinitionProps) {
     return (
         <div className="text-white">
