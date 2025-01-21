@@ -25,6 +25,7 @@ export function Definitions({
             {aiDefinition && (
                 <DefinitionAI
                     definition={aiDefinition.definition}
+                    partOfSpeech={aiDefinition.partOfSpeech}
                     examples={aiDefinition.examples}
                     wordsAll={wordsAll}
                     textSourceSubmitted={textSourceSubmitted}

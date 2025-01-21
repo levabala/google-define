@@ -5,6 +5,7 @@ import { DBWord } from '../types';
 
 type DefinitionAIProps = {
     definition: string;
+    partOfSpeech?: string;
     examples?: string[];
     wordsAll?: DBWord[];
     textSourceSubmitted: string | null;
@@ -26,6 +27,9 @@ export function DefinitionAI({
                 </span>
             </div>
             <div className="text-white">
+                {partOfSpeech && (
+                    <span className="font-bold">{partOfSpeech}: </span>
+                )}
                 {definition.split(' ').map((word, index, array) => (
                     <Fragment key={`${word}-${index}`}>
                         <Word
