@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect } from 'react';
+import { useQueryState } from 'nuqs';
 import { randomInteger } from 'remeda';
 import { WordsAll } from './components/WordsAll';
 import { Definitions } from './components/Definitions';
@@ -18,8 +19,14 @@ import { Spinner } from './components/Spinner';
 
 export default function Main() {
     const trainingGuessMutation = useMutationTrainingGuess();
-    const [textSourceCurrent, setTextSourceCurrent] = useState<string>('');
-    const [textSourceSubmitted, setTextSourceSubmitted] = useState<string>('');
+    const [textSourceCurrent, setTextSourceCurrent] = useQueryState('current', {
+        defaultValue: '',
+        clearOnDefault: true,
+    });
+    const [textSourceSubmitted, setTextSourceSubmitted] = useQueryState('submitted', {
+        defaultValue: '',
+        clearOnDefault: true,
+    });
     const [isTraining, setIsTraining] = useState(false);
     const [addNextToLearn, setAddNextToLearn] = useState(false);
     const [wordToTrain, setWordToTrain] = useState<WordData | null>(null);
@@ -84,8 +91,7 @@ export default function Main() {
                     isLoading={!wordsAll}
                     currentWord={textSourceSubmitted}
                     onWordClick={word => {
-                        setTextSourceCurrent(word);
-                        setTextSourceSubmitted(word);
+                        setTextSourceCurrent(word).then(() => setTextSourceSubmitted(word));
                     }}
                 />
                 <button
@@ -113,8 +119,8 @@ export default function Main() {
                 setTextSourceCurrent={setTextSourceCurrent}
                 textSourceSubmitted={textSourceSubmitted}
                 setTextSourceSubmitted={async (text) => {
-                    setTextSourceSubmitted(text);
-                    if (text && !wordsAll?.some((w: DBWord) => w.word === text)) {
+                    setTextSourceSubmitted(text).then(() => {
+                        if (text && !wordsAll?.some((w: DBWord) => w.word === text)) {
                         await addWordMutation.mutateAsync({
                             word: text,
                             initialStatus: addNextToLearn ? 'TO_LEARN' : undefined
@@ -166,8 +172,7 @@ export default function Main() {
                             return;
                         }
 
-                        setTextSourceCurrent(wordToTrainNext);
-                        setTextSourceSubmitted(wordToTrainNext);
+                        setTextSourceCurrent(wordToTrainNext).then(() => setTextSourceSubmitted(wordToTrainNext));
                     }}
                 />
             ) : wordCurrent ? (
