@@ -245,6 +245,11 @@ export function DefinitionsTrain({
                             onWordClick={onWordClick}
                             hideExamples
                             disableWordClick={mode === 'answer'}
+                            word={textSourceSubmitted || ''}
+                            useMutationAIDefinition={() => ({
+                                mutate: () => {},
+                                isPending: false
+                            })}
                         />
                         <span
                             className={`text-white font-bold whitespace-nowrap ${!hasAnswered ? 'invisible' : 'visible'}`}
