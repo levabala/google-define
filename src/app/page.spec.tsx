@@ -63,10 +63,10 @@ test("all words are fetched and displayed, except the hidden ones", async () => 
     // Wait for words to be loaded
     await waitFor(() => {
         // Check visible words
-        expect(screen.getByText('apple')).toBeTruthy();
-        expect(screen.getByText('banana')).toBeTruthy();
+        expect(screen.getByText('apple')).toBeInTheDocument();
+        expect(screen.getByText('banana')).toBeInTheDocument();
         
         // Check hidden word is not displayed
-        expect(screen.queryByText('cherry')).toBeNull();
+        expect(screen.queryByText('cherry')).not.toBeInTheDocument();
     });
 });
