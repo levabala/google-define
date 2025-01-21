@@ -60,13 +60,16 @@ test("all words are fetched and displayed, except the hidden ones", async () => 
         </Wrapper>
     );
 
+    // Print snapshot of rendered HTML
+    console.log(document.documentElement.outerHTML);
+
     // Wait for words to be loaded
     await waitFor(() => {
         // Check visible words
-        expect(screen.getByText('apple')).toBeInTheDocument();
-        expect(screen.getByText('banana')).toBeInTheDocument();
+        expect(screen.getByText('apple')).toBeTruthy();
+        expect(screen.getByText('banana')).toBeTruthy();
         
         // Check hidden word is not displayed
-        expect(screen.queryByText('cherry')).not.toBeInTheDocument();
+        expect(screen.queryByText('cherry')).toBeNull();
     });
 });
