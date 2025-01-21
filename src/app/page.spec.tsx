@@ -1,8 +1,9 @@
-import { test, expect, mock } from "bun:test";
+import { test, expect } from "bun:test";
 import { screen, render, waitFor } from "@testing-library/react";
 import { createWrapper } from './test-utils';
 import Page from './page';
 import { DBWord } from './types';
+import { mockFetch } from '../testing-preload';
 
 const mockWords: DBWord[] = [
     {
