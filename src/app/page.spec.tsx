@@ -1,7 +1,7 @@
 import { test, expect } from "bun:test";
 import { screen, render, waitFor } from "@testing-library/react";
 import { createWrapper } from './test-utils';
-import Page from './page';
+import { Main } from './page';
 import { DBWord } from './types';
 import { mockFetch } from '../testing-preload';
 
@@ -56,7 +56,7 @@ test("all words are fetched and displayed, except the hidden ones", async () => 
     
     render(
         <Wrapper>
-            <Page />
+            <Main />
         </Wrapper>
     );
 

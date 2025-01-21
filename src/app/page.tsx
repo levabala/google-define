@@ -205,6 +205,7 @@ function Main() {
     );
 }
 
+export { Main };
 export default dynamic(() => Promise.resolve(Main), { 
     ssr: false 
 });
