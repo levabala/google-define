@@ -1,6 +1,5 @@
 import { Definition } from "./Definition";
 import { Examples } from "./Examples";
-import { DBWord } from "../types";
 import { WordData } from "../types";
 
 type DefinitionsProps = {
@@ -15,10 +14,9 @@ type DefinitionsProps = {
 
 export function Definitions({
     results,
-    wordsAll,
     textSourceSubmitted,
     onWordClick,
-    word,
+    aiDefinition,
 }: DefinitionsProps) {
     return (
         <div className="flex flex-col gap-2">

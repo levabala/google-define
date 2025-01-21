@@ -173,7 +173,7 @@ export default function Main() {
                     results={wordCurrent.results}
                     textSourceSubmitted={textSourceSubmitted}
                     onWordClick={onWordClickCommon}
-                    aiDefinition={wordsAll?.find(w => w.word === textSourceSubmitted)?.ai_definition}
+                    aiDefinition={wordsAll?.find(w => w.word === textSourceSubmitted)?.ai_definition ?? undefined}
                 />
             ) : null}
         </div>
