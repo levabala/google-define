@@ -176,7 +176,6 @@ export default function Main() {
                     textSourceSubmitted={textSourceSubmitted}
                     onWordClick={onWordClickCommon}
                     word={textSourceSubmitted}
-                    useMutationAIDefinition={() => ({ mutate: generateAIDefinition, isPending: isGeneratingDefinition })}
                 />
             ) : null}
         </div>
