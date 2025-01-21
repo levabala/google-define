@@ -1,4 +1,5 @@
 import { Definition } from './Definition';
+import { Examples } from './Examples';
 import { DBWord } from '../types';
 import { WordData } from '../types';
 

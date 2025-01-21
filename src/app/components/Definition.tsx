@@ -22,7 +22,6 @@ export function Definition({
     disableWordClick,
     word,
 }: DefinitionProps) {
-    const aiDefinition = wordsAll?.find(w => w.word === word)?.raw.ai_definition;
     return (
         <div className="text-white">
             {result.partOfSpeech && (
