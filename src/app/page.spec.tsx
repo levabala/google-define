@@ -154,7 +154,7 @@ describe("word definitions", () => {
                 });
             }
 
-            // Default response for other endpoints
+            // Handle other endpoints
             return new Response(null, { status: 404 });
         });
 
