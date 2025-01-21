@@ -159,7 +159,7 @@ function Main() {
                 <Spinner />
             ) : isTraining && wordToTrain && wordsAll ? (
                 <DefinitionsTrain
-                    results={wordToTrain.results}
+                    results={wordToTrain.raw.results}
                     wordsAll={wordsAll}
                     word={wordToTrain}
                     onWordClick={(word, addToLearn) => {
