@@ -422,7 +422,6 @@ describe("scenarios", () => {
                 );
             });
 
-            // Verify sorting order - zucchini should be first since it's NONE status
             const wordElements = screen.getAllByTestId("word");
             const displayedWords = wordElements.map((el) => el.textContent);
 
