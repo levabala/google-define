@@ -30,6 +30,7 @@ export function SpellingTrain({
     const handleSubmit = async () => {
         setIsLoading(true);
         try {
+            // TODO: extract to a mutation
             const response = await fetch('/api/training/spelling', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
