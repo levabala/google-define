@@ -26,7 +26,7 @@ export function ButtonBase({
             className={cn(
                 'px-4 py-1 rounded inline-flex items-center justify-center gap-2',
                 'transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
-                'disabled:cursor-not-allowed',
+                'disabled:cursor-not-allowed text-white',
                 className
             )}
             data-testid={testId}
