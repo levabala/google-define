@@ -7,7 +7,7 @@ import { Definition } from './Definition';
 type SpellingTrainProps = {
     word: DBWord;
     definition: string;
-    wordsAll?: DBWord[];
+    wordsAll: DBWord[];
     onSuccess: () => void;
     onFailure: (errors: number) => void;
     onNext: () => void;
