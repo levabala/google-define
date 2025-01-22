@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/db';
-import { getUser } from '@/auth';
-import { AIDefinitionSchema } from '@/app/schemas';
-import { ai } from '@/ai';
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/utils/db";
+import { getUser } from "@/auth";
+import { AIDefinitionSchema } from "@/app/schemas";
+import { ai } from "@/ai";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
     const { word } = await req.json();
 
     if (!word) {
         return NextResponse.json(
-            { error: 'Error: the word is invalid' },
+            { error: "Error: the word is invalid" },
             { status: 400 },
         );
     }
@@ -19,88 +19,66 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         const supabase = await createClient();
         const user = await getUser(req);
 
-        const { data: wordDataDB } = await supabase
-            .from('word')
+        const { data: wordDB } = await supabase
+            .from("word")
             .select()
-            .eq('word', word)
-            .eq('user', user);
-
-        const wordDataCached = wordDataDB?.[0];
+            .eq("word", word)
+            .eq("user", user).single();
         
-        if (!wordDataCached) {
-            // Word not found, fetch from Words API first
-            const response = await fetch(`/api/words/one`, {
-                method: 'POST',
-                body: JSON.stringify({ word }),
+        if (!wordDB) {
+            throw new Error('No such word acquired');
+        }
+
+        if (wordDB.ai_definition) {
+            return NextResponse.json(wordDB.ai_definition, {
+                status: 200,
             });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch word data');
-            }
-        }
-
-        // Check if we already have an AI definition
-        const { data: updatedWordData } = await supabase
-            .from('word')
-            .select()
-            .eq('word', word)
-            .eq('user', user)
-            .single();
-
-        if (!updatedWordData) {
-            throw new Error('Word not found in database');
-        }
-
-        const existingData = JSON.parse(updatedWordData.raw as string);
-        if (existingData.ai_definition) {
-            return NextResponse.json(existingData.ai_definition, { status: 200 });
         }
 
         // Query AI for definition since we don't have it
         const aiResponse = await ai({
             messages: [
-                { 
-                    role: 'system', 
-                    content: 'You are an English dictionary assistant. Provide a clear definition that does not use the target word or any of its derivatives, along with its part of speech and 2 example sentences in JSON format. The definition should be understandable without knowing the target word. Do not capitalize the first letter of sentences in the definition or examples.'
+                {
+                    role: "system",
+                    content:
+                        "You are an English dictionary assistant. Provide a clear definition that does not use the target word or any of its derivatives, along with its part of speech and 2 example sentences in JSON format. The definition should be understandable without knowing the target word. Do not capitalize the first letter of sentences in the definition or examples.",
                 },
                 {
-                    role: 'user',
-                    content: `Define the word "${word}" in JSON format with these fields: definition (string), partOfSpeech (string), examples (array of 2 strings)`
-                }
+                    role: "user",
+                    content: `Define the word "${word}" in JSON format with these fields: definition (string), partOfSpeech (string), examples (array of 2 strings)`,
+                },
             ],
-            model: 'deepseek-chat',
-            response_format: { type: 'json_object' }
+            model: "deepseek-chat",
+            response_format: { type: "json_object" },
         });
 
         // Parse and validate AI response
         // Handle both streaming and non-streaming responses
-        const content = 'choices' in aiResponse 
-            ? aiResponse.choices[0].message.content
-            : await (async () => {
-                let result = '';
-                for await (const chunk of aiResponse) {
-                    result += chunk.choices[0]?.delta?.content || '';
-                }
-                return result;
-            })();
-            
+        const content =
+            "choices" in aiResponse
+                ? aiResponse.choices[0].message.content
+                : await (async () => {
+                      let result = "";
+                      for await (const chunk of aiResponse) {
+                          result += chunk.choices[0]?.delta?.content || "";
+                      }
+                      return result;
+                  })();
+
         if (!content) {
-            throw new Error('No content received from AI');
+            throw new Error("No content received from AI");
         }
 
         const aiDefinition = AIDefinitionSchema.parse(JSON.parse(content));
 
         // Update existing word record with AI definition
         const { error } = await supabase
-            .from('word')
-            .update({ 
-                raw: JSON.stringify({
-                    ...JSON.parse(updatedWordData.raw as string),
-                    ai_definition: aiDefinition
-                }) 
+            .from("word")
+            .update({
+                ai_definition: aiDefinition,
             })
-            .eq('word', word)
-            .eq('user', user);
+            .eq("word", word)
+            .eq("user", user);
 
         if (error) {
             throw new Error(`Database error: ${error.message}`);
@@ -109,7 +87,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         return NextResponse.json(aiDefinition, { status: 200 });
     } catch (error) {
         return NextResponse.json(
-            { error: (error as Error).message || 'Unknown error occurred' },
+            { error: (error as Error).message || "Unknown error occurred" },
             { status: 500 },
         );
     }
