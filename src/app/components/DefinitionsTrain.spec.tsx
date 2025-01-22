@@ -67,33 +67,10 @@ const mockWordsAll: DBWord[] = [
 ];
 
 const mockWordWithBothDefinitions = mockWordsAll[0];
-    word: "apple",
-    status: "TO_LEARN",
-    raw: {
-        word: "apple",
-        results: [
-            {
-                definition: "The round fruit of a tree of the rose family",
-                partOfSpeech: "noun",
-                examples: ["I ate an apple for breakfast"],
-            },
-            {
-                definition: "A tech company known for its smartphones",
-                partOfSpeech: "noun",
-                examples: ["Apple released a new iPhone"],
-            },
-        ],
-        pronunciation: { all: "ap-uhl" },
-    },
-    ai_definition: {
-        definition: "A popular fruit often used in desserts",
-        partOfSpeech: "noun",
-        examples: ["Apple pie is a classic American dessert"],
-    },
-    created_at: new Date().toISOString(),
-};
+const mockWordWithOnlyDictionary = mockWordsAll[1];
+const mockWordWithOnlyAI = mockWordsAll[2];
 
-const mockWordWithOnlyDictionary: DBWord = {
+describe("DefinitionsTrain", () => {
     word: "banana",
     status: "TO_LEARN",
     raw: {
