@@ -24,7 +24,7 @@ export function ButtonBase({
             onClick={onClick}
             disabled={disabled || isLoading}
             className={cn(
-                'px-4 py-1 rounded inline-flex items-center justify-center gap-2',
+                'px-4 py-1 rounded relative inline-flex items-center justify-center gap-2',
                 'transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
                 'disabled:cursor-not-allowed text-white',
                 className
@@ -32,8 +32,12 @@ export function ButtonBase({
             data-testid={testId}
             aria-disabled={disabled || isLoading}
         >
-            {isLoading && <Spinner className="h-4 w-4 shrink-0" />}
-            <span className="whitespace-nowrap">{children}</span>
+            <span className={cn('whitespace-nowrap', isLoading && 'invisible')}>{children}</span>
+            {isLoading && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <Spinner className="h-4 w-4" />
+                </div>
+            )}
         </button>
     );
 }
