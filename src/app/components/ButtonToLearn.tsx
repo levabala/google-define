@@ -32,22 +32,15 @@ export function ButtonToLearn({
                 });
             }}
             disabled={isToLearn || isLoading}
-            className={cn('px-2 py-1 text-white rounded inline-flex items-center justify-center gap-2 w-[100px]', 
+            className={cn(
                 isToLearn
-                    ? 'bg-yellow-800 cursor-not-allowed ring-2 ring-yellow-400'
-                    : 'bg-yellow-600 hover:bg-yellow-700',
+                    ? 'bg-yellow-800 ring-2 ring-yellow-400'
+                    : 'bg-yellow-600 hover:bg-yellow-700 text-white',
                 className
             )}
-            data-testid="to-learn-button"
+            testId="to-learn-button"
         >
-            {isLoading ? (
-                <>
-                    <Spinner className="h-4 w-4" />
-                    <span>Marking...</span>
-                </>
-            ) : (
-                'To Learn'
-            )}
-        </button>
+            {isLoading ? 'Marking...' : 'To Learn'}
+        </ButtonBase>
     );
 }

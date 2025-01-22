@@ -32,22 +32,14 @@ export function ButtonLearned({
             }}
             disabled={isLearned || isLoading}
             className={cn(
-                'px-2 py-1 text-white rounded inline-flex items-center justify-center gap-2 w-[100px]', 
                 isLearned
-                    ? 'bg-green-800 cursor-not-allowed ring-2 ring-green-400'
-                    : 'bg-green-600 hover:bg-green-700',
+                    ? 'bg-green-800 ring-2 ring-green-400'
+                    : 'bg-green-600 hover:bg-green-700 text-white',
                 className
             )}
-            data-testid="learned-button"
+            testId="learned-button"
         >
-            {isLoading || true ? (
-                <>
-                    <Spinner className="h-4 w-4" />
-                    <span>Marking...</span>
-                </>
-            ) : (
-                'Learned'
-            )}
-        </button>
+            {isLoading ? 'Marking...' : 'Learned'}
+        </ButtonBase>
     );
 }
