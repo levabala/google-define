@@ -138,6 +138,7 @@ function Main() {
             />
 
             <WordControls
+                mode={mode}
                 textSourceCurrent={textSourceCurrent}
                 setTextSourceCurrent={setTextSourceCurrent}
                 textSourceSubmitted={textSourceSubmitted}

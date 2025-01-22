@@ -7,6 +7,7 @@ import { PronunciationButton } from './PronunciationButton';
 import { DBWord } from '../types';
 
 type Props = {
+    mode: 'explore' | 'definition' | 'spelling';
     textSourceCurrent: string;
     setTextSourceCurrent: (text: string) => void;
     textSourceSubmitted: string;
@@ -32,7 +33,7 @@ export function WordControls({
         >
             <div className="flex items-center gap-2 flex-shrink-0">
                 <input
-                    type="text"
+                    type={mode === 'spelling' ? 'password' : 'text'}
                     value={textSourceCurrent}
                     onChange={e => setTextSourceCurrent(e.target.value)}
                     className="bg-gray-800 text-white border border-gray-500 focus-visible:outline-gray-800"
