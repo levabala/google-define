@@ -383,7 +383,11 @@ describe("scenarios", () => {
 
             // Find the elderberry word and its TO_LEARN button
             const elderberryWord = screen.getByText("elderberry");
-            const toLearnButton = within(elderberryWord.parentElement!).getByRole('button', { name: /to learn/i });
+            const wordContainer = elderberryWord.closest('[data-testid="word"]');
+            if (!wordContainer) {
+                throw new Error('Could not find word container');
+            }
+            const toLearnButton = within(wordContainer).getByRole('button', { name: /to learn/i });
 
             // Click the TO_LEARN button
             fireEvent.click(toLearnButton);
