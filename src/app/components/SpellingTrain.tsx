@@ -70,24 +70,33 @@ export function SpellingTrain({
                 hideExamples
             />
             
-            <input
-                type="text"
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                className="p-2 border rounded bg-gray-800 text-white"
-                placeholder="Type the word..."
-                disabled={submitted || isLoading}
-            />
-            
-            {!submitted ? (
-                <ButtonBase
-                    onClick={handleSubmit}
-                    disabled={isLoading || !answer.trim()}
-                    className="bg-blue-600 hover:bg-blue-700"
-                >
-                    {isLoading ? <Spinner className="h-5 w-5" /> : 'Submit'}
-                </ButtonBase>
-            ) : (
+            <form 
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!submitted && answer.trim()) {
+                        handleSubmit();
+                    }
+                }}
+                className="flex flex-col gap-4"
+            >
+                <input
+                    type="text"
+                    value={answer}
+                    onChange={(e) => setAnswer(e.target.value)}
+                    className="p-2 border rounded bg-gray-800 text-white"
+                    placeholder="Type the word..."
+                    disabled={submitted || isLoading}
+                />
+                
+                {!submitted ? (
+                    <ButtonBase
+                        type="submit"
+                        disabled={isLoading || !answer.trim()}
+                        className="bg-blue-600 hover:bg-blue-700"
+                    >
+                        {isLoading ? <Spinner className="h-5 w-5" /> : 'Submit'}
+                    </ButtonBase>
+                ) : (
                 <ButtonBase
                     onClick={() => {
                         setAnswer('');
@@ -102,8 +111,9 @@ export function SpellingTrain({
                     )}
                 >
                     Next Word
-                </ButtonBase>
-            )}
+                    </ButtonBase>
+                )}
+            </form>
         </div>
     );
 }
