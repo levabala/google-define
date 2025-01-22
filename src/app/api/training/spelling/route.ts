@@ -18,11 +18,9 @@ export async function POST(req: NextRequest) {
     // Calculate letter differences
     const errors = calculateSpellingErrors(word, answer);
 
-    // TODO: should be an insert to training_spelling instead
-    const { error } = await supabase.from('training').insert({
+    const { error } = await supabase.from('training_spelling').insert({
         word,
-        // FIXME: wtf is that
-        definition: `spelling_attempt:${answer}`,
+        attempt: answer,
         is_success: errors === 0,
         user
     });

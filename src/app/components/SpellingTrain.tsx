@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useMutationSpelling } from '../hooks/useMutationSpelling';
 import { cn } from '../../utils/cn';
 import { ButtonBase } from './ButtonBase';
 import { Spinner } from './Spinner';
@@ -27,20 +28,15 @@ export function SpellingTrain({
     const [isLoading, setIsLoading] = useState(false);
     const [lastCorrect, setLastCorrect] = useState<boolean | null>(null);
 
+    const spellingMutation = useMutationSpelling();
+
     const handleSubmit = async () => {
         setIsLoading(true);
         try {
-            // TODO: extract to a mutation
-            const response = await fetch('/api/training/spelling', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    word: word.word, 
-                    answer 
-                }),
+            const result = await spellingMutation.mutateAsync({
+                word: word.word,
+                answer
             });
-            
-            const result = await response.json();
             
             if (result.success) {
                 onSuccess();
