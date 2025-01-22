@@ -202,4 +202,12 @@ describe("DefinitionsTrain", () => {
         // Verify word origin appears in brackets
         expect(firstDefinitionWord).not.toHaveClass('invisible');
     });
+
+    test.todo("should call onSuccess when correct definition is selected");
+    test.todo("should call onFailure when incorrect definition is selected");
+    test.todo("should call onNext when next button is clicked");
+    test.todo("should not allow clicking on definition words in answer mode");
+    test.todo("should allow clicking on definition words in word mode");
+    test.todo("should not allow selecting answers in word mode");
+    test.todo("should allow selecting answers in answer mode");
 });
