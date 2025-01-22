@@ -1,13 +1,13 @@
 import { DBWord } from '../types';
 import { useMutationMarkWord } from '../hooks/useMutationMarkWord';
+import { cn } from '../../utils/cn';
+import { Spinner } from './Spinner';
 
 type ButtonToLearnProps = {
     textSourceSubmitted: string | null;
     wordsAll?: DBWord[];
     className?: string;
 };
-
-import { cn } from '../../utils/cn';
 
 export function ButtonToLearn({
     textSourceSubmitted,
@@ -19,6 +19,7 @@ export function ButtonToLearn({
         wordsAll?.find(
             w => w.word.toLowerCase() === textSourceSubmitted?.toLowerCase(),
         )?.status === 'TO_LEARN';
+    const isLoading = markWordMutation.isPending;
 
     return (
         <button
@@ -30,8 +31,8 @@ export function ButtonToLearn({
                     status: 'TO_LEARN',
                 });
             }}
-            disabled={isToLearn}
-            className={cn('px-2 py-1 text-white rounded', 
+            disabled={isToLearn || isLoading}
+            className={cn('px-2 py-1 text-white rounded flex items-center justify-center gap-2 min-w-[100px]', 
                 isToLearn
                     ? 'bg-yellow-800 cursor-not-allowed ring-2 ring-yellow-400'
                     : 'bg-yellow-600 hover:bg-yellow-700',
@@ -39,7 +40,14 @@ export function ButtonToLearn({
             )}
             data-testid="to-learn-button"
         >
-            To Learn
+            {isLoading ? (
+                <>
+                    <Spinner className="h-4 w-4" />
+                    <span>Marking...</span>
+                </>
+            ) : (
+                'To Learn'
+            )}
         </button>
     );
 }

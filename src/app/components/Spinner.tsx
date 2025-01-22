@@ -1,7 +1,13 @@
-export function Spinner() {
+export function Spinner({ className }: { className?: string }) {
     return (
-        <div className="flex justify-center items-center h-32" data-testid="spinner">
-            <div className="round-spinner"></div>
-        </div>
+        <div 
+            className={cn(
+                'animate-spin rounded-full border-2 border-current border-t-transparent',
+                className
+            )}
+            data-testid="spinner"
+            role="status"
+            aria-label="loading"
+        />
     );
 }
