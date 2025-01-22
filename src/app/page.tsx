@@ -27,10 +27,9 @@ function Main() {
             clearOnDefault: true,
         },
     );
-    const [isTraining, setIsTraining] = useState(false);
-    const [trainingMode, setTrainingMode] = useState<"definition" | "spelling">(
-        "definition",
-    );
+    const [mode, setMode] = useState<'explore' | 'definition' | 'spelling'>('explore');
+    const isTraining = mode !== 'explore';
+    const trainingMode = mode === 'explore' ? 'definition' : mode;
     const [addNextToLearn, setAddNextToLearn] = useState(false);
     const [wordToTrain, setWordToTrain] = useState<DBWord | null>(null);
     const [wordToTrainNext, setWordToTrainNext] = useState<string | null>(null);

@@ -1,34 +1,34 @@
-import { cn } from '../../utils/cn';
+import { RadioButton } from './RadioButton';
 
 type TrainingModeToggleProps = {
-    trainingMode: 'definition' | 'spelling';
-    setTrainingMode: (mode: 'definition' | 'spelling') => void;
+    mode: 'explore' | 'definition' | 'spelling';
+    setMode: (mode: 'explore' | 'definition' | 'spelling') => void;
 };
 
 export function TrainingModeToggle({
-    trainingMode,
-    setTrainingMode,
+    mode,
+    setMode,
 }: TrainingModeToggleProps) {
     return (
         <div className="flex gap-2 mb-4">
-            <button
-                onClick={() => setTrainingMode('definition')}
-                className={cn(
-                    'px-4 py-1 rounded',
-                    trainingMode === 'definition' ? 'bg-blue-600' : 'bg-gray-600'
-                )}
-            >
-                Definition Training
-            </button>
-            <button
-                onClick={() => setTrainingMode('spelling')}
-                className={cn(
-                    'px-4 py-1 rounded',
-                    trainingMode === 'spelling' ? 'bg-blue-600' : 'bg-gray-600'
-                )}
-            >
-                Spelling Training
-            </button>
+            <RadioButton
+                value="explore"
+                checked={mode === 'explore'}
+                onChange={setMode}
+                label="Explore"
+            />
+            <RadioButton
+                value="definition"
+                checked={mode === 'definition'}
+                onChange={setMode}
+                label="Train Definitions"
+            />
+            <RadioButton
+                value="spelling"
+                checked={mode === 'spelling'}
+                onChange={setMode}
+                label="Train Spelling"
+            />
         </div>
     );
 }

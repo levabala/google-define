@@ -81,14 +81,6 @@ export function WordControls({
                 </div>
             )}
 
-            <div className="flex-shrink-0">
-                <ToggleSwitch
-                    checked={isTraining}
-                    onChange={setIsTraining}
-                    leftLabel="Explore"
-                    rightLabel="Train"
-                />
-            </div>
         </form>
     );
 }
