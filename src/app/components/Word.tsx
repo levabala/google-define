@@ -25,6 +25,7 @@ export function Word({
     currentWord,
     isLoading,
     disableWordClick,
+    displayMode = 'normal',
 }: WordProps) {
     const matchedWord = allWords?.find(
         (w) => w.word.toLowerCase() === word.toLowerCase(),
