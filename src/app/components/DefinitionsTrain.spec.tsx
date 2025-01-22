@@ -71,40 +71,6 @@ const mockWordWithOnlyDictionary = mockWordsAll[1];
 const mockWordWithOnlyAI = mockWordsAll[2];
 
 describe("DefinitionsTrain", () => {
-    word: "banana",
-    status: "TO_LEARN",
-    raw: {
-        word: "banana",
-        results: [
-            {
-                definition: "A long curved fruit with a yellow skin",
-                partOfSpeech: "noun",
-                examples: ["Monkeys love bananas"],
-            },
-        ],
-        pronunciation: { all: "buh-nan-uh" },
-    },
-    ai_definition: null,
-    created_at: new Date().toISOString(),
-};
-
-const mockWordWithOnlyAI: DBWord = {
-    word: "cherry",
-    status: "TO_LEARN",
-    raw: {
-        word: "cherry",
-        results: [],
-        pronunciation: { all: "cher-ee" },
-    },
-    ai_definition: {
-        definition: "A small round red fruit with a pit",
-        partOfSpeech: "noun",
-        examples: ["Cherry blossoms are beautiful in spring"],
-    },
-    created_at: new Date().toISOString(),
-};
-
-describe("DefinitionsTrain", () => {
     test("should use both dictionary and AI definitions when available", async () => {
         render(
             <DefinitionsTrain
