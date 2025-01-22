@@ -1,3 +1,4 @@
+import React from 'react';
 import { cn } from '../../utils/cn';
 import { Spinner } from './Spinner';
 
@@ -12,7 +13,7 @@ type ButtonBaseProps = {
     ref?: React.Ref<HTMLButtonElement>;
 };
 
-export const ButtonBase = React.forwardRef<HTMLButtonElement, ButtonBaseProps>(({
+export const ButtonBase = React.forwardRef<HTMLButtonElement, ButtonBaseProps>(function ButtonBase({
     isLoading,
     disabled,
     onClick,
@@ -20,7 +21,7 @@ export const ButtonBase = React.forwardRef<HTMLButtonElement, ButtonBaseProps>((
     children,
     testId,
     type,
-}, ref) => {
+}, ref) {
     return (
         <button
             type={type || 'button'}
@@ -32,6 +33,7 @@ export const ButtonBase = React.forwardRef<HTMLButtonElement, ButtonBaseProps>((
                 'disabled:cursor-not-allowed text-white',
                 className
             )}
+            ref={ref}
             data-testid={testId}
             aria-disabled={disabled || isLoading}
         >
