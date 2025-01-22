@@ -385,7 +385,17 @@ describe("scenarios", () => {
                     "definitions-container",
                 );
 
-            const toLearnButton = within(definitionContainer).getByRole('button', { name: /to learn/i });
+            // First select the word by clicking it
+            const elderberryWord = within(screen.getByTestId("words-all")).getByText("elderberry");
+            fireEvent.click(elderberryWord);
+
+            // Wait for definitions to load
+            await waitFor(() => {
+                expect(screen.getByTestId("definitions-container")).toBeInTheDocument();
+            });
+
+            // Find the TO_LEARN button using test ID
+            const toLearnButton = screen.getByTestId("to-learn-button");
 
             // Click the TO_LEARN button
             fireEvent.click(toLearnButton);
