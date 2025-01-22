@@ -1,3 +1,5 @@
+import { cn } from '../../utils/cn';
+
 export function Spinner({ className }: { className?: string }) {
     return (
         <div 
