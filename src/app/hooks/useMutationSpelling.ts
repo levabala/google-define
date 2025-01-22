@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '../queryClient';
-import { WordStats } from '../types';
 
 type SpellingInput = {
     word: string;
