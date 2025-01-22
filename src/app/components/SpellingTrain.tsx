@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useMutationSpelling } from '../hooks/useMutationSpelling';
 import { cn } from '../../utils/cn';
 import { ButtonBase } from './ButtonBase';
@@ -30,6 +30,8 @@ export function SpellingTrain({
 
     const spellingMutation = useMutationSpelling();
 
+    const nextButtonRef = React.useRef<HTMLButtonElement>(null);
+
     const handleSubmit = async () => {
         setIsLoading(true);
         try {
@@ -47,6 +49,8 @@ export function SpellingTrain({
             }
             
             setSubmitted(true);
+            // Focus on the Next button after submission
+            nextButtonRef.current?.focus();
         } finally {
             setIsLoading(false);
         }
@@ -98,6 +102,7 @@ export function SpellingTrain({
                     </ButtonBase>
                 ) : (
                 <ButtonBase
+                    ref={nextButtonRef}
                     onClick={() => {
                         setAnswer('');
                         setSubmitted(false);
