@@ -1,37 +1,36 @@
-'use client';
+"use client";
 
-import dynamic from 'next/dynamic';
-import React, { useLayoutEffect, useState } from 'react';
-import { useQueryState } from 'nuqs';
-import { randomInteger } from 'remeda';
-import { WordsAll } from './components/WordsAll';
-import { Definitions } from './components/Definitions';
-import { useWord } from './hooks/useWord';
-import { useMutationAddWord } from './hooks/useMutationAddWord';
-import { useQueryGetWordsAll } from './hooks/useQueryGetWordsAll';
-import { useMutationTrainingGuess } from './hooks/useMutationTrainingGuess';
-import { DefinitionsTrain } from './components/DefinitionsTrain';
-import { useQueryGetGuessStats } from './hooks/useQueryGetGuessStats';
-import { useQueryGetRecentGuesses } from './hooks/useQueryGetRecentGuesses';
-import { StatsDisplay } from './components/StatsDisplay';
-import { WordControls } from './components/WordControls';
-import { DBWord, WordStats } from './types';
-import { Spinner } from './components/Spinner';
-import { toast } from 'react-toastify';
-import { useMount } from 'react-use';
-import { cn } from '@/utils/cn';
-import { SpellingTrain } from './components/SpellingTrain';
-import { TrainingModeToggle } from './components/TrainingModeToggle';
+import dynamic from "next/dynamic";
+import React, { useLayoutEffect, useState } from "react";
+import { useQueryState } from "nuqs";
+import { randomInteger } from "remeda";
+import { WordsAll } from "./components/WordsAll";
+import { useWord } from "./hooks/useWord";
+import { useMutationAddWord } from "./hooks/useMutationAddWord";
+import { useQueryGetWordsAll } from "./hooks/useQueryGetWordsAll";
+import { useQueryGetGuessStats } from "./hooks/useQueryGetGuessStats";
+import { useQueryGetRecentGuesses } from "./hooks/useQueryGetRecentGuesses";
+import { StatsDisplay } from "./components/StatsDisplay";
+import { WordControls } from "./components/WordControls";
+import { DBWord, WordStats } from "./types";
+import { toast } from "react-toastify";
+import { useMount } from "react-use";
+import { TrainingModeToggle } from "./components/TrainingModeToggle";
+import { MainBody } from "./components/MainBody";
 
 function Main() {
-    const trainingGuessMutation = useMutationTrainingGuess();
-    const [textSourceCurrent, setTextSourceCurrent] = useState('');
-    const [textSourceSubmitted, setTextSourceSubmitted] = useQueryState('word', {
-        defaultValue: '',
-        clearOnDefault: true,
-    });
+    const [textSourceCurrent, setTextSourceCurrent] = useState("");
+    const [textSourceSubmitted, setTextSourceSubmitted] = useQueryState(
+        "word",
+        {
+            defaultValue: "",
+            clearOnDefault: true,
+        },
+    );
     const [isTraining, setIsTraining] = useState(false);
-    const [trainingMode, setTrainingMode] = useState<'definition' | 'spelling'>('definition');
+    const [trainingMode, setTrainingMode] = useState<"definition" | "spelling">(
+        "definition",
+    );
     const [addNextToLearn, setAddNextToLearn] = useState(false);
     const [wordToTrain, setWordToTrain] = useState<DBWord | null>(null);
     const [wordToTrainNext, setWordToTrainNext] = useState<string | null>(null);
@@ -71,12 +70,12 @@ function Main() {
             const wordsToLearn = wordsAll.filter(
                 (word: DBWord) =>
                     word.word !== textSourceCurrent &&
-                    word.status === 'TO_LEARN',
+                    word.status === "TO_LEARN",
             );
 
             if (wordsToLearn.length === 0) {
-                setTextSourceCurrent('');
-                setTextSourceSubmitted('');
+                setTextSourceCurrent("");
+                setTextSourceSubmitted("");
                 setIsTraining(false);
                 return;
             }
@@ -110,23 +109,23 @@ function Main() {
                     words={wordsAll}
                     isLoading={!wordsAll}
                     currentWord={textSourceSubmitted}
-                    onWordClick={word => {
+                    onWordClick={(word) => {
                         setTextSourceCurrent(word);
                         setTextSourceSubmitted(word);
                     }}
                 />
                 <button
                     onClick={async () => {
-                        const response = await fetch('/api/logout', {
-                            method: 'POST',
+                        const response = await fetch("/api/logout", {
+                            method: "POST",
                             headers: {
-                                'Content-Type': 'application/json',
+                                "Content-Type": "application/json",
                             },
                         });
                         if (response.ok) {
-                            window.location.href = '/login';
+                            window.location.href = "/login";
                         } else {
-                            console.error('Logout failed');
+                            console.error("Logout failed");
                         }
                     }}
                     className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
@@ -135,7 +134,7 @@ function Main() {
                 </button>
             </div>
 
-            <TrainingModeToggle 
+            <TrainingModeToggle
                 trainingMode={trainingMode}
                 setTrainingMode={setTrainingMode}
             />
@@ -147,16 +146,21 @@ function Main() {
                 setTextSourceSubmitted={async (text) => {
                     try {
                         await setTextSourceSubmitted(text);
-                        if (text && !wordsAll?.some((w: DBWord) => w.word === text)) {
+                        if (
+                            text &&
+                            !wordsAll?.some((w: DBWord) => w.word === text)
+                        ) {
                             await addWordMutation.mutateAsync({
                                 word: text,
-                                initialStatus: addNextToLearn ? 'TO_LEARN' : undefined
+                                initialStatus: addNextToLearn
+                                    ? "TO_LEARN"
+                                    : undefined,
                             });
                         }
                     } catch {
                         // Reset the submitted text on error
-                        await setTextSourceSubmitted('');
-                        setTextSourceCurrent('');
+                        await setTextSourceSubmitted("");
+                        setTextSourceCurrent("");
                     }
                 }}
                 isTraining={isTraining}
@@ -171,89 +175,27 @@ function Main() {
                 recentGuesses={recentGuesses}
             />
 
-            {isFetchingWordCurrent ? (
-                <Spinner />
-            ) : isTraining && wordToTrain && wordsAll ? (
-                trainingMode === 'spelling' ? (
-                    <SpellingTrain
-                        word={wordToTrain}
-                        definition={wordToTrain.ai_definition?.definition || 
-                                    wordToTrain.raw.results?.[0]?.definition || 
-                                    'No definition available'}
-                        onSuccess={() => {
-                            trainingGuessMutation.mutate({
-                                word: textSourceSubmitted,
-                                success: true,
-                                definition: 'spelling_correct'
-                            });
-                            toast.success('Perfect spelling! 🎉');
-                        }}
-                        onFailure={(errors) => {
-                            trainingGuessMutation.mutate({
-                                word: textSourceSubmitted,
-                                success: false,
-                                definition: `spelling_errors:${errors}`
-                            });
-                            toast.error(`Spelling errors: ${errors} ❌`);
-                        }}
-                        onNext={() => {
-                            if (!wordToTrainNext) {
-                                setIsTraining(false);
-                                return;
-                            }
-                            setTextSourceCurrent(wordToTrainNext);
-                            setTextSourceSubmitted(wordToTrainNext);
-                        }}
-                    />
-                ) : (
-                    <DefinitionsTrain
-                    results={wordToTrain.raw.results}
+            {wordCurrent && wordsAll && (
+                <MainBody
+                    isFetchingWordCurrent={isFetchingWordCurrent}
+                    isTraining={isTraining}
+                    setIsTraining={setIsTraining}
+                    wordCurrent={wordCurrent}
+                    wordToTrain={wordToTrain}
                     wordsAll={wordsAll}
-                    word={wordToTrain}
-                    onWordClick={(word, addToLearn) => {
-                        onWordClickCommon(word, addToLearn);
-                        setIsTraining(false);
-                    }}
-                    onSuccess={definition => {
-                        if (!textSourceSubmitted) return;
-                        trainingGuessMutation.mutate({
-                            word: textSourceSubmitted,
-                            success: true,
-                            definition: definition,
-                        });
-                    }}
-                    onFailure={definition => {
-                        if (!textSourceSubmitted) return;
-                        trainingGuessMutation.mutate({
-                            word: textSourceSubmitted,
-                            success: false,
-                            definition: definition,
-                        });
-                    }}
-                    onNext={() => {
-                        if (!wordToTrainNext) {
-                            setIsTraining(false);
-                            return;
-                        }
-
-                        setTextSourceCurrent(wordToTrainNext);
-                        setTextSourceSubmitted(wordToTrainNext);
-                    }}
-                />
-            ) : wordCurrent ? (
-                <Definitions
-                    results={wordCurrent.raw.results}
                     textSourceSubmitted={textSourceSubmitted}
-                    onWordClick={onWordClickCommon}
-                    aiDefinition={wordCurrent.ai_definition || undefined}
-                    wordsAll={wordsAll}
+                    setTextSourceCurrent={setTextSourceCurrent}
+                    setTextSourceSubmitted={setTextSourceSubmitted}
+                    trainingMode={trainingMode}
+                    onWordClickCommon={onWordClickCommon}
+                    wordToTrainNext={wordToTrainNext}
                 />
-            ) : null}
+            )}
         </div>
     );
 }
 
 export { Main };
-export default dynamic(() => Promise.resolve(Main), { 
-    ssr: false 
+export default dynamic(() => Promise.resolve(Main), {
+    ssr: false,
 });
