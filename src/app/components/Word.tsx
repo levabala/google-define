@@ -8,6 +8,7 @@ export type WordProps = {
     currentWord?: string | null;
     isLoading?: boolean;
     disableWordClick?: boolean;
+    displayMode?: 'normal' | 'obscured';
 };
 
 function getStatusColor(matchedWord: DBWord | undefined): string {
@@ -50,7 +51,7 @@ export function Word({
             style={{ minWidth: "1rem" }}
             data-testid="word"
         >
-            {word}
+            {displayMode === 'obscured' ? '•'.repeat(word.length) : word}
         </span>
     );
 }
