@@ -189,7 +189,7 @@ describe("scenarios", () => {
                 ).toBeInTheDocument();
 
                 // Verify definitions content by checking the container's text content
-                expect(definitionContainer).toHaveTextContent(
+                expect(screen.getByTestId("definitions-container")).toHaveTextContent(
                     /noun.*The round fruit of a tree of the rose family.*I ate an apple for breakfast/,
                 );
             });
@@ -221,9 +221,6 @@ describe("scenarios", () => {
 
             // Verify definitions loaded
             await waitFor(() => {
-                const definitionContainer = screen.getByTestId(
-                    "definitions-container",
-                );
                 expect(definitionContainer).toHaveTextContent(
                     /noun.*The round fruit of a tree of the rose family.*I ate an apple for breakfast/,
                 );
