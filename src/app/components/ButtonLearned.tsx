@@ -1,5 +1,5 @@
 import { DBWord } from '../types';
-import { queryClient } from '../queryClient';
+import { useMutationMarkWord } from '../hooks/useMutationMarkWord';
 import { cn } from '../../utils/cn';
 
 type ButtonLearnedProps = {
@@ -13,6 +13,7 @@ export function ButtonLearned({
     wordsAll,
     className 
 }: ButtonLearnedProps) {
+    const markWordMutation = useMutationMarkWord();
     const isLearned = wordsAll?.find(
         w => w.word.toLowerCase() === textSourceSubmitted?.toLowerCase()
     )?.status === 'LEARNED';
@@ -20,17 +21,11 @@ export function ButtonLearned({
     return (
         <button
             type="button"
-            onClick={async () => {
+            onClick={() => {
                 if (!textSourceSubmitted) return;
-                await fetch('/api/words/one', {
-                    method: 'PUT',
-                    body: JSON.stringify({
-                        word: textSourceSubmitted,
-                        status: 'LEARNED',
-                    }),
-                });
-                queryClient.invalidateQueries({
-                    queryKey: ['dictionaryAll'],
+                markWordMutation.mutate({
+                    word: textSourceSubmitted,
+                    status: 'LEARNED',
                 });
             }}
             disabled={isLearned}
