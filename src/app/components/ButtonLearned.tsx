@@ -1,13 +1,12 @@
 import { DBWord } from '../types';
 import { queryClient } from '../queryClient';
+import { cn } from '../../utils/cn';
 
 type ButtonLearnedProps = {
     textSourceSubmitted: string | null;
     wordsAll?: DBWord[];
     className?: string;
 };
-
-import { cn } from '../../utils/cn';
 
 export function ButtonLearned({ 
     textSourceSubmitted, 
