@@ -52,7 +52,14 @@ export function Word({
             style={{ minWidth: "1rem" }}
             data-testid="word"
         >
-            {displayMode === 'obscured' ? '•'.repeat(word.length) : word}
+            <span className={displayMode === 'obscured' ? 'text-transparent relative' : ''}>
+                {word}
+                {displayMode === 'obscured' && (
+                    <span className="absolute inset-0 text-white">
+                        {'•'.repeat(word.length)}
+                    </span>
+                )}
+            </span>
         </span>
     );
 }
