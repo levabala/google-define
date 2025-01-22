@@ -88,7 +88,11 @@ export function SpellingTrain({
                 </ButtonBase>
             ) : (
                 <ButtonBase
-                    onClick={onNext}
+                    onClick={() => {
+                        setAnswer('');
+                        setSubmitted(false);
+                        onNext();
+                    }}
                     className="bg-green-600 hover:bg-green-700"
                 >
                     Next Word
