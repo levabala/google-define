@@ -21,6 +21,7 @@ import { toast } from 'react-toastify';
 import { useMount } from 'react-use';
 import { cn } from '@/utils/cn';
 import { SpellingTrain } from './components/SpellingTrain';
+import { TrainingModeToggle } from './components/TrainingModeToggle';
 
 function Main() {
     const trainingGuessMutation = useMutationTrainingGuess();
@@ -134,26 +135,10 @@ function Main() {
                 </button>
             </div>
 
-            <div className="flex gap-2 mb-4">
-                <button
-                    onClick={() => setTrainingMode('definition')}
-                    className={cn(
-                        'px-4 py-1 rounded',
-                        trainingMode === 'definition' ? 'bg-blue-600' : 'bg-gray-600'
-                    )}
-                >
-                    Definition Training
-                </button>
-                <button
-                    onClick={() => setTrainingMode('spelling')}
-                    className={cn(
-                        'px-4 py-1 rounded',
-                        trainingMode === 'spelling' ? 'bg-blue-600' : 'bg-gray-600'
-                    )}
-                >
-                    Spelling Training
-                </button>
-            </div>
+            <TrainingModeToggle 
+                trainingMode={trainingMode}
+                setTrainingMode={setTrainingMode}
+            />
 
             <WordControls
                 textSourceCurrent={textSourceCurrent}
