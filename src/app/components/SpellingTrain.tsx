@@ -7,7 +7,7 @@ import { Definition } from './Definition';
 type SpellingTrainProps = {
     word: DBWord;
     definition: string;
-    wordsAll: DBWord[];
+    wordsAll?: DBWord[];
     onSuccess: () => void;
     onFailure: (errors: number) => void;
     onNext: () => void;
@@ -59,7 +59,7 @@ export function SpellingTrain({
                     examples: word.raw.results?.[0]?.examples || [],
                     source: 'dictionary'
                 }}
-                wordsAll={wordsAll}
+                wordsAll={wordsAll || []}
                 textSourceSubmitted={word.word}
                 onWordClick={(word) => {
                     // Handle word clicks within the definition
