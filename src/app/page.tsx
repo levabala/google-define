@@ -19,6 +19,8 @@ import { DBWord, WordStats } from './types';
 import { Spinner } from './components/Spinner';
 import { toast } from 'react-toastify';
 import { useMount } from 'react-use';
+import { cn } from '@/utils/cn';
+import { SpellingTrain } from './components/SpellingTrain';
 
 function Main() {
     const trainingGuessMutation = useMutationTrainingGuess();
