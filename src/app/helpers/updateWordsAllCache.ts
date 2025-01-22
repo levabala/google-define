@@ -9,8 +9,7 @@ export function updateWordsAllCache(
     updater: (words: DBWord[]) => DBWord[],
 ) {
     queryClient.setQueryData<DBWord[]>(['wordsAll'], old => {
-        if (!old) return old;
-        const updated = updater(old);
+        const updated = updater(old || []);
         // Use shared sorting logic
         const sorted = sortWordsByStatus(updated);
         return z.array(DBWordSchema).parse(sorted);

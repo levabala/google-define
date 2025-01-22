@@ -3,6 +3,16 @@ import { afterEach, expect, mock } from "bun:test";
 import * as matchers from "@testing-library/jest-dom/matchers";
 import { cleanup } from "@testing-library/react";
 
+import { configure } from '@testing-library/react';
+
+configure({
+  getElementError: (message) => {
+    const error = new Error(message as string);
+    error.name = 'TestingLibraryElementError';
+    return error;
+  },
+});
+
 expect.extend(matchers);
 
 export const mockFetch = mock();

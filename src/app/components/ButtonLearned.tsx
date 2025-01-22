@@ -1,5 +1,5 @@
 import { DBWord } from '../types';
-import { queryClient } from '../providers';
+import { queryClient } from '../queryClient';
 
 type ButtonLearnedProps = {
     textSourceSubmitted: string | null;

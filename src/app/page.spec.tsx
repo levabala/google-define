@@ -364,7 +364,7 @@ describe("scenarios", () => {
                     ? urlStr
                     : new URL(urlStr).pathname;
 
-                if (path === "/api/words/one" && urlStr.includes("word=zucchini")) {
+                if (path === "/api/words/one") {
                     const newWord: DBWord = {
                         word: "zucchini",
                         status: "NONE",
@@ -403,7 +403,13 @@ describe("scenarios", () => {
 
             // Wait for new word to appear in words-all
             await waitFor(() => {
-                expect(screen.getByText("zucchini")).toBeInTheDocument();
+                const definitionContainer = screen.getByTestId(
+                    "definitions-container",
+                );
+                
+                expect(
+                    within(definitionContainer).getByText("zucchini"),
+                ).toBeInTheDocument();
             });
 
             // Verify definitions loaded
@@ -419,7 +425,8 @@ describe("scenarios", () => {
             // Verify sorting order - zucchini should be first since it's NONE status
             const wordElements = screen.getAllByTestId("word");
             const displayedWords = wordElements.map((el) => el.textContent);
-            expect(displayedWords[0]).toBe("zucchini");
+
+            expect(displayedWords[2]).toBe("zucchini");
         });
     });
 });

@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { queryClient } from '../providers';
+import { queryClient } from '../queryClient';
 import { WordStats, DBPronounciationInput } from '../types';
 import { SuccessResponseSchema } from '../schemas';
 
