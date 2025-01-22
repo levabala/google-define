@@ -18,6 +18,9 @@ export type MainBodyProps = {
     setTextSourceCurrent: (text: string) => void;
     setTextSourceSubmitted: (text: string) => void;
     trainingMode: TrainingMode;
+    setMode: React.Dispatch<
+        React.SetStateAction<"explore" | "definition" | "spelling">
+    >;
     onWordClickCommon: (word: string, addToLearn?: boolean) => void;
     wordToTrainNext: string | null;
 };
@@ -25,7 +28,7 @@ export type MainBodyProps = {
 export function MainBody({
     isFetchingWordCurrent,
     isTraining,
-    setIsTraining,
+    setMode,
     wordCurrent,
     wordToTrain,
     wordsAll,
@@ -70,7 +73,7 @@ export function MainBody({
                     }}
                     onNext={() => {
                         if (!wordToTrainNext) {
-                            setIsTraining(false);
+                            setMode("explore");
                             return;
                         }
                         setTextSourceCurrent(wordToTrainNext);
@@ -88,7 +91,7 @@ export function MainBody({
                     word={wordToTrain}
                     onWordClick={(word, addToLearn) => {
                         onWordClickCommon(word, addToLearn);
-                        setIsTraining(false);
+                        setMode("explore");
                     }}
                     onSuccess={(definition) => {
                         if (!textSourceSubmitted) return;
@@ -108,7 +111,7 @@ export function MainBody({
                     }}
                     onNext={() => {
                         if (!wordToTrainNext) {
-                            setIsTraining(false);
+                            setMode("explore");
                             return;
                         }
 

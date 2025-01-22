@@ -175,6 +175,7 @@ function Main() {
                 <MainBody
                     isFetchingWordCurrent={isFetchingWordCurrent}
                     isTraining={isTraining}
+                    setMode={setMode}
                     wordCurrent={wordCurrent}
                     wordToTrain={wordToTrain}
                     wordsAll={wordsAll}
