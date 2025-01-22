@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { ButtonBase } from './ButtonBase';
 import { Spinner } from './Spinner';
 import { DBWord } from '../types';
+import { Definition } from './Definition';
 
 type SpellingTrainProps = {
     word: DBWord;
     definition: string;
+    wordsAll?: DBWord[];
     onSuccess: () => void;
     onFailure: (errors: number) => void;
     onNext: () => void;
