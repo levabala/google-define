@@ -2,6 +2,7 @@ import { DBWord } from '../types';
 import { useMutationMarkWord } from '../hooks/useMutationMarkWord';
 import { cn } from '../../utils/cn';
 import { Spinner } from './Spinner';
+import { ButtonBase } from './ButtonBase';
 
 type ButtonToLearnProps = {
     textSourceSubmitted: string | null;
@@ -22,8 +23,7 @@ export function ButtonToLearn({
     const isLoading = markWordMutation.isPending;
 
     return (
-        <button
-            type="button"
+        <ButtonBase
             onClick={() => {
                 if (!textSourceSubmitted) return;
                 markWordMutation.mutate({
