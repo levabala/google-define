@@ -341,74 +341,74 @@ describe("scenarios", () => {
     });
 
     describe("word status transitions", () => {
-        // test("should transition word to TO_LEARN status and update sorting", async () => {
-        //     const Wrapper = createWrapper();
-        //     render(
-        //         <Wrapper>
-        //             <Main />
-        //         </Wrapper>,
-        //         {
-        //             wrapper: withNuqsTestingAdapter(),
-        //         },
-        //     );
+        test("should transition word to TO_LEARN status and update sorting", async () => {
+            const Wrapper = createWrapper();
+            render(
+                <Wrapper>
+                    <Main />
+                </Wrapper>,
+                {
+                    wrapper: withNuqsTestingAdapter(),
+                },
+            );
 
-        //     // Wait for initial words to load
-        //     await waitFor(() => {
-        //         expect(screen.getByText("elderberry")).toBeInTheDocument();
-        //     });
+            // Wait for initial words to load
+            await waitFor(() => {
+                expect(screen.getByText("elderberry")).toBeInTheDocument();
+            });
 
-        //     // Mock the status update endpoint
-        //     mockFetch.mockImplementation(async (input: RequestInfo | URL) => {
-        //         const urlStr = input.toString();
-        //         const path = urlStr.startsWith("/")
-        //             ? urlStr
-        //             : new URL(urlStr).pathname;
+            // Mock the status update endpoint
+            mockFetch.mockImplementation(async (input: RequestInfo | URL) => {
+                const urlStr = input.toString();
+                const path = urlStr.startsWith("/")
+                    ? urlStr
+                    : new URL(urlStr).pathname;
 
-        //         if (path === "/api/words/one" && input instanceof Request && input.method === "PUT") {
-        //             // Update the mock word's status
-        //             const updatedWord = mockWords.find(w => w.word === "elderberry");
-        //             if (updatedWord) {
-        //                 updatedWord.status = "TO_LEARN";
-        //             }
-        //             return new Response(JSON.stringify(updatedWord), {
-        //                 status: 200,
-        //                 headers: {
-        //                     "Content-Type": "application/json",
-        //                 },
-        //             });
-        //         }
+                if (path === "/api/words/one" && input instanceof Request && input.method === "PUT") {
+                    // Update the mock word's status
+                    const updatedWord = mockWords.find(w => w.word === "elderberry");
+                    if (updatedWord) {
+                        updatedWord.status = "TO_LEARN";
+                    }
+                    return new Response(JSON.stringify(updatedWord), {
+                        status: 200,
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
+                }
 
-        //         return new Response(null, { status: 404 });
-        //     });
+                return new Response(null, { status: 404 });
+            });
 
-        //         const definitionContainer = screen.getByTestId(
-        //             "definitions-container",
-        //         );
+                const definitionContainer = screen.getByTestId(
+                    "definitions-container",
+                );
 
-        //     const toLearnButton = within(definitionContainer).getByRole('button', { name: /to learn/i });
+            const toLearnButton = within(definitionContainer).getByRole('button', { name: /to learn/i });
 
-        //     // Click the TO_LEARN button
-        //     fireEvent.click(toLearnButton);
+            // Click the TO_LEARN button
+            fireEvent.click(toLearnButton);
 
-        //     // Wait for the word to move in the sorted list
-        //     await waitFor(() => {
-        //         const wordElements = screen.getAllByTestId("word");
-        //         const displayedWords = wordElements.map((el) => el.textContent);
+            // Wait for the word to move in the sorted list
+            await waitFor(() => {
+                const wordElements = screen.getAllByTestId("word");
+                const displayedWords = wordElements.map((el) => el.textContent);
 
-        //         // Verify elderberry moved from NONE section to TO_LEARN section
-        //         // while maintaining alphabetical order within groups
-        //         expect(displayedWords).toEqual([
-        //             "grape", // NONE
-        //             "apple", // TO_LEARN
-        //             "date", // TO_LEARN
-        //             "elderberry", // TO_LEARN (moved here)
-        //             "honeydew", // TO_LEARN
-        //             "banana", // LEARNED
-        //             "fig", // LEARNED
-        //             "kiwi", // LEARNED
-        //         ]);
-        //     });
-        // });
+                // Verify elderberry moved from NONE section to TO_LEARN section
+                // while maintaining alphabetical order within groups
+                expect(displayedWords).toEqual([
+                    "grape", // NONE
+                    "apple", // TO_LEARN
+                    "date", // TO_LEARN
+                    "elderberry", // TO_LEARN (moved here)
+                    "honeydew", // TO_LEARN
+                    "banana", // LEARNED
+                    "fig", // LEARNED
+                    "kiwi", // LEARNED
+                ]);
+            });
+        });
     });
 
     describe("adding new words", () => {
