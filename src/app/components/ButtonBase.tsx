@@ -32,14 +32,8 @@ export function ButtonBase({
             data-testid={testId}
             aria-disabled={disabled || isLoading}
         >
-            {isLoading ? (
-                <>
-                    <Spinner className="h-4 w-4 shrink-0" />
-                    <span className="whitespace-nowrap">{children}</span>
-                </>
-            ) : (
-                children
-            )}
+            {isLoading && <Spinner className="h-4 w-4 shrink-0" />}
+            <span className="whitespace-nowrap">{children}</span>
         </button>
     );
 }

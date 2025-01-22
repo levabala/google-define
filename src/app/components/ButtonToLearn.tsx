@@ -37,9 +37,10 @@ export function ButtonToLearn({
                     : 'bg-yellow-600 hover:bg-yellow-700 text-white',
                 className
             )}
+            isLoading={isLoading}
             testId="to-learn-button"
         >
-            {isLoading ? 'Marking...' : 'To Learn'}
+            To Learn
         </ButtonBase>
     );
 }
