@@ -18,6 +18,7 @@ import { WordControls } from './components/WordControls';
 import { DBWord, WordStats } from './types';
 import { Spinner } from './components/Spinner';
 import { toast } from 'react-toastify';
+import { useMount } from 'react-use';
 
 function Main() {
     const trainingGuessMutation = useMutationTrainingGuess();
@@ -34,6 +35,12 @@ function Main() {
     const addWordMutation = useMutationAddWord();
     const wordCurrent = useWord(textSourceSubmitted);
     const isFetchingWordCurrent = !wordCurrent && !!textSourceSubmitted;
+
+    useMount(() => {
+        if (textSourceSubmitted) {
+            setTextSourceCurrent(textSourceSubmitted);
+        }
+    });
 
     useLayoutEffect(() => {
         if (textSourceSubmitted && !wordCurrent && !isFetchingWordCurrent) {

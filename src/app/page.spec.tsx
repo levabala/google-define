@@ -204,9 +204,6 @@ describe("scenarios", () => {
 
     describe("word selection", () => {
         test("input should be populated with word from query params", async () => {
-            // Set initial query param
-            window.history.pushState({}, "", "/?word=apple");
-
             render(
                 <Wrapper>
                     <Main />
@@ -220,7 +217,8 @@ describe("scenarios", () => {
 
             // Wait for input to be populated
             await waitFor(() => {
-                const input = screen.getByTestId("word-input") as HTMLInputElement;
+                const wordControls = screen.getByTestId("word-controls");
+                const input = within(wordControls).getByTestId("word-input") as HTMLInputElement;
                 expect(input.value).toBe("apple");
             });
         });
