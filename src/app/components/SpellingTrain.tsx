@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { cn } from '../utils/cn';
+import { cn } from '../../utils/cn';
 import { ButtonBase } from './ButtonBase';
 import { Spinner } from './Spinner';
 import { DBWord } from '../types';
