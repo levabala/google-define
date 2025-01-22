@@ -52,10 +52,12 @@ export function Word({
             style={{ minWidth: "1rem" }}
             data-testid="word"
         >
-            <span className={displayMode === 'obscured' ? 'text-transparent relative' : ''}>
-                {word}
+            <span className={displayMode === 'obscured' ? 'relative' : ''}>
+                <span className={displayMode === 'obscured' ? 'text-transparent' : ''}>
+                    {word}
+                </span>
                 {displayMode === 'obscured' && (
-                    <span className="absolute inset-0 text-white">
+                    <span className="absolute left-0 top-0 text-white whitespace-nowrap">
                         {'•'.repeat(word.length)}
                     </span>
                 )}
