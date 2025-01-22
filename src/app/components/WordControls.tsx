@@ -34,6 +34,7 @@ export function WordControls({
                 e.preventDefault();
                 setTextSourceSubmitted(textSourceCurrent);
             }}
+            data-testid="word-controls"
         >
             <div className="flex items-center gap-2 flex-shrink-0">
                 <input

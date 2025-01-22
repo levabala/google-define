@@ -325,25 +325,25 @@ describe("scenarios", () => {
                 return container;
             });
 
-            const wordElements = within(wordsAllContainer).getAllByTestId("word");
+            const wordElements =
+                within(wordsAllContainer).getAllByTestId("word");
             const displayedWords = wordElements.map((el) => el.textContent);
 
-                // Verify sorting order:
-                // 1. NONE status first (elderberry)
-                // 2. TO_LEARN next (apple, date)
-                // 3. LEARNED last (banana, fig)
-                // All alphabetically within their groups
-                expect(displayedWords).toEqual([
-                    "elderberry", // NONE (alphabetically first)
-                    "grape", // NONE
-                    "apple", // TO_LEARN
-                    "date", // TO_LEARN
-                    "honeydew", // TO_LEARN
-                    "banana", // LEARNED
-                    "fig", // LEARNED
-                    "kiwi", // LEARNED
-                ]);
-            });
+            // Verify sorting order:
+            // 1. NONE status first (elderberry)
+            // 2. TO_LEARN next (apple, date)
+            // 3. LEARNED last (banana, fig)
+            // All alphabetically within their groups
+            expect(displayedWords).toEqual([
+                "elderberry", // NONE (alphabetically first)
+                "grape", // NONE
+                "apple", // TO_LEARN
+                "date", // TO_LEARN
+                "honeydew", // TO_LEARN
+                "banana", // LEARNED
+                "fig", // LEARNED
+                "kiwi", // LEARNED
+            ]);
         });
     });
 
@@ -362,7 +362,9 @@ describe("scenarios", () => {
             // Wait for initial words to load and get container
             const wordsAllContainer = await waitFor(() => {
                 const container = screen.getByTestId("words-all");
-                expect(within(container).getByText("elderberry")).toBeInTheDocument();
+                expect(
+                    within(container).getByText("elderberry"),
+                ).toBeInTheDocument();
                 return container;
             });
 
@@ -398,18 +400,21 @@ describe("scenarios", () => {
             );
 
             // First select the word by clicking it
-            const elderberryWord = within(wordsAllContainer).getByText("elderberry");
+            const elderberryWord =
+                within(wordsAllContainer).getByText("elderberry");
             fireEvent.click(elderberryWord);
 
             // Wait for definitions to load and get container
-            const definitionsContainer = await waitFor(() => {
+            await waitFor(() => {
                 const container = screen.getByTestId("definitions-container");
                 expect(container).toBeInTheDocument();
-                return container;
             });
 
+            const wordControls = screen.getByTestId("word-controls");
+
             // Find the TO_LEARN button using test ID within definitions
-            const toLearnButton = within(definitionsContainer).getByTestId("to-learn-button");
+            const toLearnButton =
+                within(wordControls).getByTestId("to-learn-button");
 
             // Click the TO_LEARN button
             fireEvent.click(toLearnButton);
