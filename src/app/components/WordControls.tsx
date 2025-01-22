@@ -16,6 +16,7 @@ type Props = {
 };
 
 export function WordControls({
+    mode,
     textSourceCurrent,
     setTextSourceCurrent,
     textSourceSubmitted,
