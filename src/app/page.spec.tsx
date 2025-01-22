@@ -1,4 +1,5 @@
 import { describe, test, expect } from "bun:test";
+import { clone } from "remeda";
 import {
     screen,
     render,
@@ -13,7 +14,7 @@ import { mockFetch } from "../testing-preload";
 import { beforeEach } from "bun:test";
 import { withNuqsTestingAdapter } from "nuqs/adapters/testing";
 
-const mockWords: DBWord[] = [
+const mockWordsDefault: DBWord[] = [
     {
         word: "apple",
         status: "TO_LEARN",
@@ -128,7 +129,10 @@ const mockWords: DBWord[] = [
 
 describe("scenarios", () => {
     let Wrapper: React.FC<{ children: React.ReactNode }>;
+    let mockWords = clone(mockWordsDefault);
+
     beforeEach(() => {
+        mockWords = clone(mockWordsDefault);
         // Mock the fetch implementation
         mockFetch.mockImplementation(async (input: RequestInfo | URL) => {
             // Handle both string and URL inputs
@@ -189,7 +193,9 @@ describe("scenarios", () => {
                 ).toBeInTheDocument();
 
                 // Verify definitions content by checking the container's text content
-                expect(screen.getByTestId("definitions-container")).toHaveTextContent(
+                expect(
+                    screen.getByTestId("definitions-container"),
+                ).toHaveTextContent(
                     /noun.*The round fruit of a tree of the rose family.*I ate an apple for breakfast/,
                 );
             });
@@ -221,7 +227,9 @@ describe("scenarios", () => {
 
             // Verify definitions loaded
             await waitFor(() => {
-                expect(screen.getByTestId("definitions-container")).toHaveTextContent(
+                expect(
+                    screen.getByTestId("definitions-container"),
+                ).toHaveTextContent(
                     /noun.*The round fruit of a tree of the rose family.*I ate an apple for breakfast/,
                 );
             });
@@ -352,37 +360,47 @@ describe("scenarios", () => {
             });
 
             // Mock the status update endpoint
-            mockFetch.mockImplementation(async (input: RequestInfo | URL) => {
-                const urlStr = input.toString();
-                const path = urlStr.startsWith("/")
-                    ? urlStr
-                    : new URL(urlStr).pathname;
+            mockFetch.mockImplementation(
+                async (
+                    input: RequestInfo | URL,
+                    params: { method: string },
+                ) => {
+                    const urlStr = input.toString();
+                    const path = urlStr.startsWith("/")
+                        ? urlStr
+                        : new URL(urlStr).pathname;
 
-                if (path === "/api/words/one" && input instanceof Request && input.method === "PUT") {
-                    // Update the mock word's status
-                    const updatedWord = mockWords.find(w => w.word === "elderberry");
-                    if (updatedWord) {
-                        updatedWord.status = "TO_LEARN";
+                    if (path === "/api/words/one" && params.method === "PUT") {
+                        // Update the mock word's status
+                        const updatedWord = mockWords.find(
+                            (w) => w.word === "elderberry",
+                        );
+                        if (updatedWord) {
+                            updatedWord.status = "TO_LEARN";
+                        }
+                        return new Response(JSON.stringify(updatedWord), {
+                            status: 200,
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                        });
                     }
-                    return new Response(JSON.stringify(updatedWord), {
-                        status: 200,
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    });
-                }
 
-                return new Response(null, { status: 404 });
-            });
-
+                    return new Response(null, { status: 404 });
+                },
+            );
 
             // First select the word by clicking it
-            const elderberryWord = within(screen.getByTestId("words-all")).getByText("elderberry");
+            const elderberryWord = within(
+                screen.getByTestId("words-all"),
+            ).getByText("elderberry");
             fireEvent.click(elderberryWord);
 
             // Wait for definitions to load
             await waitFor(() => {
-                expect(screen.getByTestId("definitions-container")).toBeInTheDocument();
+                expect(
+                    screen.getByTestId("definitions-container"),
+                ).toBeInTheDocument();
             });
 
             // Find the TO_LEARN button using test ID
@@ -430,40 +448,47 @@ describe("scenarios", () => {
             });
 
             // Mock the add word endpoint
-            mockFetch.mockImplementation(async (input: RequestInfo | URL) => {
-                const urlStr = input.toString();
-                const path = urlStr.startsWith("/")
-                    ? urlStr
-                    : new URL(urlStr).pathname;
+            mockFetch.mockImplementation(
+                async (
+                    input: RequestInfo | URL,
+                    { method }: { method: string },
+                ) => {
+                    const urlStr = input.toString();
+                    const path = urlStr.startsWith("/")
+                        ? urlStr
+                        : new URL(urlStr).pathname;
 
-                if (path === "/api/words/one") {
-                    const newWord: DBWord = {
-                        word: "zucchini",
-                        status: "NONE",
-                        raw: {
+                    if (path === "/api/words/one" && method === "POST") {
+                        const newWord: DBWord = {
                             word: "zucchini",
-                            results: [
-                                {
-                                    definition: "A summer squash",
-                                    partOfSpeech: "noun",
-                                    examples: ["I grew zucchini in my garden"],
-                                },
-                            ],
-                            pronunciation: { all: "zoo-kee-nee" },
-                        },
-                        ai_definition: null,
-                        created_at: new Date().toISOString(),
-                    };
-                    return new Response(JSON.stringify(newWord), {
-                        status: 200,
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    });
-                }
+                            status: "NONE",
+                            raw: {
+                                word: "zucchini",
+                                results: [
+                                    {
+                                        definition: "A summer squash",
+                                        partOfSpeech: "noun",
+                                        examples: [
+                                            "I grew zucchini in my garden",
+                                        ],
+                                    },
+                                ],
+                                pronunciation: { all: "zoo-kee-nee" },
+                            },
+                            ai_definition: null,
+                            created_at: new Date().toISOString(),
+                        };
+                        return new Response(JSON.stringify(newWord), {
+                            status: 200,
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                        });
+                    }
 
-                return new Response(null, { status: 404 });
-            });
+                    return new Response(null, { status: 404 });
+                },
+            );
 
             // Find the input and add button
             const input = screen.getByTestId("word-input");
@@ -478,7 +503,7 @@ describe("scenarios", () => {
                 const definitionContainer = screen.getByTestId(
                     "definitions-container",
                 );
-                
+
                 expect(
                     within(definitionContainer).getByText("zucchini"),
                 ).toBeInTheDocument();
@@ -497,7 +522,7 @@ describe("scenarios", () => {
             const wordElements = screen.getAllByTestId("word");
             const displayedWords = wordElements.map((el) => el.textContent);
 
-            expect(displayedWords[2]).toBe("zucchini");
+            expect(displayedWords[1]).toBe("zucchini");
         });
     });
 });

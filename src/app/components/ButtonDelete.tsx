@@ -10,6 +10,7 @@ type ButtonDeleteProps = {
 };
 
 import { cn } from '../../utils/cn';
+import { ButtonBase } from './ButtonBase';
 
 export function ButtonDelete({
     textSourceSubmitted,
@@ -27,8 +28,7 @@ export function ButtonDelete({
     if (!exists) return null;
 
     return (
-        <button
-            type="button"
+        <ButtonBase
             onClick={() => {
                 if (!textSourceSubmitted) return;
                 deleteWordMutation.mutate(textSourceSubmitted, {
