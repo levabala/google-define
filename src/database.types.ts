@@ -93,6 +93,48 @@ export type Database = {
           },
         ]
       }
+      training_spelling: {
+        Row: {
+          answer: string
+          created_at: string
+          errors_count: number
+          id: number
+          user: string
+          word: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          errors_count: number
+          id?: number
+          user: string
+          word: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          errors_count?: number
+          id?: number
+          user?: string
+          word?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_spelling_user_fkey"
+            columns: ["user"]
+            isOneToOne: false
+            referencedRelation: "user"
+            referencedColumns: ["login"]
+          },
+          {
+            foreignKeyName: "training_spelling_word_fkey"
+            columns: ["word"]
+            isOneToOne: false
+            referencedRelation: "word"
+            referencedColumns: ["word"]
+          },
+        ]
+      }
       user: {
         Row: {
           created_at: string

@@ -101,6 +101,7 @@ export function SpellingTrain({
                         {isLoading ? <Spinner className="h-5 w-5" /> : 'Submit'}
                     </ButtonBase>
                 ) : (
+                // TODO: focus on the Next button after submission
                 <ButtonBase
                     ref={nextButtonRef}
                     onClick={() => {

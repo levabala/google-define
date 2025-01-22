@@ -13,6 +13,7 @@ type ButtonBaseProps = {
     ref?: React.Ref<HTMLButtonElement>;
 };
 
+// TODO: pass all the button standart props automatically
 export const ButtonBase = React.forwardRef<HTMLButtonElement, ButtonBaseProps>(function ButtonBase({
     isLoading,
     disabled,
