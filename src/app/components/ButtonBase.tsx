@@ -4,10 +4,11 @@ import { Spinner } from './Spinner';
 type ButtonBaseProps = {
     isLoading?: boolean;
     disabled?: boolean;
-    onClick: () => void;
+    onClick?: () => void;
     className?: string;
     children: React.ReactNode;
     testId?: string;
+    type?: 'button' | 'submit' | 'reset';
 };
 
 export function ButtonBase({
@@ -17,10 +18,11 @@ export function ButtonBase({
     className,
     children,
     testId,
+    type,
 }: ButtonBaseProps) {
     return (
         <button
-            type="button"
+            type={type || 'button'}
             onClick={onClick}
             disabled={disabled || isLoading}
             className={cn(
