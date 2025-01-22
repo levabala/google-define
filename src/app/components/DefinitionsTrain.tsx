@@ -1,10 +1,10 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
-import { DBWord } from '../types';
-import { Definition } from './Definition';
-import { ToggleSwitch } from './ToggleSwitch';
+import { useState, useMemo, useRef, useEffect } from "react";
+import { DBWord } from "../types";
+import { Definition } from "./Definition";
+import { ToggleSwitch } from "./ToggleSwitch";
 
 type DefinitionsTrainProps = {
-    results: DBWord['raw']['results'];
+    results: DBWord["raw"]["results"];
     wordsAll?: DBWord[];
     word: DBWord | null;
     onWordClick: (word: string, addToLearn?: boolean) => void;
@@ -13,7 +13,7 @@ type DefinitionsTrainProps = {
     onNext?: () => void;
 };
 
-type Mode = 'answer' | 'word';
+type Mode = "answer" | "word";
 
 export function DefinitionsTrain({
     results,
@@ -26,7 +26,7 @@ export function DefinitionsTrain({
 }: DefinitionsTrainProps) {
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
     const [hasAnswered, setHasAnswered] = useState(false);
-    const [mode, setMode] = useState<Mode>('answer');
+    const [mode, setMode] = useState<Mode>("answer");
     const nextButtonRef = useRef<HTMLButtonElement>(null);
 
     // Calculate prevailing partOfSpeech and get the first matching definition
@@ -34,26 +34,34 @@ export function DefinitionsTrain({
         // Create a combined array of regular and AI definitions
         const allDefinitions = [
             ...(results || []),
-            ...(word?.ai_definition ? [{
-                definition: word.ai_definition.definition,
-                partOfSpeech: word.ai_definition.partOfSpeech || 'unknown',
-                examples: word.ai_definition.examples || [],
-                fromWord: word.word
-            }] : [])
+            ...(word?.ai_definition
+                ? [
+                      {
+                          definition: word.ai_definition.definition,
+                          partOfSpeech:
+                              word.ai_definition.partOfSpeech || "unknown",
+                          examples: word.ai_definition.examples || [],
+                          fromWord: word.word,
+                      },
+                  ]
+                : []),
         ];
 
         if (allDefinitions.length === 0) {
-            return { prevailingPos: 'unknown', correctDefinition: { definition: '', partOfSpeech: null } };
+            return {
+                prevailingPos: "unknown",
+                correctDefinition: { definition: "", partOfSpeech: null },
+            };
         }
 
         // Count occurrences of each partOfSpeech
         const posCount = allDefinitions.reduce<Record<string, number>>(
             (acc, result) => {
-                const pos = result.partOfSpeech || 'unknown';
+                const pos = result.partOfSpeech || "unknown";
                 acc[pos] = (acc[pos] || 0) + 1;
                 return acc;
             },
-            {}
+            {},
         );
 
         // Find the most common partOfSpeech
@@ -69,12 +77,16 @@ export function DefinitionsTrain({
 
         // Get definitions with the prevailing partOfSpeech
         const matchingDefs = firstThreeDefinitions.filter(
-            r => r.partOfSpeech === prevailingPos,
+            (r) => r.partOfSpeech === prevailingPos,
         );
 
         // Choose randomly from matching definitions, or from first three if no matches
-        const defsToChooseFrom = matchingDefs.length > 0 ? matchingDefs : firstThreeDefinitions;
-        const correctDef = defsToChooseFrom[Math.floor(Math.random() * defsToChooseFrom.length)];
+        const defsToChooseFrom =
+            matchingDefs.length > 0 ? matchingDefs : firstThreeDefinitions;
+        const correctDef =
+            defsToChooseFrom[
+                Math.floor(Math.random() * defsToChooseFrom.length)
+            ];
 
         return { prevailingPos, correctDefinition: correctDef };
     }, [results, word]);
@@ -86,32 +98,35 @@ export function DefinitionsTrain({
         }
 
         // Get all definitions grouped by word, including AI definitions
-        const allDefinitions = wordsAll.flatMap(word => {
+        const allDefinitions = wordsAll.flatMap((word) => {
             const definitions = [];
-            
+
             // Add regular definitions
             if (word.raw.results && word.raw.results.length > 0) {
                 // First, find the prevailing pos for this word
-                const posCount = word.raw.results.reduce<Record<string, number>>(
-                    (acc, result) => {
-                        const pos = result.partOfSpeech || 'unknown';
-                        acc[pos] = (acc[pos] || 0) + 1;
-                        return acc;
-                    },
-                    {}
-                );
+                const posCount = word.raw.results.reduce<
+                    Record<string, number>
+                >((acc, result) => {
+                    const pos = result.partOfSpeech || "unknown";
+                    acc[pos] = (acc[pos] || 0) + 1;
+                    return acc;
+                }, {});
 
                 const wordPrevailingPos = Object.entries(posCount).reduce(
                     (a, b) => (b[1] > a[1] ? b : a),
                 )[0];
 
                 // Only return definitions that match the prevailing pos
-                definitions.push(...word.raw.results
-                    .filter(result => result.partOfSpeech === wordPrevailingPos)
-                    .map(result => ({
-                        ...result,
-                        fromWord: word.word,
-                    }))
+                definitions.push(
+                    ...word.raw.results
+                        .filter(
+                            (result) =>
+                                result.partOfSpeech === wordPrevailingPos,
+                        )
+                        .map((result) => ({
+                            ...result,
+                            fromWord: word.word,
+                        })),
                 );
             }
 
@@ -119,9 +134,9 @@ export function DefinitionsTrain({
             if (word.ai_definition) {
                 definitions.push({
                     definition: word.ai_definition.definition,
-                    partOfSpeech: word.ai_definition.partOfSpeech || 'unknown',
+                    partOfSpeech: word.ai_definition.partOfSpeech || "unknown",
                     examples: word.ai_definition.examples || [],
-                    fromWord: word.word
+                    fromWord: word.word,
                 });
             }
 
@@ -130,12 +145,12 @@ export function DefinitionsTrain({
 
         // First try to get definitions with matching partOfSpeech
         const matchingDefinitions = allDefinitions.filter(
-            def =>
+            (def) =>
                 def.fromWord !== word.word &&
                 def.partOfSpeech === prevailingPos &&
                 !def.definition
                     .toLowerCase()
-                    .includes(word?.word.toLowerCase() || ''),
+                    .includes(word?.word.toLowerCase() || ""),
         );
 
         // If we don't have enough matching definitions, include other parts of speech
@@ -147,12 +162,12 @@ export function DefinitionsTrain({
         } else {
             // Get all other definitions (regardless of partOfSpeech)
             const otherPosDefinitions = allDefinitions.filter(
-                def =>
+                (def) =>
                     def.fromWord !== word.word &&
                     def.partOfSpeech !== prevailingPos &&
                     !def.definition
                         .toLowerCase()
-                        .includes(word?.word.toLowerCase() || ''),
+                        .includes(word?.word.toLowerCase() || ""),
             );
 
             // Combine matching and non-matching definitions
@@ -195,9 +210,9 @@ export function DefinitionsTrain({
 
     const getButtonClass = (index: number) => {
         const baseClasses =
-            'p-2 mb-2 w-full text-left border rounded transition-colors';
+            "p-2 mb-2 w-full text-left border rounded transition-colors";
 
-        if (!hasAnswered && mode === 'answer') {
+        if (!hasAnswered && mode === "answer") {
             return `${baseClasses} hover:bg-gray-700`;
         }
 
@@ -211,16 +226,16 @@ export function DefinitionsTrain({
             const shouldShowOutline = selectedIndex !== null && !isSelected;
             return `${baseClasses} ${
                 isSelected
-                    ? 'bg-green-600/50 hover:bg-green-600/60'
+                    ? "bg-green-600/50 hover:bg-green-600/60"
                     : shouldShowOutline
-                      ? 'outline outline-2 outline-green-500'
-                      : ''
+                      ? "outline outline-2 outline-green-500"
+                      : ""
             }`;
         }
 
         // Wrong answer
         return `${baseClasses} ${
-            isSelected ? 'bg-red-600/50 hover:bg-red-600/60' : ''
+            isSelected ? "bg-red-600/50 hover:bg-red-600/60" : ""
         }`;
     };
 
@@ -235,21 +250,21 @@ export function DefinitionsTrain({
 
             window.scrollTo({
                 top: offsetPosition,
-                behavior: 'smooth',
+                behavior: "smooth",
             });
         }
     }, [hasAnswered, definitionChoices]);
 
     return (
-        <div 
-            className={`flex flex-col gap-1 transition-opacity duration-300`} 
+        <div
+            className={`flex flex-col gap-1 transition-opacity duration-300`}
             data-testid="definitions-train"
             role="list"
         >
             <div className="flex">
                 <ToggleSwitch
-                    checked={mode === 'word'}
-                    onChange={checked => setMode(checked ? 'word' : 'answer')}
+                    checked={mode === "word"}
+                    onChange={(checked) => setMode(checked ? "word" : "answer")}
                     leftLabel="Answer Mode"
                     rightLabel="Word Mode"
                 />
@@ -258,15 +273,15 @@ export function DefinitionsTrain({
             {definitionChoices.map((def, index) => (
                 <button
                     key={`${def.definition}-${index}`}
-                    onClick={() => mode === 'answer' && handleSelect(index)}
+                    onClick={() => mode === "answer" && handleSelect(index)}
                     data-testid={`definition-choice-${index}`}
                     role="listitem"
                     className={`${getButtonClass(index)} transition-all duration-300 text-white ${
-                        mode === 'word'
-                            ? 'cursor-default border-gray-700'
-                            : 'border-gray-600'
+                        mode === "word"
+                            ? "cursor-default border-gray-700"
+                            : "border-gray-600"
                     }`}
-                    disabled={hasAnswered || mode === 'word'}
+                    disabled={hasAnswered || mode === "word"}
                 >
                     <div className="flex justify-between items-start gap-1">
                         <Definition
@@ -275,10 +290,11 @@ export function DefinitionsTrain({
                             textSourceSubmitted={word?.word || null}
                             onWordClick={onWordClick}
                             hideExamples
-                            disableWordClick={mode === 'answer'}
+                            disableWordClick={mode === "answer"}
                         />
                         <span
-                            className={`text-white font-bold whitespace-nowrap ${!hasAnswered ? 'invisible' : 'visible'}`}
+                            className={`text-white font-bold whitespace-nowrap ${!hasAnswered ? "invisible" : "visible"}`}
+                            data-testid="definition-word"
                         >
                             {def.fromWord && `[${def.fromWord}]`}
                         </span>
@@ -296,8 +312,8 @@ export function DefinitionsTrain({
                 }}
                 className={`mt-4 p-2 rounded transition-colors flex items-center justify-center gap-2 ${
                     hasAnswered
-                        ? 'bg-blue-500 hover:bg-blue-600 cursor-pointer'
-                        : 'bg-blue-500/50 cursor-not-allowed'
+                        ? "bg-blue-500 hover:bg-blue-600 cursor-pointer"
+                        : "bg-blue-500/50 cursor-not-allowed"
                 }`}
                 disabled={!hasAnswered}
             >

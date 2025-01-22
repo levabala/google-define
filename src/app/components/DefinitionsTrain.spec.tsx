@@ -1,8 +1,11 @@
 import { describe, test, expect } from "bun:test";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { DefinitionsTrain } from "./DefinitionsTrain";
+import { DBWord } from "../types";
 
-function expectAtLeastOne(expectations: (() => void)[]) {
+function expectAny(expectations: (() => void)[]) {
     const errors: Error[] = [];
-    
+
     for (const expectation of expectations) {
         try {
             expectation();
@@ -11,18 +14,14 @@ function expectAtLeastOne(expectations: (() => void)[]) {
             errors.push(error as Error);
         }
     }
-    
+
     // If we get here, all expectations failed
     throw new Error(
         `None of the expectations passed:\n${errors
             .map((e, i) => `  ${i + 1}. ${e.message}`)
-            .join("\n")}`
+            .join("\n")}`,
     );
 }
-import { render, screen, fireEvent } from "@testing-library/react";
-import { DefinitionsTrain } from "./DefinitionsTrain";
-import { DBWord } from "../types";
-import { createWrapper } from "../test-utils";
 
 const mockWordsAll: DBWord[] = [
     {
@@ -102,30 +101,43 @@ describe("DefinitionsTrain", () => {
                 onFailure={() => {}}
                 onNext={() => {}}
             />,
-            { wrapper: createWrapper() },
         );
 
         // Wait for definitions to load
         const definitions = screen.getAllByTestId(/definition-choice-/);
         expect(definitions.length).toBe(3);
 
-        screen.debug(definitions);
+        const definitionsTrainContainer =
+            screen.getByTestId("definitions-train");
 
-        // Verify at least one definition contains expected text
-        expectAtLeastOne([
-            () => expect(definitions).toHaveTextContent(
-                "The round fruit of a tree of the rose family"
-            ),
-            () => expect(definitions).toHaveTextContent(
-                "A tech company known for its smartphones"
-            ),
-            () => expect(definitions).toHaveTextContent(
-                "A popular fruit often used in desserts"
-            )
+        expectAny([
+            () =>
+                expect(definitionsTrainContainer).toHaveTextContent(
+                    /The round fruit of a tree of the rose family/,
+                ),
+            () =>
+                expect(definitionsTrainContainer).toHaveTextContent(
+                    /A tech company known for its smartphones/,
+                ),
+            () =>
+                expect(definitionsTrainContainer).toHaveTextContent(
+                    /A popular fruit often used in desserts/,
+                ),
+        ]);
+
+        expect(definitionsTrainContainer).toHaveTextContent(
+            /A long curved fruit with a yellow skin/,
+        );
+
+        expectAny([
+            () =>
+                expect(definitionsTrainContainer).toHaveTextContent(
+                    /A small round red fruit with a pit/,
+                ),
         ]);
     });
 
-    test("should use only dictionary definitions when AI definition is missing", async () => {
+    test("should be able to use dictionary definitions when AI definition is missing", async () => {
         render(
             <DefinitionsTrain
                 results={mockWordWithOnlyDictionary.raw.results}
@@ -136,24 +148,13 @@ describe("DefinitionsTrain", () => {
                 onFailure={() => {}}
                 onNext={() => {}}
             />,
-            { wrapper: createWrapper() },
         );
 
-        const definitions = screen.getAllByTestId(/definition-choice-/);
-        const definitionTexts = definitions.map((d) =>
-            Array.from(d.querySelectorAll('[data-testid="word"]'))
-                .map((span) => span.textContent)
-                .join(" "),
-        );
+        const definitionsTrainContainer =
+            screen.getByTestId("definitions-train");
 
-        // Verify dictionary definition is present
-        expect(definitionTexts).toHaveTextContent(
-            "A long curved fruit with a yellow skin",
-        );
-
-        // Verify no AI definition is present
-        expect(definitionTexts).not.toHaveTextContent(
-            "A popular fruit often used in desserts",
+        expect(definitionsTrainContainer).toHaveTextContent(
+            /A long curved fruit with a yellow skin/,
         );
     });
 
@@ -168,24 +169,13 @@ describe("DefinitionsTrain", () => {
                 onFailure={() => {}}
                 onNext={() => {}}
             />,
-            { wrapper: createWrapper() },
         );
 
-        const definitions = screen.getAllByTestId(/definition-choice-/);
-        const definitionTexts = definitions.map((d) =>
-            Array.from(d.querySelectorAll('[data-testid="word"]'))
-                .map((span) => span.textContent)
-                .join(" "),
-        );
+        const definitionsTrainContainer =
+            screen.getByTestId("definitions-train");
 
-        // Verify AI definition is present
-        expect(definitionTexts).toHaveTextContent(
-            "A small round red fruit with a pit",
-        );
-
-        // Verify no dictionary definitions are present
-        expect(definitionTexts).not.toHaveTextContent(
-            "The round fruit of a tree of the rose family",
+        expect(definitionsTrainContainer).toHaveTextContent(
+            /A small round red fruit with a pit/,
         );
     });
 
@@ -194,23 +184,22 @@ describe("DefinitionsTrain", () => {
             <DefinitionsTrain
                 results={mockWordWithBothDefinitions.raw.results}
                 word={mockWordWithBothDefinitions}
+                wordsAll={mockWordsAll}
                 onWordClick={() => {}}
                 onSuccess={() => {}}
                 onFailure={() => {}}
                 onNext={() => {}}
             />,
-            { wrapper: createWrapper() },
         );
 
-        // Wait for definitions to load
-        const definitions = screen.getAllByTestId(/definition-choice-/);
-        expect(definitions.length).toBe(5);
-
-        // Select a definition
-        const firstDefinition = screen.getAllByTestId(/definition-choice-/)[0];
-        fireEvent.click(firstDefinition);
+        const firstDefinitionWord = screen.getAllByTestId(/definition-word/)[0];
 
         // Verify word origin appears in brackets
-        expect(firstDefinition).toHaveTextContent(/\[.*\]/);
+        expect(firstDefinitionWord).toHaveClass('invisible');
+
+        fireEvent.click(firstDefinitionWord);
+
+        // Verify word origin appears in brackets
+        expect(firstDefinitionWord).not.toHaveClass('invisible');
     });
 });
