@@ -18,15 +18,15 @@ export async function POST(req: NextRequest) {
     // Calculate letter differences
     const errors = calculateSpellingErrors(word, answer);
 
-    const { error } = await supabase.from('training').insert({
+    const { error } = await supabase.from('training_spelling').insert({
         word,
-        definition: `spelling_attempt:${answer}`,
-        is_success: errors === 0,
+        answer,
+        errors_count: errors,
         user
     });
 
     if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        throw new Error(error.message);
     }
 
     return NextResponse.json({ 
