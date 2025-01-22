@@ -161,8 +161,6 @@ function Main() {
                         setTextSourceCurrent("");
                     }
                 }}
-                isTraining={isTraining}
-                setIsTraining={setIsTraining}
                 wordsAll={wordsAll}
             />
 
@@ -177,7 +175,6 @@ function Main() {
                 <MainBody
                     isFetchingWordCurrent={isFetchingWordCurrent}
                     isTraining={isTraining}
-                    setIsTraining={setIsTraining}
                     wordCurrent={wordCurrent}
                     wordToTrain={wordToTrain}
                     wordsAll={wordsAll}
