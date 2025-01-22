@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useMutationSpelling } from '../hooks/useMutationSpelling';
 import { cn } from '../../utils/cn';
 import { ButtonBase } from './ButtonBase';

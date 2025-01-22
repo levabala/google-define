@@ -9,9 +9,10 @@ type ButtonBaseProps = {
     children: React.ReactNode;
     testId?: string;
     type?: 'button' | 'submit' | 'reset';
+    ref?: React.Ref<HTMLButtonElement>;
 };
 
-export function ButtonBase({
+export const ButtonBase = React.forwardRef<HTMLButtonElement, ButtonBaseProps>(({
     isLoading,
     disabled,
     onClick,
@@ -19,7 +20,7 @@ export function ButtonBase({
     children,
     testId,
     type,
-}: ButtonBaseProps) {
+}, ref) => {
     return (
         <button
             type={type || 'button'}
@@ -42,4 +43,4 @@ export function ButtonBase({
             )}
         </button>
     );
-}
+});
