@@ -1,7 +1,6 @@
 import { DBWord } from '../types';
 import { useMutationMarkWord } from '../hooks/useMutationMarkWord';
 import { cn } from '../../utils/cn';
-import { Spinner } from './Spinner';
 import { ButtonBase } from './ButtonBase';
 
 type ButtonLearnedProps = {
