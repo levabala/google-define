@@ -189,9 +189,6 @@ describe("scenarios", () => {
                 ).toBeInTheDocument();
 
                 // Verify definitions content by checking the container's text content
-                const definitionContainer = screen.getByTestId(
-                    "definitions-container",
-                );
                 expect(definitionContainer).toHaveTextContent(
                     /noun.*The round fruit of a tree of the rose family.*I ate an apple for breakfast/,
                 );
