@@ -19,7 +19,7 @@ const mockWordWithBothDefinitions: DBWord = {
                 definition: "A tech company known for its smartphones",
                 partOfSpeech: "noun",
                 examples: ["Apple released a new iPhone"],
-            }
+            },
         ],
         pronunciation: { all: "ap-uhl" },
     },
@@ -41,7 +41,7 @@ const mockWordWithOnlyDictionary: DBWord = {
                 definition: "A long curved fruit with a yellow skin",
                 partOfSpeech: "noun",
                 examples: ["Monkeys love bananas"],
-            }
+            },
         ],
         pronunciation: { all: "buh-nan-uh" },
     },
@@ -76,28 +76,36 @@ describe("DefinitionsTrain", () => {
                 onFailure={() => {}}
                 onNext={() => {}}
             />,
-            { wrapper: createWrapper() }
+            { wrapper: createWrapper() },
         );
+
+        screen.debug();
 
         // Wait for definitions to load
         await waitFor(() => {
             const definitions = screen.getAllByTestId(/definition-choice-/);
             expect(definitions.length).toBe(5); // 4 random + 1 correct
-            
+
             // Check that all definitions are present in the choices
-            const definitionTexts = definitions.map(d => d.textContent);
-            
+            const definitionTexts = definitions.map((d) => d.textContent);
+
             // Verify dictionary definitions
             expect(definitionTexts).toContainEqual(
-                expect.stringContaining("The round fruit of a tree of the rose family")
+                expect.stringContaining(
+                    "The round fruit of a tree of the rose family",
+                ),
             );
             expect(definitionTexts).toContainEqual(
-                expect.stringContaining("A tech company known for its smartphones")
+                expect.stringContaining(
+                    "A tech company known for its smartphones",
+                ),
             );
-            
+
             // Verify AI definition
             expect(definitionTexts).toContainEqual(
-                expect.stringContaining("A popular fruit often used in desserts")
+                expect.stringContaining(
+                    "A popular fruit often used in desserts",
+                ),
             );
         });
     });
@@ -112,21 +120,25 @@ describe("DefinitionsTrain", () => {
                 onFailure={() => {}}
                 onNext={() => {}}
             />,
-            { wrapper: createWrapper() }
+            { wrapper: createWrapper() },
         );
 
         await waitFor(() => {
             const definitions = screen.getAllByTestId(/definition-choice-/);
-            const definitionTexts = definitions.map(d => d.textContent);
-            
+            const definitionTexts = definitions.map((d) => d.textContent);
+
             // Verify dictionary definition is present
             expect(definitionTexts).toContainEqual(
-                expect.stringContaining("A long curved fruit with a yellow skin")
+                expect.stringContaining(
+                    "A long curved fruit with a yellow skin",
+                ),
             );
-            
+
             // Verify no AI definition is present
             expect(definitionTexts).not.toContainEqual(
-                expect.stringContaining("A popular fruit often used in desserts")
+                expect.stringContaining(
+                    "A popular fruit often used in desserts",
+                ),
             );
         });
     });
@@ -141,21 +153,23 @@ describe("DefinitionsTrain", () => {
                 onFailure={() => {}}
                 onNext={() => {}}
             />,
-            { wrapper: createWrapper() }
+            { wrapper: createWrapper() },
         );
 
         await waitFor(() => {
             const definitions = screen.getAllByTestId(/definition-choice-/);
-            const definitionTexts = definitions.map(d => d.textContent);
-            
+            const definitionTexts = definitions.map((d) => d.textContent);
+
             // Verify AI definition is present
             expect(definitionTexts).toContainEqual(
-                expect.stringContaining("A small round red fruit with a pit")
+                expect.stringContaining("A small round red fruit with a pit"),
             );
-            
+
             // Verify no dictionary definitions are present
             expect(definitionTexts).not.toContainEqual(
-                expect.stringContaining("The round fruit of a tree of the rose family")
+                expect.stringContaining(
+                    "The round fruit of a tree of the rose family",
+                ),
             );
         });
     });
@@ -170,7 +184,7 @@ describe("DefinitionsTrain", () => {
                 onFailure={() => {}}
                 onNext={() => {}}
             />,
-            { wrapper: createWrapper() }
+            { wrapper: createWrapper() },
         );
 
         // Wait for definitions to load
