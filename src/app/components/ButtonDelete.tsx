@@ -38,7 +38,7 @@ export function ButtonDelete({
                     },
                 });
             }}
-            className={cn('px-2 py-1 text-white rounded bg-red-600 hover:bg-red-700', className)}
+            className={cn('px-2 py-1 text-white rounded inline-flex items-center justify-center gap-2 w-[100px] bg-red-600 hover:bg-red-700', className)}
             data-testid="delete-button"
         >
             Delete

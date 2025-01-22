@@ -32,7 +32,7 @@ export function ButtonLearned({
             }}
             disabled={isLearned || isLoading}
             className={cn(
-                'px-2 py-1 text-white rounded flex items-center justify-center gap-2 min-w-[100px]', 
+                'px-2 py-1 text-white rounded inline-flex items-center justify-center gap-2 w-[100px]', 
                 isLearned
                     ? 'bg-green-800 cursor-not-allowed ring-2 ring-green-400'
                     : 'bg-green-600 hover:bg-green-700',

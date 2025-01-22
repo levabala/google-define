@@ -32,7 +32,7 @@ export function ButtonToLearn({
                 });
             }}
             disabled={isToLearn || isLoading}
-            className={cn('px-2 py-1 text-white rounded flex items-center justify-center gap-2 min-w-[100px]', 
+            className={cn('px-2 py-1 text-white rounded inline-flex items-center justify-center gap-2 w-[100px]', 
                 isToLearn
                     ? 'bg-yellow-800 cursor-not-allowed ring-2 ring-yellow-400'
                     : 'bg-yellow-600 hover:bg-yellow-700',
