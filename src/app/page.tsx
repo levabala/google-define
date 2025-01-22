@@ -104,6 +104,7 @@ function Main() {
         <div className="flex flex-col gap-1">
             <div className="flex gap-4 items-start">
                 <WordsAll
+                    mode={mode}
                     words={wordsAll}
                     isLoading={!wordsAll}
                     currentWord={textSourceSubmitted}

@@ -1,8 +1,8 @@
 import { DBWord } from '../types';
 import { Word } from './Word';
-import { useQueryState } from 'nuqs';
 
 type Props = {
+    mode: 'explore' | 'definition' | 'spelling';
     words: DBWord[] | undefined;
     isLoading: boolean;
     currentWord: string;
@@ -10,14 +10,12 @@ type Props = {
 };
 
 export function WordsAll({
+    mode,
     words,
     isLoading,
     currentWord,
     onWordClick,
 }: Props) {
-    const [mode] = useQueryState('mode', {
-        defaultValue: 'explore',
-    });
     // Mock data for loading state with realistic word lengths
     const mockWords = [
         'example',
