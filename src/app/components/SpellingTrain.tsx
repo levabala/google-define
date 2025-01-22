@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { cn } from '../utils/cn';
 import { ButtonBase } from './ButtonBase';
 import { Spinner } from './Spinner';
 import { DBWord } from '../types';
@@ -24,6 +25,7 @@ export function SpellingTrain({
     const [answer, setAnswer] = useState('');
     const [submitted, setSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [lastCorrect, setLastCorrect] = useState<boolean | null>(null);
 
     const handleSubmit = async () => {
         setIsLoading(true);
@@ -41,8 +43,10 @@ export function SpellingTrain({
             
             if (result.success) {
                 onSuccess();
+                setLastCorrect(true);
             } else {
                 onFailure(result.errors);
+                setLastCorrect(false);
             }
             
             setSubmitted(true);
@@ -91,9 +95,14 @@ export function SpellingTrain({
                     onClick={() => {
                         setAnswer('');
                         setSubmitted(false);
+                        setLastCorrect(null);
                         onNext();
                     }}
-                    className="bg-green-600 hover:bg-green-700"
+                    className={cn(
+                        lastCorrect === true && 'bg-green-600 hover:bg-green-700',
+                        lastCorrect === false && 'bg-red-600 hover:bg-red-700',
+                        lastCorrect === null && 'bg-gray-600 hover:bg-gray-700'
+                    )}
                 >
                     Next Word
                 </ButtonBase>
