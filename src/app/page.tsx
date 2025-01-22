@@ -75,7 +75,7 @@ function Main() {
             if (wordsToLearn.length === 0) {
                 setTextSourceCurrent("");
                 setTextSourceSubmitted("");
-                setIsTraining(false);
+                setMode('explore');
                 return;
             }
 

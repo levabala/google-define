@@ -11,7 +11,6 @@ export type TrainingMode = "definition" | "spelling";
 export type MainBodyProps = {
     isFetchingWordCurrent: boolean;
     isTraining: boolean;
-    setIsTraining: (isTraining: boolean) => void;
     wordCurrent: DBWord;
     wordToTrain: DBWord | null;
     wordsAll: DBWord[];
