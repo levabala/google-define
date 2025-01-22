@@ -92,26 +92,24 @@ describe("DefinitionsTrain", () => {
             const definitions = screen.getAllByTestId(/definition-choice-/);
             expect(definitions.length).toBe(3);
 
-            // Check that all definitions are present in the choices
-            const definitionTexts = definitions.map((d) => d.textContent);
+            // Get definition text from spans
+            const definitionTexts = definitions.map((d) => 
+                Array.from(d.querySelectorAll('[data-testid="word"]'))
+                    .map(span => span.textContent)
+                    .join(' ')
+            );
 
             // Verify dictionary definitions
-            expect(definitionTexts).toContainEqual(
-                expect.stringContaining(
-                    "The round fruit of a tree of the rose family",
-                ),
+            expect(definitionTexts).toContain(
+                "The round fruit of a tree of the rose family"
             );
-            expect(definitionTexts).toContainEqual(
-                expect.stringContaining(
-                    "A tech company known for its smartphones",
-                ),
+            expect(definitionTexts).toContain(
+                "A tech company known for its smartphones"
             );
 
             // Verify AI definition
-            expect(definitionTexts).toContainEqual(
-                expect.stringContaining(
-                    "A popular fruit often used in desserts",
-                ),
+            expect(definitionTexts).toContain(
+                "A popular fruit often used in desserts"
             );
         });
     });
@@ -132,20 +130,20 @@ describe("DefinitionsTrain", () => {
 
         await waitFor(() => {
             const definitions = screen.getAllByTestId(/definition-choice-/);
-            const definitionTexts = definitions.map((d) => d.textContent);
-
-            // Verify dictionary definition is present
-            expect(definitionTexts).toContainEqual(
-                expect.stringContaining(
-                    "A long curved fruit with a yellow skin",
-                ),
+            const definitionTexts = definitions.map((d) =>
+                Array.from(d.querySelectorAll('[data-testid="word"]'))
+                    .map(span => span.textContent)
+                    .join(' ')
             );
-
+            
+            // Verify dictionary definition is present
+            expect(definitionTexts).toContain(
+                "A long curved fruit with a yellow skin"
+            );
+            
             // Verify no AI definition is present
-            expect(definitionTexts).not.toContainEqual(
-                expect.stringContaining(
-                    "A popular fruit often used in desserts",
-                ),
+            expect(definitionTexts).not.toContain(
+                "A popular fruit often used in desserts"
             );
         });
     });
@@ -166,18 +164,20 @@ describe("DefinitionsTrain", () => {
 
         await waitFor(() => {
             const definitions = screen.getAllByTestId(/definition-choice-/);
-            const definitionTexts = definitions.map((d) => d.textContent);
-
-            // Verify AI definition is present
-            expect(definitionTexts).toContainEqual(
-                expect.stringContaining("A small round red fruit with a pit"),
+            const definitionTexts = definitions.map((d) =>
+                Array.from(d.querySelectorAll('[data-testid="word"]'))
+                    .map(span => span.textContent)
+                    .join(' ')
             );
-
+            
+            // Verify AI definition is present
+            expect(definitionTexts).toContain(
+                "A small round red fruit with a pit"
+            );
+            
             // Verify no dictionary definitions are present
-            expect(definitionTexts).not.toContainEqual(
-                expect.stringContaining(
-                    "The round fruit of a tree of the rose family",
-                ),
+            expect(definitionTexts).not.toContain(
+                "The round fruit of a tree of the rose family"
             );
         });
     });
