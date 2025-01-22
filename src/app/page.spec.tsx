@@ -221,7 +221,7 @@ describe("scenarios", () => {
 
             // Verify definitions loaded
             await waitFor(() => {
-                expect(definitionContainer).toHaveTextContent(
+                expect(screen.getByTestId("definitions-container")).toHaveTextContent(
                     /noun.*The round fruit of a tree of the rose family.*I ate an apple for breakfast/,
                 );
             });
@@ -375,9 +375,6 @@ describe("scenarios", () => {
                 return new Response(null, { status: 404 });
             });
 
-                const definitionContainer = screen.getByTestId(
-                    "definitions-container",
-                );
 
             // First select the word by clicking it
             const elderberryWord = within(screen.getByTestId("words-all")).getByText("elderberry");
