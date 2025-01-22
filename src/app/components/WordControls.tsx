@@ -42,7 +42,7 @@ export function WordControls({
                         data-testid="word-input"
                     />
                     {mode === 'spelling' && (
-                        <div className="absolute inset-0 pointer-events-none bg-gray-800 flex items-center px-2">
+                        <div className="absolute inset-0 pointer-events-none bg-gray-800 flex items-center px-2 text-white">
                             {'•'.repeat(textSourceCurrent.length)}
                         </div>
                     )}
