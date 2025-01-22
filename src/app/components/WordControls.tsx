@@ -33,13 +33,20 @@ export function WordControls({
             data-testid="word-controls"
         >
             <div className="flex items-center gap-2 flex-shrink-0">
-                <input
-                    type={mode === 'spelling' ? 'password' : 'text'}
-                    value={textSourceCurrent}
-                    onChange={e => setTextSourceCurrent(e.target.value)}
-                    className="bg-gray-800 text-white border border-gray-500 focus-visible:outline-gray-800"
-                    data-testid="word-input"
-                />
+                <div className="relative">
+                    <input
+                        type="text"
+                        value={textSourceCurrent}
+                        onChange={e => setTextSourceCurrent(e.target.value)}
+                        className="bg-gray-800 text-white border border-gray-500 focus-visible:outline-gray-800"
+                        data-testid="word-input"
+                    />
+                    {mode === 'spelling' && (
+                        <div className="absolute inset-0 pointer-events-none bg-gray-800 flex items-center px-2">
+                            {'•'.repeat(textSourceCurrent.length)}
+                        </div>
+                    )}
+                </div>
                 <button 
                     type="submit" 
                     className="bg-gray-300 p-1"
