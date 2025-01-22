@@ -16,6 +16,7 @@ type SpellingTrainProps = {
 export function SpellingTrain({
     word,
     definition,
+    wordsAll,
     onSuccess,
     onFailure,
     onNext,
