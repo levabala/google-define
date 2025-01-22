@@ -50,9 +50,21 @@ export function SpellingTrain({
 
     return (
         <div className="flex flex-col gap-4">
-            <div className="text-lg font-semibold">
-                {definition}
-            </div>
+            <Definition
+                result={{
+                    definition,
+                    partOfSpeech: word.raw.results?.[0]?.partOfSpeech,
+                    examples: word.raw.results?.[0]?.examples,
+                    source: 'dictionary'
+                }}
+                wordsAll={wordsAll}
+                textSourceSubmitted={word.word}
+                onWordClick={(word) => {
+                    // Handle word clicks within the definition
+                    setAnswer(word);
+                }}
+                hideExamples
+            />
             
             <input
                 type="text"
