@@ -28,6 +28,7 @@ function Main() {
         clearOnDefault: true,
     });
     const [isTraining, setIsTraining] = useState(false);
+    const [trainingMode, setTrainingMode] = useState<'definition' | 'spelling'>('definition');
     const [addNextToLearn, setAddNextToLearn] = useState(false);
     const [wordToTrain, setWordToTrain] = useState<DBWord | null>(null);
     const [wordToTrainNext, setWordToTrainNext] = useState<string | null>(null);
@@ -131,6 +132,27 @@ function Main() {
                 </button>
             </div>
 
+            <div className="flex gap-2 mb-4">
+                <button
+                    onClick={() => setTrainingMode('definition')}
+                    className={cn(
+                        'px-4 py-1 rounded',
+                        trainingMode === 'definition' ? 'bg-blue-600' : 'bg-gray-600'
+                    )}
+                >
+                    Definition Training
+                </button>
+                <button
+                    onClick={() => setTrainingMode('spelling')}
+                    className={cn(
+                        'px-4 py-1 rounded',
+                        trainingMode === 'spelling' ? 'bg-blue-600' : 'bg-gray-600'
+                    )}
+                >
+                    Spelling Training
+                </button>
+            </div>
+
             <WordControls
                 textSourceCurrent={textSourceCurrent}
                 setTextSourceCurrent={setTextSourceCurrent}
@@ -165,7 +187,39 @@ function Main() {
             {isFetchingWordCurrent ? (
                 <Spinner />
             ) : isTraining && wordToTrain && wordsAll ? (
-                <DefinitionsTrain
+                trainingMode === 'spelling' ? (
+                    <SpellingTrain
+                        word={wordToTrain}
+                        definition={wordToTrain.ai_definition?.definition || 
+                                    wordToTrain.raw.results?.[0]?.definition || 
+                                    'No definition available'}
+                        onSuccess={() => {
+                            trainingGuessMutation.mutate({
+                                word: textSourceSubmitted,
+                                success: true,
+                                definition: 'spelling_correct'
+                            });
+                            toast.success('Perfect spelling! 🎉');
+                        }}
+                        onFailure={(errors) => {
+                            trainingGuessMutation.mutate({
+                                word: textSourceSubmitted,
+                                success: false,
+                                definition: `spelling_errors:${errors}`
+                            });
+                            toast.error(`Spelling errors: ${errors} ❌`);
+                        }}
+                        onNext={() => {
+                            if (!wordToTrainNext) {
+                                setIsTraining(false);
+                                return;
+                            }
+                            setTextSourceCurrent(wordToTrainNext);
+                            setTextSourceSubmitted(wordToTrainNext);
+                        }}
+                    />
+                ) : (
+                    <DefinitionsTrain
                     results={wordToTrain.raw.results}
                     wordsAll={wordsAll}
                     word={wordToTrain}
