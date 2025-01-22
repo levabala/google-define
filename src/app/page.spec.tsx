@@ -320,7 +320,7 @@ describe("scenarios", () => {
 
             // Wait for words to be loaded
             await waitFor(() => {
-                const wordElements = screen.getAllByTestId("word");
+                const wordElements = within(wordsAllContainer).getAllByTestId("word");
                 const displayedWords = wordElements.map((el) => el.textContent);
 
                 // Verify sorting order:
@@ -354,9 +354,11 @@ describe("scenarios", () => {
                 },
             );
 
-            // Wait for initial words to load
-            await waitFor(() => {
-                expect(screen.getByText("elderberry")).toBeInTheDocument();
+            // Wait for initial words to load and get container
+            const wordsAllContainer = await waitFor(() => {
+                const container = screen.getByTestId("words-all");
+                expect(within(container).getByText("elderberry")).toBeInTheDocument();
+                return container;
             });
 
             // Mock the status update endpoint
@@ -391,20 +393,18 @@ describe("scenarios", () => {
             );
 
             // First select the word by clicking it
-            const elderberryWord = within(
-                screen.getByTestId("words-all"),
-            ).getByText("elderberry");
+            const elderberryWord = within(wordsAllContainer).getByText("elderberry");
             fireEvent.click(elderberryWord);
 
-            // Wait for definitions to load
-            await waitFor(() => {
-                expect(
-                    screen.getByTestId("definitions-container"),
-                ).toBeInTheDocument();
+            // Wait for definitions to load and get container
+            const definitionsContainer = await waitFor(() => {
+                const container = screen.getByTestId("definitions-container");
+                expect(container).toBeInTheDocument();
+                return container;
             });
 
-            // Find the TO_LEARN button using test ID
-            const toLearnButton = screen.getByTestId("to-learn-button");
+            // Find the TO_LEARN button using test ID within definitions
+            const toLearnButton = within(definitionsContainer).getByTestId("to-learn-button");
 
             // Click the TO_LEARN button
             fireEvent.click(toLearnButton);
