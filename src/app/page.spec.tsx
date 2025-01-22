@@ -203,6 +203,28 @@ describe("scenarios", () => {
     });
 
     describe("word selection", () => {
+        test("input should be populated with word from query params", async () => {
+            // Set initial query param
+            window.history.pushState({}, "", "/?word=apple");
+
+            render(
+                <Wrapper>
+                    <Main />
+                </Wrapper>,
+                {
+                    wrapper: withNuqsTestingAdapter({
+                        searchParams: new URLSearchParams({ word: "apple" }),
+                    }),
+                },
+            );
+
+            // Wait for input to be populated
+            await waitFor(() => {
+                const input = screen.getByTestId("word-input") as HTMLInputElement;
+                expect(input.value).toBe("apple");
+            });
+        });
+
         test("clicking word in WordsAll updates current word and query param", async () => {
             const Wrapper = createWrapper();
             render(
