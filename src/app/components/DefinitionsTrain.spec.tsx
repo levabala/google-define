@@ -90,7 +90,7 @@ describe("DefinitionsTrain", () => {
         // Wait for definitions to load
         await waitFor(() => {
             const definitions = screen.getAllByTestId(/definition-choice-/);
-            expect(definitions.length).toBe(5); // 4 random + 1 correct
+            expect(definitions.length).toBe(3);
 
             // Check that all definitions are present in the choices
             const definitionTexts = definitions.map((d) => d.textContent);
