@@ -26,7 +26,6 @@ export function WordControls({
     setIsTraining,
     wordsAll,
 }: Props) {
-    const mutation = useMutationAIDefinition();
     return (
         <form
             className="mt-2 flex flex-wrap items-center gap-3 w-full"
