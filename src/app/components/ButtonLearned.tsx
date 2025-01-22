@@ -40,7 +40,7 @@ export function ButtonLearned({
             )}
             data-testid="learned-button"
         >
-            {isLoading ? (
+            {isLoading || true ? (
                 <>
                     <Spinner className="h-4 w-4" />
                     <span>Marking...</span>
