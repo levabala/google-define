@@ -55,8 +55,8 @@ export function SpellingTrain({
             <Definition
                 result={{
                     definition,
-                    partOfSpeech: word.raw.results?.[0]?.partOfSpeech,
-                    examples: word.raw.results?.[0]?.examples,
+                    partOfSpeech: word.raw.results?.[0]?.partOfSpeech || undefined,
+                    examples: word.raw.results?.[0]?.examples || undefined,
                     source: 'dictionary'
                 }}
                 wordsAll={wordsAll}
