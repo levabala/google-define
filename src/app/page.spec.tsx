@@ -318,10 +318,15 @@ describe("scenarios", () => {
                 },
             );
 
-            // Wait for words to be loaded
-            await waitFor(() => {
-                const wordElements = within(wordsAllContainer).getAllByTestId("word");
-                const displayedWords = wordElements.map((el) => el.textContent);
+            // Wait for words to be loaded and get container
+            const wordsAllContainer = await waitFor(() => {
+                const container = screen.getByTestId("words-all");
+                expect(container).toBeInTheDocument();
+                return container;
+            });
+
+            const wordElements = within(wordsAllContainer).getAllByTestId("word");
+            const displayedWords = wordElements.map((el) => el.textContent);
 
                 // Verify sorting order:
                 // 1. NONE status first (elderberry)
