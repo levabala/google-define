@@ -1,14 +1,14 @@
 import { cn } from '../../utils/cn';
 
-type RadioButtonProps = {
-    value: string;
+type RadioButtonProps<T extends string> = {
+    value: T;
     checked: boolean;
-    onChange: (value: string) => void;
+    onChange: (value: T) => void;
     label: string;
     className?: string;
 };
 
-export function RadioButton({ value, checked, onChange, label, className }: RadioButtonProps) {
+export function RadioButton<T extends string>({ value, checked, onChange, label, className }: RadioButtonProps<T>) {
     return (
         <label className={cn(
             'px-4 py-1 rounded cursor-pointer transition-colors',

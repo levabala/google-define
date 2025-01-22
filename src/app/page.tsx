@@ -96,7 +96,6 @@ function Main() {
         wordsAll,
         setTextSourceCurrent,
         setTextSourceSubmitted,
-        setIsTraining,
         setWordToTrain,
         setWordToTrainNext,
     ]);
@@ -134,8 +133,8 @@ function Main() {
             </div>
 
             <TrainingModeToggle
-                trainingMode={trainingMode}
-                setTrainingMode={setTrainingMode}
+                mode={mode}
+                setMode={setMode}
             />
 
             <WordControls

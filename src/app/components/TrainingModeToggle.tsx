@@ -11,7 +11,7 @@ export function TrainingModeToggle({
 }: TrainingModeToggleProps) {
     return (
         <div className="flex gap-2 mb-4">
-            <RadioButton
+            <RadioButton<'explore' | 'definition' | 'spelling'>
                 value="explore"
                 checked={mode === 'explore'}
                 onChange={setMode}

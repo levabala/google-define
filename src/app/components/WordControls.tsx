@@ -2,7 +2,6 @@ import { ButtonDelete } from './ButtonDelete';
 import { ButtonLearned } from './ButtonLearned';
 import { ButtonToLearn } from './ButtonToLearn';
 import { SpeakButton } from './SpeakButton';
-import { ToggleSwitch } from './ToggleSwitch';
 import { ButtonAI } from './ButtonAI';
 import { PronunciationButton } from './PronunciationButton';
 import { DBWord } from '../types';
@@ -12,8 +11,6 @@ type Props = {
     setTextSourceCurrent: (text: string) => void;
     textSourceSubmitted: string;
     setTextSourceSubmitted: (text: string) => void;
-    isTraining: boolean;
-    setIsTraining: (isTraining: boolean) => void;
     wordsAll?: DBWord[];
 };
 
@@ -22,8 +19,6 @@ export function WordControls({
     setTextSourceCurrent,
     textSourceSubmitted,
     setTextSourceSubmitted,
-    isTraining,
-    setIsTraining,
     wordsAll,
 }: Props) {
     return (
