@@ -1,7 +1,7 @@
-import { DBWord } from '../types';
-import { useMutationAIDefinition } from '../hooks/useMutationAIDefinition';
-import { cn } from '../../utils/cn';
-import { ButtonBase } from './ButtonBase';
+import { DBWord } from "../types";
+import { useMutationAIDefinition } from "../hooks/useMutationAIDefinition";
+import { cn } from "../../utils/cn";
+import { ButtonBase } from "./ButtonBase";
 
 type ButtonAIProps = {
     textSourceSubmitted: string | null;
@@ -17,7 +17,7 @@ export function ButtonAI({
     const mutation = useMutationAIDefinition();
 
     const exists = wordsAll?.some(
-        w => w.word.toLowerCase() === textSourceSubmitted?.toLowerCase(),
+        (w) => w.word.toLowerCase() === textSourceSubmitted?.toLowerCase(),
     );
 
     if (!exists) return null;
@@ -28,11 +28,14 @@ export function ButtonAI({
                 if (!textSourceSubmitted) return;
                 mutation.mutate(textSourceSubmitted);
             }}
-            className={cn('bg-blue-600 hover:bg-blue-700 text-white', className)}
+            className={cn(
+                "bg-blue-600 hover:bg-blue-700 text-white",
+                className,
+            )}
             isLoading={mutation.isPending}
             testId="ai-button"
         >
-            {mutation.isPending ? 'Generating AI...' : 'AI Definition'}
+            AI Definition
         </ButtonBase>
     );
 }
