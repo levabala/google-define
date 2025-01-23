@@ -60,10 +60,10 @@ export function SpellingTrain({
         <div className="flex flex-col gap-4">
             <Definition
                 result={{
-                    definition,
-                    partOfSpeech: word.raw.results?.[0]?.partOfSpeech || null,
-                    examples: word.raw.results?.[0]?.examples || [],
-                    source: 'dictionary'
+                    definition: word.raw.ai_definition?.definition || definition,
+                    partOfSpeech: word.raw.ai_definition?.partOfSpeech || word.raw.results?.[0]?.partOfSpeech || null,
+                    examples: word.raw.ai_definition?.examples || word.raw.results?.[0]?.examples || [],
+                    source: word.raw.ai_definition ? 'ai' : 'dictionary'
                 }}
                 wordsAll={wordsAll || []}
                 textSourceSubmitted={word.word}
