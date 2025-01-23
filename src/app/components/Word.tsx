@@ -8,6 +8,7 @@ export type WordProps = {
     currentWord?: string | null;
     isLoading?: boolean;
     disableWordClick?: boolean;
+    // TODO: convert to isObscured
     displayMode?: 'normal' | 'obscured';
 };
 
@@ -52,6 +53,7 @@ export function Word({
             style={{ minWidth: "1rem" }}
             data-testid="word"
         >
+            { /* TODO: obscured must be done purely with CSS so not to change the width */ }
             <span className={displayMode === 'obscured' ? 'relative' : ''}>
                 <span className={displayMode === 'obscured' ? 'text-transparent' : ''}>
                     {word}
