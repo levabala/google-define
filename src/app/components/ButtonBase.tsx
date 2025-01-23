@@ -20,7 +20,7 @@ export const ButtonBase = React.forwardRef<HTMLButtonElement, ButtonBaseProps>(f
         <button
             {...props}
             type={props.type || 'button'}
-            disabled={disabled || isLoading || props.disabled}
+            disabled={disabled || isLoading}
             className={cn(
                 'px-4 py-1 rounded relative inline-flex items-center justify-center gap-2',
                 'transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
