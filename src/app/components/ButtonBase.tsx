@@ -2,32 +2,25 @@ import React from 'react';
 import { cn } from '../../utils/cn';
 import { Spinner } from './Spinner';
 
-type ButtonBaseProps = {
+type ButtonBaseProps = React.ComponentPropsWithoutRef<'button'> & {
     isLoading?: boolean;
-    disabled?: boolean;
-    onClick?: () => void;
     className?: string;
-    children: React.ReactNode;
     testId?: string;
-    type?: 'button' | 'submit' | 'reset';
-    ref?: React.Ref<HTMLButtonElement>;
 };
 
-// TODO: pass all the button standart props automatically
 export const ButtonBase = React.forwardRef<HTMLButtonElement, ButtonBaseProps>(function ButtonBase({
     isLoading,
-    disabled,
-    onClick,
     className,
     children,
     testId,
-    type,
+    disabled,
+    ...props
 }, ref) {
     return (
         <button
-            type={type || 'button'}
-            onClick={onClick}
-            disabled={disabled || isLoading}
+            {...props}
+            type={props.type || 'button'}
+            disabled={disabled || isLoading || props.disabled}
             className={cn(
                 'px-4 py-1 rounded relative inline-flex items-center justify-center gap-2',
                 'transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
