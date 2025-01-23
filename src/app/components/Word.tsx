@@ -53,16 +53,15 @@ export function Word({
             style={{ minWidth: "1rem" }}
             data-testid="word"
         >
-            { /* TODO: obscured must be done purely with CSS so not to change the width */ }
-            <span className={displayMode === 'obscured' ? 'relative' : ''}>
-                <span className={displayMode === 'obscured' ? 'text-transparent' : ''}>
-                    {word}
-                </span>
-                {displayMode === 'obscured' && (
-                    <span className="absolute left-0 top-0 text-white whitespace-nowrap">
-                        {'•'.repeat(word.length)}
-                    </span>
+            <span 
+                className={cn(
+                    displayMode === 'obscured' && [
+                        'relative after:content-[""] after:absolute after:left-0 after:top-0',
+                        'after:w-full after:h-full after:bg-white after:rounded-sm'
+                    ]
                 )}
+            >
+                {word}
             </span>
         </span>
     );
