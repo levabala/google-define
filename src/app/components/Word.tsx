@@ -1,4 +1,5 @@
 import { DBWord } from "../types";
+import { cn } from "../../utils/cn";
 
 export type WordProps = {
     word: string;
