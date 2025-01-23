@@ -57,8 +57,8 @@ export function Word({
             <span 
                 className={cn(
                     displayMode === 'obscured' && [
-                        'relative after:content-[""] after:absolute after:left-0 after:top-0',
-                        'after:w-full after:h-full after:bg-white after:rounded-sm'
+                        'blur-sm transition-all duration-300',
+                        'hover:blur-0 focus:blur-0'
                     ]
                 )}
             >
