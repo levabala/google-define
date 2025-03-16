@@ -1,13 +1,15 @@
-'use client';
+"use client";
 
-import { QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
-import { persistQueryClient } from '@tanstack/react-query-persist-client';
-import { queryClient } from './queryClient';
+import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
+import { persistQueryClient } from "@tanstack/react-query-persist-client";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { TRPCReactProvider } from "./trpc/client";
+import { getQueryClient } from "./trpc/client";
+
+const queryClient = getQueryClient();
 
 const persister =
-    typeof window !== 'undefined'
+    typeof window !== "undefined"
         ? createSyncStoragePersister({
               storage: window.localStorage,
           })
@@ -19,9 +21,9 @@ if (persister) {
         persister,
         maxAge: Infinity,
         dehydrateOptions: {
-            shouldDehydrateQuery: query => {
+            shouldDehydrateQuery: (query) => {
                 // Don't persist queries with 'dictionaryAll' key
-                return !query.queryKey.includes('dictionaryAll');
+                return !query.queryKey.includes("dictionaryAll");
             },
         },
     });
@@ -33,9 +35,9 @@ export function Providers({
     children: React.ReactNode;
 }>) {
     return (
-        <QueryClientProvider client={queryClient}>
+        <TRPCReactProvider>
             {children}
             <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
+        </TRPCReactProvider>
     );
 }

@@ -1,12 +1,9 @@
-import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { Geist, Geist_Mono } from "next/font/google";
-import { Providers } from "./providers";
 import type { Metadata } from "next";
-import { Toast } from "./toast";
+import { Geist, Geist_Mono } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Providers } from "./v1/providerss";
 import "./globals.css";
-
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { getQueryClient } from "./trpc/server";
+import { Toast } from "./v1/toastt";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -28,19 +25,13 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const queryClient = getQueryClient();
-
     return (
-        <html>
+        <html lang="en">
             <body
                 className={`dark ${geistSans.variable} ${geistMono.variable}`}
             >
                 <NuqsAdapter>
-                    <Providers>
-                        <HydrationBoundary state={dehydrate(queryClient)}>
-                            {children}
-                        </HydrationBoundary>
-                    </Providers>
+                    <Providers>{children}</Providers>
                 </NuqsAdapter>
                 <Toast />
             </body>
