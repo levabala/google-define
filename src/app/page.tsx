@@ -186,7 +186,7 @@ const CurrentWord: React.FC<{ word: Tables<"word"> }> = ({ word }) => {
     );
 
     return (
-        <>
+        <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 justify-between">
                 <h3 className="text-xl">{word.word}</h3>
                 <Button
@@ -212,7 +212,7 @@ const CurrentWord: React.FC<{ word: Tables<"word"> }> = ({ word }) => {
                     </Button>
                 </div>
             )}
-        </>
+        </div>
     );
 };
 
