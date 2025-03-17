@@ -222,7 +222,7 @@ function Main() {
     const queryClient = useQueryClient();
 
     const [shouldInvalidate, setShouldInvalidate] = useQueryState("invalidate");
-    const { currentWordStr } = useCurrentWordStr();
+    const { currentWordStr, setCurrentWordStr } = useCurrentWordStr();
     const [currentWord, setCurrentWord] = useState<Tables<"word"> | null>(null);
 
     const addWord = useMutation(
@@ -257,7 +257,11 @@ function Main() {
     return (
         <main className="bg-background flex h-screen flex-col gap-2 p-2">
             <div className="flex flex-col grow overflow-auto">
-                {currentWord ? <CurrentWord word={currentWord} /> : null}
+                {currentWord ? (
+                    <CurrentWord word={currentWord} />
+                ) : (
+                    <h3 className="text-xl">{currentWordStr}</h3>
+                )}
             </div>
             <hr className="border-t border-gray-500" />
             <div className="flex flex-wrap max-h-64 overflow-auto">
@@ -280,8 +284,15 @@ function Main() {
                     const formData = new FormData(form);
 
                     const data = {
-                        value: formData.get("value")?.valueOf() as string,
+                        value: (formData.get("value")?.valueOf() as string).trim().toLowerCase(),
                     };
+
+                    setCurrentWordStr(data.value);
+                    
+                    if (wordsAll.data?.find(word => word.word === data.value)) {
+                        form.reset();
+                        return;
+                    }
 
                     addWord.mutate(data, {
                         onSuccess: () => {
