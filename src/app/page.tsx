@@ -10,6 +10,7 @@ import { useTRPC } from "./trpc/client";
 import { useQueryState } from "nuqs";
 import { cn } from "@/lib/utils";
 import { type } from "arktype";
+import dynamic from "next/dynamic";
 
 function removeNonAlphanumeric(str: string): string {
     let result = "";
@@ -186,7 +187,7 @@ const CurrentWord: React.FC<{ word: Tables<"word"> }> = ({ word }) => {
     );
 
     return (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2 justify-between">
                 <h3 className="text-xl">{word.word}</h3>
                 <Button
@@ -216,7 +217,7 @@ const CurrentWord: React.FC<{ word: Tables<"word"> }> = ({ word }) => {
     );
 };
 
-export default function Main() {
+function Main() {
     const trpc = useTRPC();
     const queryClient = useQueryClient();
 
@@ -293,3 +294,7 @@ export default function Main() {
         </main>
     );
 }
+
+export default dynamic(() => Promise.resolve(Main), {
+    ssr: false,
+});

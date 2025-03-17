@@ -7,6 +7,7 @@ import "./globals.css";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getQueryClient } from "./trpc/server";
+import { Suspense } from "react";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -32,13 +33,11 @@ export default function RootLayout({
 
     return (
         <html className="dark">
-            <body
-                className={`${geistSans.variable} ${geistMono.variable}`}
-            >
+            <body className={`${geistSans.variable} ${geistMono.variable}`}>
                 <NuqsAdapter>
                     <Providers>
                         <HydrationBoundary state={dehydrate(queryClient)}>
-                            {children}
+                            <Suspense fallback="loading">{children}</Suspense>
                         </HydrationBoundary>
                     </Providers>
                 </NuqsAdapter>
