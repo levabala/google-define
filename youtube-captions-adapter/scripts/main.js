@@ -114,9 +114,3 @@ const observer = new MutationObserver(callback);
 
 // Start observing the target node
 observer.observe(captionsContainer, config);
-
-// captionsContainer.style.visibility = "hidden";
-
-// enableCaptionsButton.addEventListener("click", () => {
-//     captionsContainer.style.visibility = "visible";
-// });

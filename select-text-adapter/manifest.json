@@ -1,0 +1,17 @@
+{
+    "name": "Select text to dictionary adapter",
+    "description": "Select text to dictionary adapter",
+    "version": "1.0",
+    "manifest_version": 3,
+    "action": {
+        "default_popup": "select-text-adapter.html",
+        "default_icon": "select-text-adapter.png"
+    },
+    "content_scripts": [
+        {
+            "js": ["scripts/main.js"],
+            "css": ["styles.css"],
+            "matches": ["<all_urls>"]
+        }
+    ]
+}
