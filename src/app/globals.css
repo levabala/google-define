@@ -156,7 +156,5 @@
 
 .h-screen {
     height: 100vh;
-    height: calc(
-        100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom)
-    );
+    height: 100dvh;
 }
