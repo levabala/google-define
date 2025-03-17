@@ -1,0 +1,19 @@
+{
+    "name": "Youtube captions to dictionary adapter",
+    "description": "Youtube captions to dictionary adapter",
+    "version": "1.0",
+    "manifest_version": 3,
+    "action": {
+        "default_popup": "youtube-captions-adapter.html",
+        "default_icon": "youtube-captions-adapter.png"
+    },
+    "content_scripts": [
+        {
+            "js": ["scripts/main.js"],
+            "css": ["styles.css"],
+            "matches": [
+                "https://www.youtube.com/watch*"
+            ]
+        }
+    ]
+}
