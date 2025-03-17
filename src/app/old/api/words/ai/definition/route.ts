@@ -45,7 +45,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
                 },
                 {
                     role: "user",
-                    content: `Define the word "${word}" in JSON format with these fields: definition (string), partOfSpeech (string), examples (array of 2 strings)`,
+                    content: `Define the word "${word}" in JSON format as an array with elements of these fields: definition (string), partOfSpeech (string), examples (array of 2 strings)`,
                 },
             ],
             model: "deepseek-chat",

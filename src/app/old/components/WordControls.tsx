@@ -32,7 +32,7 @@ export function WordControls({
             }}
             data-testid="word-controls"
         >
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
                 <div className="relative">
                     <input
                         type="text"
@@ -58,29 +58,29 @@ export function WordControls({
 
             {textSourceSubmitted && (
                 <div className="flex flex-wrap items-center gap-2 whitespace-nowrap">
-                    <SpeakButton text={textSourceSubmitted} className="flex-shrink-0" />
-                    <PronunciationButton word={textSourceSubmitted} className="flex-shrink-0" />
+                    <SpeakButton text={textSourceSubmitted} className="shrink-0" />
+                    <PronunciationButton word={textSourceSubmitted} className="shrink-0" />
                     <ButtonToLearn
                         textSourceSubmitted={textSourceSubmitted}
                         wordsAll={wordsAll}
-                        className="flex-shrink-0"
+                        className="shrink-0"
                     />
                     <ButtonLearned
                         textSourceSubmitted={textSourceSubmitted}
                         wordsAll={wordsAll}
-                        className="flex-shrink-0"
+                        className="shrink-0"
                     />
                     <ButtonDelete
                         textSourceSubmitted={textSourceSubmitted}
                         wordsAll={wordsAll}
                         setTextSourceCurrent={setTextSourceCurrent}
                         setTextSourceSubmitted={setTextSourceSubmitted}
-                        className="flex-shrink-0"
+                        className="shrink-0"
                     />
                     <ButtonAI
                         textSourceSubmitted={textSourceSubmitted}
                         wordsAll={wordsAll}
-                        className="flex-shrink-0"
+                        className="shrink-0"
                     />
                 </div>
             )}

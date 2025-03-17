@@ -1,5 +1,7 @@
 import { baseProcedure, createTRPCRouter } from "../init";
+import { DefinitionSchema } from "@/app/types";
 import { type } from "arktype";
+import { ai } from "@/ai";
 
 export const appRouter = createTRPCRouter({
     addWord: baseProcedure
@@ -39,6 +41,117 @@ export const appRouter = createTRPCRouter({
             }
 
             return wordCreated;
+        }),
+    deleteWord: baseProcedure
+        .input(
+            type({
+                word: "string",
+            }).assert,
+        )
+        .mutation(async (opts) => {
+            const { userLogin: user, supabase } = opts.ctx;
+            const { word } = opts.input;
+
+            const { data: wordExisting } = await supabase
+                .from("word")
+                .select()
+                .eq("word", word)
+                .eq("user", user)
+                .maybeSingle();
+
+            if (!wordExisting) {
+                throw new Error("the word doesnt exist");
+            }
+
+            const { error } = await supabase
+                .from("word")
+                .update({
+                    status: "HIDDEN",
+                })
+                .eq("word", word)
+                .eq("user", user);
+
+            if (error) {
+                throw new Error("failed to delete the word");
+            }
+        }),
+    requestAIDefinition: baseProcedure
+        .input(
+            type({
+                wordStr: "string",
+            }).assert,
+        )
+        .mutation(async (opts) => {
+            const { userLogin: user, supabase } = opts.ctx;
+            const { wordStr } = opts.input;
+
+            const { data: wordExisting } = await supabase
+                .from("word")
+                .select()
+                .eq("word", wordStr)
+                .eq("user", user)
+                .maybeSingle();
+
+            if (!wordExisting) {
+                throw new Error("the word doesnt exist");
+            }
+
+            // Query AI for definition since we don't have it
+            const aiResponse = await ai({
+                messages: [
+                    {
+                        role: "system",
+                        content:
+                            "You are an English dictionary assistant. Provide a clear definition that does not use the target word or any of its derivatives, along with its part of speech and 2 example sentences in JSON format. The definition should be understandable without knowing the target word. Do not capitalize the first letter of sentences in the definition or examples.",
+                    },
+                    {
+                        role: "user",
+                        content: `Provide the definition of the word "${wordStr}" in JSON format with the top-level property "definitions" as an array. Each element of the array should include the following fields: definition (string), partOfSpeech (string), and examples (array of 2 strings). Each element should represent a distinct meaning of the word.`,
+                    },
+                ],
+                model: "deepseek-chat",
+                response_format: { type: "json_object" },
+            });
+
+            // Parse and validate AI response
+            // Handle both streaming and non-streaming responses
+            const content =
+                "choices" in aiResponse
+                    ? aiResponse.choices[0].message.content
+                    : await (async () => {
+                          let result = "";
+                          for await (const chunk of aiResponse) {
+                              result += chunk.choices[0]?.delta?.content || "";
+                          }
+                          return result;
+                      })();
+
+            if (!content) {
+                throw new Error("No content received from AI");
+            }
+
+            console.log("raw ai response:", JSON.parse(content));
+
+            const aiDefinition = DefinitionSchema.array().assert(
+                JSON.parse(content)?.definitions,
+            );
+
+            console.log({ aiDefinition });
+
+            // Update existing word record with AI definition
+            const { error } = await supabase
+                .from("word")
+                .update({
+                    ai_definition: aiDefinition,
+                })
+                .eq("word", wordStr)
+                .eq("user", user);
+
+            if (error) {
+                throw new Error(`Database error: ${error.message}`);
+            }
+
+            return aiDefinition;
         }),
     getWordsAll: baseProcedure.query(async (opts) => {
         const { userLogin: user, supabase } = opts.ctx;

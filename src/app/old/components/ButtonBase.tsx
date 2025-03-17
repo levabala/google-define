@@ -23,7 +23,7 @@ export const ButtonBase = React.forwardRef<HTMLButtonElement, ButtonBaseProps>(f
             disabled={disabled || isLoading}
             className={cn(
                 'px-4 py-1 rounded relative inline-flex items-center justify-center gap-2',
-                'transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
+                'transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-2',
                 'disabled:cursor-not-allowed text-white',
                 className
             )}

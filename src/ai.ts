@@ -58,6 +58,7 @@ async function callAIInternal(...args: CreateParams) {
         throw error;
     }
 
+    console.log('hit ai api');
     return await openai.chat.completions.create(...args);
 }
 

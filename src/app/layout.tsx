@@ -31,9 +31,9 @@ export default function RootLayout({
     const queryClient = getQueryClient();
 
     return (
-        <html>
+        <html className="dark">
             <body
-                className={`dark ${geistSans.variable} ${geistMono.variable}`}
+                className={`${geistSans.variable} ${geistMono.variable}`}
             >
                 <NuqsAdapter>
                     <Providers>

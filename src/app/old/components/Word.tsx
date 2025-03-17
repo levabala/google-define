@@ -57,7 +57,7 @@ export function Word({
             <span 
                 className={cn(
                     displayMode === 'obscured' && [
-                        'blur-sm transition-all duration-300',
+                        'blur-xs transition-all duration-300',
                         'hover:blur-0 focus:blur-0'
                     ]
                 )}
