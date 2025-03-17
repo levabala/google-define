@@ -14,9 +14,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const router = appRouter.createCaller(ctx);
 
         await router.addWord({ value: word });
-    } catch(e) {
+    } catch (e) {
         console.log(e);
     }
 
-    return NextResponse.redirect(new URL(`/?word=${word}&invalidate=1`, req.url), 303);
+    const url = new URL(`/?word=${word}&invalidate=1`, req.url);
+
+    if (req.nextUrl.searchParams.get("exit") === "1") {
+        url.searchParams.set("exit", "1");
+    }
+
+    return NextResponse.redirect(url, 303);
 }

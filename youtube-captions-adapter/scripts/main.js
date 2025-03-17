@@ -20,15 +20,56 @@ const captionsContainer = document.getElementById(
     "ytp-caption-window-container",
 );
 
+function showToast(message, duration = 3000) {
+    // Create the toast container
+    const toast = document.createElement("div");
+    toast.textContent = message;
+
+    // Style the toast
+    Object.assign(toast.style, {
+        position: "fixed",
+        bottom: "20px",
+        left: "50px",
+        backgroundColor: "#333",
+        color: "#fff",
+        padding: "10px 20px",
+        borderRadius: "5px",
+        fontSize: "14px",
+        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.3)",
+        opacity: "0",
+        transition: "opacity 0.3s ease-in-out",
+        zIndex: "1000",
+    });
+
+    // Append the toast to the body
+    document.body.appendChild(toast);
+
+    // Show the toast (fade in)
+    setTimeout(() => {
+        toast.style.opacity = "1";
+    }, 10);
+
+    // Remove the toast after the specified duration
+    setTimeout(() => {
+        toast.style.opacity = "0"; // Fade out
+        setTimeout(() => {
+            document.body.removeChild(toast); // Remove from DOM
+        }, 300); // Match the fade-out duration
+    }, duration);
+}
+
 captionsContainer.addEventListener("click", (e) => {
     if (!e.target.getAttribute("caption-text-node") === "true") {
         return;
     }
 
     const text = e.target.textContent.trim();
-    const url = host + "?word=" + text;
+    const url = host + "api/addWord?word=" + text + "&exit=1";
+
     console.log(url);
     window.open(url);
+
+    showToast('Added', 2000);
 });
 
 // Configuration for the observer

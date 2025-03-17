@@ -34,6 +34,15 @@ export default function RootLayout({
     return (
         <html className="dark">
             <body className={`${geistSans.variable} ${geistMono.variable}`}>
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            if (new URL(window.location).searchParams.get('exit') === "1") {
+                                window.close();
+                            }
+                        `,
+                    }}
+                />
                 <NuqsAdapter>
                     <Providers>
                         <HydrationBoundary state={dehydrate(queryClient)}>
