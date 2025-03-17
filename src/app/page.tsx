@@ -8,9 +8,9 @@ import { Json, Tables } from "@/database.types";
 import { Input } from "@/components/ui/input";
 import { useTRPC } from "./trpc/client";
 import { useQueryState } from "nuqs";
+import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
 import { type } from "arktype";
-import dynamic from "next/dynamic";
 
 function removeNonAlphanumeric(str: string): string {
     let result = "";
@@ -187,7 +187,7 @@ const CurrentWord: React.FC<{ word: Tables<"word"> }> = ({ word }) => {
     );
 
     return (
-        <div className="flex flex-col gap-1">
+        <div className="flex grow flex-col gap-1">
             <div className="flex items-center gap-2 justify-between">
                 <h3 className="text-xl">{word.word}</h3>
                 <Button
@@ -221,6 +221,7 @@ function Main() {
     const trpc = useTRPC();
     const queryClient = useQueryClient();
 
+    const [shouldInvalidate, setShouldInvalidate] = useQueryState("invalidate");
     const { currentWordStr } = useCurrentWordStr();
     const [currentWord, setCurrentWord] = useState<Tables<"word"> | null>(null);
 
@@ -245,6 +246,13 @@ function Main() {
             wordsAll.data.find((word) => word.word === currentWordStr) || null,
         );
     }, [currentWordStr, wordsAll.data]);
+
+    useEffect(() => {
+        if (shouldInvalidate) {
+            wordsAll.refetch();
+            setShouldInvalidate(null);
+        }
+    }, [setShouldInvalidate, shouldInvalidate, wordsAll]);
 
     return (
         <main className="bg-background flex h-screen flex-col gap-2 p-2">

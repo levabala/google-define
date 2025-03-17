@@ -1,4 +1,3 @@
-import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import { NextRequest } from "next/server";
 import { createClient } from "@/utils/db";
 import { initTRPC } from "@trpc/server";
@@ -7,7 +6,7 @@ import { getUser } from "@/auth";
 import { cache } from "react";
 
 export const createTRPCContext = cache(
-    async (opts: FetchCreateContextFnOptions) => {
+    async (opts: { req: Request }) => {
         console.log('recreate context');
         const { req } = opts;
 

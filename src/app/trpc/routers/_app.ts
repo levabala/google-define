@@ -159,7 +159,8 @@ export const appRouter = createTRPCRouter({
         const { data: wordsList } = await supabase
             .from("word")
             .select()
-            .eq("user", user);
+            .eq("user", user)
+            .neq("status", "HIDDEN");
 
         if (!wordsList) {
             throw new Error("unexpected");

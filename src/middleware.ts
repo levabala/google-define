@@ -6,6 +6,7 @@ if (!process.env.JWT_SECRET) {
 }
 
 export async function middleware(req: NextRequest) {
+    console.log(req.url, req.cookies);
     if (process.env.DISABLE_AUTH === '1') {
         return NextResponse.next();
     }
