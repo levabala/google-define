@@ -95,7 +95,7 @@ const WordButton: React.FC<
         <Button
             variant="link"
             className={cn(
-                "flex",
+                "flex max-w-full",
                 isHighlighted && "text-primary-foreground",
                 className,
             )}
@@ -105,7 +105,9 @@ const WordButton: React.FC<
             }}
             {...props}
         >
-            {word}
+            <span className="block w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                {word}
+            </span>
         </Button>
     );
 };
@@ -142,7 +144,7 @@ const WordDefinitionsAI: React.FC<{ definitionRaw: Json }> = ({
     }
 
     return (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 overflow-auto">
             {definitionList.map((definition) => (
                 <WordDefinition
                     key={definition.definition + definition.partOfSpeech}
@@ -187,7 +189,7 @@ const CurrentWord: React.FC<{ word: Tables<"word"> }> = ({ word }) => {
     );
 
     return (
-        <div className="flex grow flex-col gap-1">
+        <div className="flex grow flex-col gap-1 overflow-hidden">
             <div className="flex items-center gap-2 justify-between">
                 <h3 className="text-xl">{word.word}</h3>
                 <Button
@@ -256,7 +258,7 @@ function Main() {
 
     return (
         <main className="bg-background flex h-screen flex-col gap-2 p-2">
-            <div className="flex flex-col grow overflow-auto">
+            <div className="flex flex-col grow overflow-hidden">
                 {currentWord ? (
                     <CurrentWord word={currentWord} />
                 ) : (
@@ -264,11 +266,11 @@ function Main() {
                 )}
             </div>
             <hr className="border-t border-gray-500" />
-            <div className="flex flex-wrap max-h-64 overflow-auto">
+            <div className="flex flex-wrap shrink-0 h-40 overflow-auto">
                 {wordsAll.data
                     ? wordsAll.data.map((word, i) => {
                           return (
-                              <div key={word.word + i} className="w-1/3">
+                              <div key={word.word + i} className="w-1/2">
                                   <WordButton word={word.word} />
                               </div>
                           );
@@ -284,12 +286,16 @@ function Main() {
                     const formData = new FormData(form);
 
                     const data = {
-                        value: (formData.get("value")?.valueOf() as string).trim().toLowerCase(),
+                        value: (formData.get("value")?.valueOf() as string)
+                            .trim()
+                            .toLowerCase(),
                     };
 
                     setCurrentWordStr(data.value);
-                    
-                    if (wordsAll.data?.find(word => word.word === data.value)) {
+
+                    if (
+                        wordsAll.data?.find((word) => word.word === data.value)
+                    ) {
                         form.reset();
                         return;
                     }
