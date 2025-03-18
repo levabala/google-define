@@ -21,8 +21,8 @@ function useAddWordMutation() {
     const mutateOptions = trpc.addWord.mutationOptions({
         onSuccess: (res) => {
             queryClient.setQueryData(trpc.getWordsAll.queryKey(), (prev) => [
-                ...(prev || []),
                 res,
+                ...(prev || []),
             ]);
         },
     });
