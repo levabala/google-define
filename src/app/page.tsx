@@ -481,7 +481,7 @@ export default function Main() {
                     <CurrentWord key={currentWord.word} word={currentWord} />
                 ) : (
                     <CurrentWordLayout
-                        wordStr={currentWordStr || "no word is chosen"}
+                        wordStr={currentWordStr || "what to save next?"}
                         deleteButtonProps={{ disabled: true }}
                         wordUpdateIfLearnedProps={{ disabled: true }}
                     >
