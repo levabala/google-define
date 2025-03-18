@@ -1,9 +1,9 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Button, ButtonProps } from "@/components/ui/button";
 import { Definition, DefinitionSchema } from "./types";
 import { Fragment, useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Json, Tables } from "@/database.types";
 import { Input } from "@/components/ui/input";
 import { useTRPC } from "./trpc/client";
@@ -155,9 +155,34 @@ const WordDefinitionsAI: React.FC<{ definitionRaw: Json }> = ({
     );
 };
 
+const CurrentWordLayout: React.FC<
+    {
+        wordStr: string;
+        deleteButtonProps: ButtonProps;
+    } & React.PropsWithChildren
+> = ({ children, wordStr, deleteButtonProps }) => {
+    return (
+        <div className="flex grow flex-col gap-1 overflow-hidden">
+            <div className="flex items-center gap-2 justify-between">
+                <h3 className="text-xl">{wordStr}</h3>
+                <Button
+                    key={wordStr}
+                    variant="destructive"
+                    size="sm"
+                    {...deleteButtonProps}
+                >
+                    Delete
+                </Button>
+            </div>
+            {children}
+        </div>
+    );
+};
+
 const CurrentWord: React.FC<{ word: Tables<"word"> }> = ({ word }) => {
     const trpc = useTRPC();
     const queryClient = useQueryClient();
+    const { setCurrentWordStr } = useCurrentWordStr();
 
     const requestAIDefinition = useMutation(
         trpc.requestAIDefinition.mutationOptions({
@@ -184,23 +209,19 @@ const CurrentWord: React.FC<{ word: Tables<"word"> }> = ({ word }) => {
                 queryClient.setQueryData(trpc.getWordsAll.queryKey(), (prev) =>
                     prev?.filter((wordInner) => wordInner.word !== word.word),
                 );
+                setCurrentWordStr(null);
             },
         }),
     );
 
     return (
-        <div className="flex grow flex-col gap-1 overflow-hidden">
-            <div className="flex items-center gap-2 justify-between">
-                <h3 className="text-xl">{word.word}</h3>
-                <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => deleteWord.mutate({ word: word.word })}
-                    isLoading={deleteWord.isPending}
-                >
-                    Delete
-                </Button>
-            </div>
+        <CurrentWordLayout
+            wordStr={word.word}
+            deleteButtonProps={{
+                onClick: () => deleteWord.mutate({ word: word.word }),
+                isLoading: deleteWord.isPending,
+            }}
+        >
             {word.ai_definition ? (
                 <WordDefinitionsAI definitionRaw={word.ai_definition} />
             ) : (
@@ -215,7 +236,7 @@ const CurrentWord: React.FC<{ word: Tables<"word"> }> = ({ word }) => {
                     </Button>
                 </div>
             )}
-        </div>
+        </CurrentWordLayout>
     );
 };
 
@@ -262,7 +283,38 @@ function Main() {
                 {currentWord ? (
                     <CurrentWord word={currentWord} />
                 ) : (
-                    <h3 className="text-xl">{currentWordStr}</h3>
+                    <CurrentWordLayout
+                        wordStr={currentWordStr || "no word is chosen"}
+                        deleteButtonProps={{ disabled: true }}
+                    >
+                        <div className="flex justify-center items-center grow">
+                            <Button
+                                type="submit"
+                                className=""
+                                isLoading={addWord.isPending}
+                                onClick={() => {
+                                    if (!currentWordStr) {
+                                        return;
+                                    }
+
+                                    addWord.mutate(
+                                        { value: currentWordStr },
+                                        {
+                                            onSuccess: () => {
+                                                (
+                                                    document.getElementById(
+                                                        "addWordForm",
+                                                    ) as HTMLFormElement
+                                                ).reset();
+                                            },
+                                        },
+                                    );
+                                }}
+                            >
+                                look up
+                            </Button>
+                        </div>
+                    </CurrentWordLayout>
                 )}
             </div>
             <hr className="border-t border-gray-500" />
@@ -278,6 +330,7 @@ function Main() {
                     : "none"}
             </div>
             <form
+                id="addWordForm"
                 className="flex gap-2"
                 onSubmit={(e) => {
                     e.preventDefault();
@@ -307,7 +360,12 @@ function Main() {
                     });
                 }}
             >
-                <Input name="value" placeholder="word/phrase" className="" />
+                <Input
+                    defaultValue={currentWordStr || ""}
+                    name="value"
+                    placeholder="word/phrase"
+                    className=""
+                />
                 <Button
                     type="submit"
                     className=""
