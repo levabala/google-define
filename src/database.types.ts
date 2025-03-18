@@ -156,6 +156,7 @@ export type Database = {
       word: {
         Row: {
           ai_definition: Json | null
+          ai_definition_request_start_date: string | null
           created_at: string
           raw: Json
           status: Database["public"]["Enums"]["word_status"]
@@ -164,6 +165,7 @@ export type Database = {
         }
         Insert: {
           ai_definition?: Json | null
+          ai_definition_request_start_date?: string | null
           created_at?: string
           raw: Json
           status?: Database["public"]["Enums"]["word_status"]
@@ -172,6 +174,7 @@ export type Database = {
         }
         Update: {
           ai_definition?: Json | null
+          ai_definition_request_start_date?: string | null
           created_at?: string
           raw?: Json
           status?: Database["public"]["Enums"]["word_status"]

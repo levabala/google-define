@@ -1,18 +1,79 @@
-import { baseProcedure, createTRPCRouter } from "../init";
+import { baseProcedure, Context, createTRPCRouter } from "../init";
 import { DefinitionSchema } from "@/app/types";
 import { type } from "arktype";
 import { ai } from "@/ai";
+
+async function fetchAIDefinition(ctx: Context, wordStr: string) {
+    const { error } = await ctx.supabase
+        .from("word")
+        .update({
+            ai_definition_request_start_date: new Date().toISOString(),
+        })
+        .eq("word", wordStr)
+        .eq("user", ctx.userLogin);
+
+    if (error) {
+        throw new Error("failed to update ai_definition_request_start_date", {
+            cause: error,
+        });
+    }
+
+    // Query AI for definition since we don't have it
+    const aiResponse = await ai({
+        messages: [
+            {
+                role: "system",
+                content:
+                    "You are an English dictionary assistant. Provide a clear definition that does not use the target word or any of its derivatives, along with its part of speech and 2 example sentences in JSON format. The definition should be understandable without knowing the target word. Do not capitalize the first letter of sentences in the definition or examples.",
+            },
+            {
+                role: "user",
+                content: `Provide the definition of the word "${wordStr}" in JSON format with the top-level property "definitions" as an array. Each element of the array should include the following fields: definition (string), partOfSpeech (string), and examples (array of 2 strings). Each element should represent a distinct meaning of the word.`,
+            },
+        ],
+        model: "deepseek-chat",
+        response_format: { type: "json_object" },
+    });
+
+    // Parse and validate AI response
+    // Handle both streaming and non-streaming responses
+    const content =
+        "choices" in aiResponse
+            ? aiResponse.choices[0].message.content
+            : await (async () => {
+                  let result = "";
+                  for await (const chunk of aiResponse) {
+                      result += chunk.choices[0]?.delta?.content || "";
+                  }
+                  return result;
+              })();
+
+    if (!content) {
+        throw new Error("No content received from AI");
+    }
+
+    console.log("raw ai response:", JSON.parse(content));
+
+    const aiDefinition = DefinitionSchema.array().assert(
+        JSON.parse(content)?.definitions,
+    );
+
+    console.log({ aiDefinition });
+
+    return aiDefinition;
+}
 
 export const appRouter = createTRPCRouter({
     addWord: baseProcedure
         .input(
             type({
                 value: "string",
+                shouldFetchAIDefinition: "boolean?",
             }).assert,
         )
         .mutation(async (opts) => {
             const { userLogin: user, supabase } = opts.ctx;
-            const { value } = opts.input;
+            const { value, shouldFetchAIDefinition } = opts.input;
 
             const { data: wordExisting } = await supabase
                 .from("word")
@@ -54,6 +115,10 @@ export const appRouter = createTRPCRouter({
                 })
                 .select()
                 .single();
+
+            if (shouldFetchAIDefinition) {
+                fetchAIDefinition(opts.ctx, value);
+            }
 
             if (!wordCreated) {
                 throw new Error("failed to create the word");
@@ -115,47 +180,19 @@ export const appRouter = createTRPCRouter({
                 throw new Error("the word doesnt exist");
             }
 
-            // Query AI for definition since we don't have it
-            const aiResponse = await ai({
-                messages: [
-                    {
-                        role: "system",
-                        content:
-                            "You are an English dictionary assistant. Provide a clear definition that does not use the target word or any of its derivatives, along with its part of speech and 2 example sentences in JSON format. The definition should be understandable without knowing the target word. Do not capitalize the first letter of sentences in the definition or examples.",
-                    },
-                    {
-                        role: "user",
-                        content: `Provide the definition of the word "${wordStr}" in JSON format with the top-level property "definitions" as an array. Each element of the array should include the following fields: definition (string), partOfSpeech (string), and examples (array of 2 strings). Each element should represent a distinct meaning of the word.`,
-                    },
-                ],
-                model: "deepseek-chat",
-                response_format: { type: "json_object" },
-            });
+            const AI_DEFINITION_EXPIRATION_DURATION_MS = 1000 * 60;
+            const timePast = wordExisting.ai_definition_request_start_date
+                ? Date.now() -
+                  new Date(
+                      wordExisting.ai_definition_request_start_date,
+                  ).valueOf()
+                : null;
 
-            // Parse and validate AI response
-            // Handle both streaming and non-streaming responses
-            const content =
-                "choices" in aiResponse
-                    ? aiResponse.choices[0].message.content
-                    : await (async () => {
-                          let result = "";
-                          for await (const chunk of aiResponse) {
-                              result += chunk.choices[0]?.delta?.content || "";
-                          }
-                          return result;
-                      })();
-
-            if (!content) {
-                throw new Error("No content received from AI");
+            if (timePast && timePast < AI_DEFINITION_EXPIRATION_DURATION_MS) {
+                throw new Error("cannot request a new definition. too soon");
             }
 
-            console.log("raw ai response:", JSON.parse(content));
-
-            const aiDefinition = DefinitionSchema.array().assert(
-                JSON.parse(content)?.definitions,
-            );
-
-            console.log({ aiDefinition });
+            const aiDefinition = await fetchAIDefinition(opts.ctx, wordStr);
 
             // Update existing word record with AI definition
             const { error } = await supabase

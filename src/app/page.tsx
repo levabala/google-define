@@ -28,8 +28,11 @@ function useAddWordMutation() {
     const mutateOptionsPatched: typeof mutateOptions = {
         ...mutateOptions,
         mutationFn: mutateOptions.mutationFn
-            ? ({ value }) =>
-                  mutateOptions.mutationFn!({ value: normalizeWord(value) })
+            ? ({ value, ...rest }) =>
+                  mutateOptions.mutationFn!({
+                      value: normalizeWord(value),
+                      ...rest,
+                  })
             : undefined,
     };
 
@@ -42,6 +45,14 @@ function useWordsAllQuery() {
     return useQuery(trpc.getWordsAll.queryOptions());
 }
 
+function isAlphanumericCharCode(charCode: number): boolean {
+    return (
+        (charCode >= 48 && charCode <= 57) || // Numbers 0-9
+        (charCode >= 65 && charCode <= 90) || // Uppercase letters A-Z
+        (charCode >= 97 && charCode <= 122)
+    ); // Lowercase letters a-z
+}
+
 function removeNonAlphanumeric(str: string): string {
     let result = "";
     for (let i = 0; i < str.length; i++) {
@@ -49,9 +60,7 @@ function removeNonAlphanumeric(str: string): string {
         const charCode = str.charCodeAt(i);
 
         if (
-            (charCode >= 48 && charCode <= 57) || // Numbers 0-9
-            (charCode >= 65 && charCode <= 90) || // Uppercase letters A-Z
-            (charCode >= 97 && charCode <= 122) || // Lowercase letters a-z
+            isAlphanumericCharCode(charCode) ||
             charCode === 32 // Space character
         ) {
             result += char;
@@ -69,7 +78,9 @@ function areWordsEqual(w1: string, w2: string) {
 }
 
 function useCurrentWordStr() {
-    const [currentWordStr, setCurrentWordStr] = useQueryState("word");
+    const [currentWordStr, setCurrentWordStr] = useQueryState("word", {
+        history: "push",
+    });
 
     return { currentWordStr, setCurrentWordStr };
 }
@@ -87,10 +98,7 @@ const TextAsWords: React.FC<{
             const charCode = text.charCodeAt(i);
 
             // Check if character is alphanumeric
-            const isAlphaNum =
-                (charCode >= 48 && charCode <= 57) || // 0-9
-                (charCode >= 65 && charCode <= 90) || // A-Z
-                (charCode >= 97 && charCode <= 122); // a-z
+            const isAlphaNum = isAlphanumericCharCode(charCode);
 
             if (isAlphaNum) {
                 // If we were building a non-word, flush it
@@ -157,7 +165,10 @@ const Word: React.FC<
                 if (!areWordsEqual(word, currentWordStr || "")) {
                     if (e.metaKey) {
                         if (!isAdded) {
-                            addWord.mutate({ value: word });
+                            addWord.mutate({
+                                value: word,
+                                shouldFetchAIDefinition: true,
+                            });
                         }
                     } else {
                         setCurrentWordStr(word);
@@ -302,6 +313,9 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
         }),
     );
 
+    const aiRequestAlreadyPending =
+        !word.ai_definition && word.ai_definition_request_start_date !== null;
+
     return (
         <CurrentWordLayout
             wordStr={word.word}
@@ -318,9 +332,13 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
                         onClick={() =>
                             requestAIDefinition.mutate({ wordStr: word.word })
                         }
-                        isLoading={requestAIDefinition.isPending}
+                        isLoading={
+                            requestAIDefinition.isPending ||
+                            aiRequestAlreadyPending
+                        }
                     >
                         ai definition
+                        {aiRequestAlreadyPending ? "(refresh to check)" : null}
                     </Button>
                 </div>
             )}
