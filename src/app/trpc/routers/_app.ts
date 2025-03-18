@@ -217,7 +217,8 @@ export const appRouter = createTRPCRouter({
             .from("word")
             .select()
             .eq("user", user)
-            .neq("status", "HIDDEN");
+            .neq("status", "HIDDEN")
+            .order("created_at", { ascending: false });
 
         if (!wordsList) {
             throw new Error("unexpected");

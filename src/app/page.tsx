@@ -5,6 +5,7 @@ import { Attributes, Fragment, JSX, useEffect, useMemo } from "react";
 import { AI_DEFINITION_EXPIRATION_DURATION_MS } from "./constants";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { Definition, DefinitionSchema } from "./types";
+import { formatDateRelativeAuto } from "./utils";
 import { Json, Tables } from "@/database.types";
 import { Input } from "@/components/ui/input";
 import { useTRPC } from "./trpc/client";
@@ -261,13 +262,17 @@ const WordDefinitionsAI: React.FC<{ definitionRaw: Json }> = ({
 const CurrentWordLayout: React.FC<
     {
         wordStr: string;
+        addDate?: Date;
         deleteButtonProps: ButtonProps;
     } & React.PropsWithChildren
-> = ({ children, wordStr, deleteButtonProps }) => {
+> = ({ children, addDate, wordStr, deleteButtonProps }) => {
     return (
         <div className="flex grow flex-col gap-1 overflow-hidden">
             <div className="flex items-center gap-2 justify-between">
-                <h3 className="text-xl">{wordStr}</h3>
+                <span>
+                    <h3 className="text-xl inline">{wordStr}</h3>
+                    <span className="text-xs text-muted-foreground ml-2">{addDate && formatDateRelativeAuto(addDate)}</span>
+                </span>
                 <Button variant="destructive" size="sm" {...deleteButtonProps}>
                     Delete
                 </Button>
@@ -325,6 +330,7 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
     return (
         <CurrentWordLayout
             wordStr={word.word}
+            addDate={new Date(word.created_at)}
             deleteButtonProps={{
                 onClick: () => deleteWord.mutate({ word: word.word }),
                 isLoading: deleteWord.isPending,
