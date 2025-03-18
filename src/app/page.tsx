@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Attributes, Fragment, JSX, useEffect, useMemo } from "react";
+import { Attributes, Fragment, JSX, useEffect, useLayoutEffect, useMemo } from "react";
 import { AI_DEFINITION_EXPIRATION_DURATION_MS } from "./constants";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { Toggle, ToggleProps } from "@/components/ui/toggle";
@@ -411,7 +411,7 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
         !!timePast &&
         timePast < AI_DEFINITION_EXPIRATION_DURATION_MS;
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (shouldRequestAIDefinition) {
             requestAIDefinition.mutate({ wordStr: word.word });
             setShouldRequestAIDefinition(false);
