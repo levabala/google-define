@@ -2,8 +2,8 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, ButtonProps } from "@/components/ui/button";
+import { Attributes, Fragment, useEffect } from "react";
 import { Definition, DefinitionSchema } from "./types";
-import { Fragment, useEffect, useState } from "react";
 import { Json, Tables } from "@/database.types";
 import { Input } from "@/components/ui/input";
 import { useTRPC } from "./trpc/client";
@@ -11,6 +11,38 @@ import { useQueryState } from "nuqs";
 import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
 import { type } from "arktype";
+
+function useAddWordMutation() {
+    const trpc = useTRPC();
+    const queryClient = useQueryClient();
+
+    const mutateOptions = trpc.addWord.mutationOptions({
+        onSuccess: (res) => {
+            queryClient.setQueryData(trpc.getWordsAll.queryKey(), (prev) => [
+                ...(prev || []),
+                res,
+            ]);
+        },
+    });
+
+    console.log(mutateOptions);
+
+    const mutateOptionsPatched: typeof mutateOptions = {
+        ...mutateOptions,
+        onMutate: mutateOptions.onMutate
+            ? ({ value }) =>
+                  mutateOptions.onMutate?.({ value: normalizeWord(value) })
+            : undefined,
+    };
+
+    return useMutation(mutateOptionsPatched);
+}
+
+function useWordsAllQuery() {
+    const trpc = useTRPC();
+
+    return useQuery(trpc.getWordsAll.queryOptions());
+}
 
 function removeNonAlphanumeric(str: string): string {
     let result = "";
@@ -21,12 +53,21 @@ function removeNonAlphanumeric(str: string): string {
         if (
             (charCode >= 48 && charCode <= 57) || // Numbers 0-9
             (charCode >= 65 && charCode <= 90) || // Uppercase letters A-Z
-            (charCode >= 97 && charCode <= 122) // Lowercase letters a-z
+            (charCode >= 97 && charCode <= 122) || // Lowercase letters a-z
+            charCode === 32 // Space character
         ) {
             result += char;
         }
     }
     return result;
+}
+
+function normalizeWord(str: string): string {
+    return removeNonAlphanumeric(str).trim().toLowerCase();
+}
+
+function areWordsEqual(w1: string, w2: string) {
+    return normalizeWord(w1) === normalizeWord(w2);
 }
 
 function useCurrentWordStr() {
@@ -60,19 +101,36 @@ const Word: React.FC<
         word: string;
     } & React.HTMLAttributes<HTMLSpanElement>
 > = ({ word, className, onClick, ...props }) => {
+    const wordsAll = useWordsAllQuery();
+    const addWord = useAddWordMutation();
+
     const { currentWordStr, setCurrentWordStr } = useCurrentWordStr();
 
     const isHighlighted = currentWordStr === removeNonAlphanumeric(word);
+    const isAdded = Boolean(
+        wordsAll.data?.find((wordInner) => wordInner.word === word),
+    );
 
     return (
         <span
             className={cn(
-                "inline hover:underline",
-                isHighlighted && "font-bold",
+                "inline hover:underline cursor-pointer",
+                addWord.isPending && "animate-pulse duration-500",
+                isAdded && !isHighlighted && "font-bold",
+                isHighlighted && "underline",
                 className,
             )}
             onClick={(e) => {
-                setCurrentWordStr(word);
+                if (word !== currentWordStr) {
+                    if (e.metaKey) {
+                        if (!isAdded) {
+                            addWord.mutate({ value: word });
+                        }
+                    } else {
+                        setCurrentWordStr(word);
+                    }
+                }
+
                 onClick?.(e);
             }}
             {...props}
@@ -165,12 +223,7 @@ const CurrentWordLayout: React.FC<
         <div className="flex grow flex-col gap-1 overflow-hidden">
             <div className="flex items-center gap-2 justify-between">
                 <h3 className="text-xl">{wordStr}</h3>
-                <Button
-                    key={wordStr}
-                    variant="destructive"
-                    size="sm"
-                    {...deleteButtonProps}
-                >
+                <Button variant="destructive" size="sm" {...deleteButtonProps}>
                     Delete
                 </Button>
             </div>
@@ -179,7 +232,9 @@ const CurrentWordLayout: React.FC<
     );
 };
 
-const CurrentWord: React.FC<{ word: Tables<"word"> }> = ({ word }) => {
+const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
+    word,
+}) => {
     const trpc = useTRPC();
     const queryClient = useQueryClient();
     const { setCurrentWordStr } = useCurrentWordStr();
@@ -241,34 +296,27 @@ const CurrentWord: React.FC<{ word: Tables<"word"> }> = ({ word }) => {
 };
 
 function Main() {
-    const trpc = useTRPC();
-    const queryClient = useQueryClient();
-
     const [shouldInvalidate, setShouldInvalidate] = useQueryState("invalidate");
     const { currentWordStr, setCurrentWordStr } = useCurrentWordStr();
-    const [currentWord, setCurrentWord] = useState<Tables<"word"> | null>(null);
 
-    const addWord = useMutation(
-        trpc.addWord.mutationOptions({
-            onSuccess: (res) => {
-                queryClient.setQueryData(
-                    trpc.getWordsAll.queryKey(),
-                    (prev) => [...(prev || []), res],
-                );
-            },
-        }),
-    );
-    const wordsAll = useQuery(trpc.getWordsAll.queryOptions());
+    const addWord = useAddWordMutation();
+    const wordsAll = useWordsAllQuery();
+
+    const currentWord: Tables<"word"> | null =
+        wordsAll.data?.find((word) => word.word === currentWordStr) || null;
 
     useEffect(() => {
-        if (!wordsAll.data) {
+        if (
+            !currentWordStr ||
+            currentWord?.word === currentWordStr ||
+            addWord.variables?.value === currentWordStr ||
+            !wordsAll.data
+        ) {
             return;
         }
 
-        setCurrentWord(
-            wordsAll.data.find((word) => word.word === currentWordStr) || null,
-        );
-    }, [currentWordStr, wordsAll.data]);
+        addWord.mutate({ value: currentWordStr });
+    }, [addWord, currentWord?.word, currentWordStr, wordsAll.data]);
 
     useEffect(() => {
         if (shouldInvalidate) {
@@ -278,42 +326,44 @@ function Main() {
     }, [setShouldInvalidate, shouldInvalidate, wordsAll]);
 
     return (
-        <main className="bg-background flex h-screen flex-col gap-2 p-2">
+        <main className="bg-background flex h-screen flex-col gap-2 p-2 max-w-[500px] mx-auto">
             <div className="flex flex-col grow overflow-hidden">
                 {currentWord ? (
-                    <CurrentWord word={currentWord} />
+                    <CurrentWord key={currentWord.word} word={currentWord} />
                 ) : (
                     <CurrentWordLayout
                         wordStr={currentWordStr || "no word is chosen"}
                         deleteButtonProps={{ disabled: true }}
                     >
-                        <div className="flex justify-center items-center grow">
-                            <Button
-                                type="submit"
-                                className=""
-                                isLoading={addWord.isPending}
-                                onClick={() => {
-                                    if (!currentWordStr) {
-                                        return;
-                                    }
+                        {currentWordStr ? (
+                            <div className="flex justify-center items-center grow">
+                                <Button
+                                    type="submit"
+                                    className=""
+                                    isLoading={addWord.isPending}
+                                    onClick={() => {
+                                        if (!currentWordStr) {
+                                            return;
+                                        }
 
-                                    addWord.mutate(
-                                        { value: currentWordStr },
-                                        {
-                                            onSuccess: () => {
-                                                (
-                                                    document.getElementById(
-                                                        "addWordForm",
-                                                    ) as HTMLFormElement
-                                                ).reset();
+                                        addWord.mutate(
+                                            { value: currentWordStr },
+                                            {
+                                                onSuccess: () => {
+                                                    (
+                                                        document.getElementById(
+                                                            "addWordForm",
+                                                        ) as HTMLFormElement
+                                                    ).reset();
+                                                },
                                             },
-                                        },
-                                    );
-                                }}
-                            >
-                                look up
-                            </Button>
-                        </div>
+                                        );
+                                    }}
+                                >
+                                    look up
+                                </Button>
+                            </div>
+                        ) : null}
                     </CurrentWordLayout>
                 )}
             </div>
@@ -360,12 +410,7 @@ function Main() {
                     });
                 }}
             >
-                <Input
-                    defaultValue={currentWordStr || ""}
-                    name="value"
-                    placeholder="word/phrase"
-                    className=""
-                />
+                <Input name="value" placeholder="word/phrase" className="" />
                 <Button
                     type="submit"
                     className=""
