@@ -148,6 +148,42 @@ export const appRouter = createTRPCRouter({
 
             return wordCreated;
         }),
+    wordUpdateIfLearned: baseProcedure
+        .input(
+            type({
+                word: "string",
+                isLearned: "boolean",
+            }).assert,
+        )
+        .mutation(async (opts) => {
+            const { userLogin: user, supabase } = opts.ctx;
+            const { word, isLearned } = opts.input;
+
+            const { data: wordExisting } = await supabase
+                .from("word")
+                .select()
+                .eq("word", word)
+                .eq("user", user)
+                .maybeSingle();
+
+            if (!wordExisting) {
+                throw new Error("the word doesnt exist");
+            }
+
+            const { data: wordUpdated, error } = await supabase
+                .from("word")
+                .update({
+                    status: isLearned ? 'LEARNED' : 'TO_LEARN',
+                })
+                .eq("word", word)
+                .eq("user", user).select().single();
+
+            if (error) {
+                throw new Error("failed to update the word");
+            }
+
+            return wordUpdated;
+        }),
     deleteWord: baseProcedure
         .input(
             type({

@@ -4,13 +4,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Attributes, Fragment, JSX, useEffect, useMemo } from "react";
 import { AI_DEFINITION_EXPIRATION_DURATION_MS } from "./constants";
 import { Button, ButtonProps } from "@/components/ui/button";
+import { Toggle, ToggleProps } from "@/components/ui/toggle";
 import { Definition, DefinitionSchema } from "./types";
 import { formatDateRelativeAuto } from "./utils";
 import { Json, Tables } from "@/database.types";
 import { Input } from "@/components/ui/input";
+import { sortWordsAll } from "./helpers";
 import { useTRPC } from "./trpc/client";
 import { useQueryState } from "nuqs";
-import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
 import { type } from "arktype";
 
@@ -44,7 +45,14 @@ function useAddWordMutation() {
 function useWordsAllQuery() {
     const trpc = useTRPC();
 
-    return useQuery(trpc.getWordsAll.queryOptions());
+    const query = useQuery(trpc.getWordsAll.queryOptions());
+
+    return useMemo(() => {
+        return {
+            ...query,
+            data: query.data ? sortWordsAll(query.data) : query.data,
+        };
+    }, [query]);
 }
 
 function isAlphanumericCharCodeOrDash(charCode: number): boolean {
@@ -192,15 +200,20 @@ const WordButton: React.FC<
         word: string;
     } & React.ComponentProps<typeof Button>
 > = ({ word, className, onClick, ...props }) => {
+    const wordsAll = useWordsAllQuery();
     const { currentWordStr, setCurrentWordStr } = useCurrentWordStr();
 
     const isHighlighted = areWordsEqual(currentWordStr || "", word);
+    const isLearned =
+        wordsAll.data?.find((wordInner) => areWordsEqual(wordInner.word, word))
+            ?.status === "LEARNED";
 
     return (
         <Button
             variant="link"
             className={cn(
                 "flex max-w-full",
+                isLearned && "text-success decoration-success",
                 isHighlighted && "text-primary-foreground",
                 className,
             )}
@@ -210,7 +223,12 @@ const WordButton: React.FC<
             }}
             {...props}
         >
-            <span className="block w-full overflow-hidden text-ellipsis whitespace-nowrap">
+            <span
+                className={cn(
+                    "block w-full overflow-hidden text-ellipsis whitespace-nowrap",
+                    isLearned && "text-success decoration-success",
+                )}
+            >
                 {word}
             </span>
         </Button>
@@ -265,8 +283,15 @@ const CurrentWordLayout: React.FC<
         wordStr: string;
         addDate?: Date;
         deleteButtonProps: ButtonProps;
+        wordUpdateIfLearnedProps: ToggleProps;
     } & React.PropsWithChildren
-> = ({ children, addDate, wordStr, deleteButtonProps }) => {
+> = ({
+    children,
+    addDate,
+    wordStr,
+    deleteButtonProps,
+    wordUpdateIfLearnedProps,
+}) => {
     return (
         <div className="flex grow flex-col gap-1 overflow-hidden">
             <div className="flex items-center gap-2 justify-between">
@@ -276,9 +301,23 @@ const CurrentWordLayout: React.FC<
                         {addDate && formatDateRelativeAuto(addDate)}
                     </span>
                 </span>
-                <Button variant="destructive" size="sm" {...deleteButtonProps}>
-                    Delete
-                </Button>
+                <div className="flex gap-1">
+                    <Toggle
+                        variant="outline"
+                        size="sm"
+                        className="data-[state=on]:bg-success"
+                        {...wordUpdateIfLearnedProps}
+                    >
+                        Learned
+                    </Toggle>
+                    <Button
+                        variant="destructive"
+                        size="sm"
+                        {...deleteButtonProps}
+                    >
+                        Delete
+                    </Button>
+                </div>
             </div>
             {children}
         </div>
@@ -291,6 +330,10 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
     const trpc = useTRPC();
     const queryClient = useQueryClient();
     const { setCurrentWordStr } = useCurrentWordStr();
+
+    useEffect(() => {
+        console.log(word);
+    }, [word]);
 
     const requestAIDefinition = useMutation(
         trpc.requestAIDefinition.mutationOptions({
@@ -322,6 +365,20 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
         }),
     );
 
+    const wordUpdateIfLearned = useMutation(
+        trpc.wordUpdateIfLearned.mutationOptions({
+            onSuccess: (wordUpdated) => {
+                queryClient.setQueryData(trpc.getWordsAll.queryKey(), (prev) =>
+                    prev?.map((wordInner) =>
+                        areWordsEqual(wordInner.word, word.word)
+                            ? wordUpdated
+                            : wordInner,
+                    ),
+                );
+            },
+        }),
+    );
+
     const timePast = word.ai_definition_request_start_date
         ? Date.now() - new Date(word.ai_definition_request_start_date).valueOf()
         : null;
@@ -337,6 +394,15 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
             deleteButtonProps={{
                 onClick: () => deleteWord.mutate({ word: word.word }),
                 isLoading: deleteWord.isPending,
+            }}
+            wordUpdateIfLearnedProps={{
+                onClick: () =>
+                    wordUpdateIfLearned.mutate({
+                        word: word.word,
+                        isLearned: word.status !== "LEARNED",
+                    }),
+                isLoading: wordUpdateIfLearned.isPending,
+                pressed: word.status === "LEARNED",
             }}
         >
             {word.ai_definition ? (
@@ -359,7 +425,7 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
     );
 };
 
-function Main() {
+export default function Main() {
     const [shouldInvalidate, setShouldInvalidate] = useQueryState("invalidate");
     const { currentWordStr, setCurrentWordStr } = useCurrentWordStr();
 
@@ -398,6 +464,7 @@ function Main() {
                     <CurrentWordLayout
                         wordStr={currentWordStr || "no word is chosen"}
                         deleteButtonProps={{ disabled: true }}
+                        wordUpdateIfLearnedProps={{ disabled: true }}
                     >
                         {currentWordStr ? (
                             <div className="flex justify-center items-center grow">
@@ -489,7 +556,3 @@ function Main() {
         </main>
     );
 }
-
-export default dynamic(() => Promise.resolve(Main), {
-    ssr: false,
-});
