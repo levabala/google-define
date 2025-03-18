@@ -267,7 +267,7 @@ const WordDefinitionsAI: React.FC<{ definitionRaw: Json }> = ({
     }
 
     return (
-        <div className="flex flex-col gap-2 overflow-auto">
+        <div className="flex flex-col gap-2 grow overflow-auto">
             {definitionList.map((definition) => (
                 <WordDefinition
                     key={definition.definition + definition.partOfSpeech}
@@ -301,25 +301,21 @@ const CurrentWordLayout: React.FC<
                         {addDate && formatDateRelativeAuto(addDate)}
                     </span>
                 </span>
-                <div className="flex gap-1">
-                    <Toggle
-                        variant="outline"
-                        size="sm"
-                        className="data-[state=on]:bg-success"
-                        {...wordUpdateIfLearnedProps}
-                    >
-                        Learned
-                    </Toggle>
-                    <Button
-                        variant="destructive"
-                        size="sm"
-                        {...deleteButtonProps}
-                    >
-                        Delete
-                    </Button>
-                </div>
             </div>
             {children}
+            <div className="flex gap-1 self-end">
+                <Toggle
+                    variant="outline"
+                    size="sm"
+                    className="data-[state=on]:bg-success"
+                    {...wordUpdateIfLearnedProps}
+                >
+                    Learned
+                </Toggle>
+                <Button variant="destructive" size="sm" {...deleteButtonProps}>
+                    Delete
+                </Button>
+            </div>
         </div>
     );
 };
