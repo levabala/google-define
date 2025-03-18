@@ -19,7 +19,11 @@ function useShouldRequestAIDefinitionQueryState() {
     const [shouldRequestAIDefinition, setShouldRequestAIDefinition] =
         useQueryState("should-request-ai-definition");
 
-    return { shouldRequestAIDefinition, setShouldRequestAIDefinition };
+    return {
+        shouldRequestAIDefinition: shouldRequestAIDefinition === "1",
+        setShouldRequestAIDefinition: (value: boolean) =>
+            setShouldRequestAIDefinition(value ? "1" : null),
+    };
 }
 
 function useAddWordMutation() {
@@ -162,6 +166,8 @@ const Word: React.FC<
 > = ({ word, className, onClick, ...props }) => {
     const wordsAll = useWordsAllQuery();
     const addWord = useAddWordMutation();
+    const { setShouldRequestAIDefinition } =
+        useShouldRequestAIDefinitionQueryState();
 
     const { currentWordStr, setCurrentWordStr } = useCurrentWordStr();
 
@@ -174,7 +180,7 @@ const Word: React.FC<
         <span
             className={cn(
                 "inline hover:underline cursor-pointer",
-                addWord.isPending && "animate-pulse duration-500",
+                addWord.isPending && "animate-pulse duration-800",
                 isAdded && !isHighlighted && "font-bold",
                 isHighlighted && "underline",
                 className,
@@ -189,7 +195,17 @@ const Word: React.FC<
                             });
                         }
                     } else {
-                        setCurrentWordStr(word);
+                        addWord.mutate(
+                            {
+                                value: word,
+                            },
+                            {
+                                onSuccess: () => {
+                                    setCurrentWordStr(word);
+                                    setShouldRequestAIDefinition(true);
+                                },
+                            },
+                        );
                     }
                 }
 
@@ -398,7 +414,7 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
     useEffect(() => {
         if (shouldRequestAIDefinition) {
             requestAIDefinition.mutate({ wordStr: word.word });
-            setShouldRequestAIDefinition(null);
+            setShouldRequestAIDefinition(false);
         }
     }, [
         requestAIDefinition,
@@ -561,7 +577,7 @@ export default function Main() {
                         {
                             onSuccess: () => {
                                 form.reset();
-                                setShouldRequestAIDefinition("1");
+                                setShouldRequestAIDefinition(true);
                             },
                         },
                     );
