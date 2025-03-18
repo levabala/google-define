@@ -309,7 +309,7 @@ const CurrentWordLayout: React.FC<
                     </span>
                 </span>
             </div>
-            <div className="grow">{children}</div>
+            <div className="flex flex-col grow">{children}</div>
             <div className="flex gap-1 self-end">
                 <Toggle
                     variant="outline"
