@@ -77,19 +77,19 @@ function useCurrentWordStr() {
 const TextAsWords: React.FC<{
     text: string;
 }> = ({ text }) => {
-    const words = text.split(" ");
+    // Split text into words and non-alphanumeric parts
+    const parts = text.split(/([^a-zA-Z0-9]+)/);
 
     return (
         <>
-            {words.map((word, i, arr) =>
-                i === arr.length - 1 ? (
-                    <Word key={word + i} word={word} />
-                ) : (
-                    <Fragment key={word + i}>
-                        <Word word={word} />{" "}
-                    </Fragment>
-                ),
-            )}
+            {parts.map((part, i) => {
+                // Only wrap alphanumeric parts in Word component
+                if (/[a-zA-Z0-9]/.test(part)) {
+                    return <Word key={i} word={part} />;
+                }
+                // Render non-alphanumeric parts as plain text
+                return <Fragment key={i}>{part}</Fragment>;
+            })}
         </>
     );
 };
