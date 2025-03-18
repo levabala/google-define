@@ -297,7 +297,7 @@ const CurrentWordLayout: React.FC<
             <div className="flex items-center gap-2 justify-between">
                 <span>
                     <h3 className="text-xl inline">{wordStr}</h3>
-                    <span className="text-xs text-muted-foreground ml-2">
+                    <span className="text-xs text-muted-foreground ml-2 whitespace-nowrap">
                         {addDate && formatDateRelativeAuto(addDate)}
                     </span>
                 </span>
