@@ -1,5 +1,5 @@
-import { OpenAI } from "openai";
 import throttle from "lodash.throttle";
+import { OpenAI } from "openai";
 
 // Rate limiting configuration
 export const MINUTE_LIMIT = 30; // Max calls per minute
@@ -44,8 +44,8 @@ let openai: OpenAI;
 async function callAIInternal(...args: CreateParams) {
     if (!openai) {
         openai = new OpenAI({
-            baseURL: "https://api.deepseek.com",
-            apiKey: process.env.DEEPSEEK_API_KEY,
+            baseURL: "https://openrouter.ai/api/v1",
+            apiKey: process.env.OPENROUTER_API_KEY,
         });
     }
 
@@ -54,11 +54,11 @@ async function callAIInternal(...args: CreateParams) {
         const error = new Error(
             `Rate limit exceeded. Try again in ${Math.ceil((retryAfter || 0) / 1000)} seconds`,
         );
-        error.name = 'RateLimitError';
+        error.name = "RateLimitError";
         throw error;
     }
 
-    console.log('hit ai api');
+    console.log("hit ai api");
     return await openai.chat.completions.create(...args);
 }
 
