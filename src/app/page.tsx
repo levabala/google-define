@@ -77,21 +77,46 @@ function useCurrentWordStr() {
 const TextAsWords: React.FC<{
     text: string;
 }> = ({ text }) => {
-    // Split text into words and non-alphanumeric parts
-    const parts = text.split(/([^a-zA-Z0-9]+)/);
+    const parts: JSX.Element[] = [];
+    let currentWord = '';
+    let currentNonWord = '';
 
-    return (
-        <>
-            {parts.map((part, i) => {
-                // Only wrap alphanumeric parts in Word component
-                if (/[a-zA-Z0-9]/.test(part)) {
-                    return <Word key={i} word={part} />;
-                }
-                // Render non-alphanumeric parts as plain text
-                return <Fragment key={i}>{part}</Fragment>;
-            })}
-        </>
-    );
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const charCode = text.charCodeAt(i);
+
+        // Check if character is alphanumeric
+        const isAlphaNum = 
+            (charCode >= 48 && charCode <= 57) || // 0-9
+            (charCode >= 65 && charCode <= 90) || // A-Z
+            (charCode >= 97 && charCode <= 122);  // a-z
+
+        if (isAlphaNum) {
+            // If we were building a non-word, flush it
+            if (currentNonWord) {
+                parts.push(<Fragment key={parts.length}>{currentNonWord}</Fragment>);
+                currentNonWord = '';
+            }
+            currentWord += char;
+        } else {
+            // If we were building a word, flush it
+            if (currentWord) {
+                parts.push(<Word key={parts.length} word={currentWord} />);
+                currentWord = '';
+            }
+            currentNonWord += char;
+        }
+    }
+
+    // Flush any remaining content
+    if (currentWord) {
+        parts.push(<Word key={parts.length} word={currentWord} />);
+    }
+    if (currentNonWord) {
+        parts.push(<Fragment key={parts.length}>{currentNonWord}</Fragment>);
+    }
+
+    return <>{parts}</>;
 };
 
 const Word: React.FC<
