@@ -25,13 +25,11 @@ function useAddWordMutation() {
         },
     });
 
-    console.log(mutateOptions);
-
     const mutateOptionsPatched: typeof mutateOptions = {
         ...mutateOptions,
-        onMutate: mutateOptions.onMutate
+        mutationFn: mutateOptions.mutationFn
             ? ({ value }) =>
-                  mutateOptions.onMutate?.({ value: normalizeWord(value) })
+                  mutateOptions.mutationFn!({ value: normalizeWord(value) })
             : undefined,
     };
 
