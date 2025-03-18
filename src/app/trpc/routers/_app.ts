@@ -32,7 +32,7 @@ async function fetchAIDefinition(ctx: Context, wordStr: string) {
                 content: `Provide the definition of the word "${wordStr}" in JSON format with the top-level property "definitions" as an array. Each element of the array should include the following fields: definition (string), partOfSpeech (string), and examples (array of 2 strings). Each element should represent a distinct meaning of the word. Without formatting. Raw json`,
             },
         ],
-        model: "deepseek/deepseek-chat",
+        model: "openai/gpt-4o-mini",
         response_format: { type: "json_object" },
     });
 
@@ -53,7 +53,8 @@ async function fetchAIDefinition(ctx: Context, wordStr: string) {
         throw new Error("No content received from AI");
     }
 
-    console.log("raw ai response:", JSON.parse(content));
+    console.log("raw ai response:", content);
+    console.log("json ai response:", JSON.parse(content));
 
     const aiDefinition = DefinitionSchema.array().assert(
         JSON.parse(content)?.definitions,
