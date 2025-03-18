@@ -22,6 +22,25 @@ export const appRouter = createTRPCRouter({
                 .maybeSingle();
 
             if (wordExisting) {
+                if (wordExisting.status === "HIDDEN") {
+                    const { data: wordExistingRecovered, error } =
+                        await supabase
+                            .from("word")
+                            .update({
+                                status: "NONE",
+                            })
+                            .eq("word", wordExisting.word)
+                            .eq("user", user)
+                            .select()
+                            .single();
+
+                    if (error) {
+                        throw new Error("failed to add the word");
+                    }
+
+                    return wordExistingRecovered;
+                }
+
                 throw new Error("the word is already added");
             }
 
