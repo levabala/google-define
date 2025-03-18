@@ -106,9 +106,9 @@ const Word: React.FC<
 
     const { currentWordStr, setCurrentWordStr } = useCurrentWordStr();
 
-    const isHighlighted = currentWordStr === removeNonAlphanumeric(word);
+    const isHighlighted = areWordsEqual(currentWordStr || '', word);
     const isAdded = Boolean(
-        wordsAll.data?.find((wordInner) => wordInner.word === word),
+        wordsAll.data?.find((wordInner) => areWordsEqual(wordInner.word, word)),
     );
 
     return (
@@ -121,7 +121,7 @@ const Word: React.FC<
                 className,
             )}
             onClick={(e) => {
-                if (word !== currentWordStr) {
+                if (!areWordsEqual(word, currentWordStr || '')) {
                     if (e.metaKey) {
                         if (!isAdded) {
                             addWord.mutate({ value: word });
@@ -147,7 +147,7 @@ const WordButton: React.FC<
 > = ({ word, className, onClick, ...props }) => {
     const { currentWordStr, setCurrentWordStr } = useCurrentWordStr();
 
-    const isHighlighted = currentWordStr === word;
+    const isHighlighted = areWordsEqual(currentWordStr || '', word);
 
     return (
         <Button
@@ -244,7 +244,7 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
             onSuccess: (res) => {
                 queryClient.setQueryData(trpc.getWordsAll.queryKey(), (prev) =>
                     prev?.map((wordInner) => {
-                        if (wordInner.word !== word.word) {
+                        if (!areWordsEqual(wordInner.word, word.word)) {
                             return wordInner;
                         }
 
@@ -397,7 +397,7 @@ function Main() {
                     setCurrentWordStr(data.value);
 
                     if (
-                        wordsAll.data?.find((word) => word.word === data.value)
+                        wordsAll.data?.find((word) => areWordsEqual(word.word, data.value))
                     ) {
                         form.reset();
                         return;
