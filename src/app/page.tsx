@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Attributes, Fragment, JSX, useEffect, useMemo } from "react";
+import { AI_DEFINITION_EXPIRATION_DURATION_MS } from "./constants";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { Definition, DefinitionSchema } from "./types";
 import { Json, Tables } from "@/database.types";
@@ -313,8 +314,13 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
         }),
     );
 
+    const timePast = word.ai_definition_request_start_date
+        ? Date.now() - new Date(word.ai_definition_request_start_date).valueOf()
+        : null;
     const aiRequestAlreadyPending =
-        !word.ai_definition && word.ai_definition_request_start_date !== null;
+        !word.ai_definition &&
+        !!timePast &&
+        timePast < AI_DEFINITION_EXPIRATION_DURATION_MS;
 
     return (
         <CurrentWordLayout
@@ -332,13 +338,11 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
                         onClick={() =>
                             requestAIDefinition.mutate({ wordStr: word.word })
                         }
-                        isLoading={
-                            requestAIDefinition.isPending ||
-                            aiRequestAlreadyPending
-                        }
+                        isLoading={requestAIDefinition.isPending}
+                        disabled={aiRequestAlreadyPending}
                     >
                         ai definition
-                        {aiRequestAlreadyPending ? "(refresh to check)" : null}
+                        {aiRequestAlreadyPending ? " (refresh to check)" : null}
                     </Button>
                 </div>
             )}

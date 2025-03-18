@@ -2,6 +2,7 @@ import { baseProcedure, Context, createTRPCRouter } from "../init";
 import { DefinitionSchema } from "@/app/types";
 import { type } from "arktype";
 import { ai } from "@/ai";
+import { AI_DEFINITION_EXPIRATION_DURATION_MS } from "@/app/constants";
 
 async function fetchAIDefinition(ctx: Context, wordStr: string) {
     const { error } = await ctx.supabase
@@ -28,7 +29,7 @@ async function fetchAIDefinition(ctx: Context, wordStr: string) {
             },
             {
                 role: "user",
-                content: `Provide the definition of the word "${wordStr}" in JSON format with the top-level property "definitions" as an array. Each element of the array should include the following fields: definition (string), partOfSpeech (string), and examples (array of 2 strings). Each element should represent a distinct meaning of the word.`,
+                content: `Provide the definition of the word "${wordStr}" in JSON format with the top-level property "definitions" as an array. Each element of the array should include the following fields: definition (string), partOfSpeech (string), and examples (array of 2 strings). Each element should represent a distinct meaning of the word. Without formatting. Raw json`,
             },
         ],
         model: "deepseek/deepseek-chat",
@@ -180,7 +181,6 @@ export const appRouter = createTRPCRouter({
                 throw new Error("the word doesnt exist");
             }
 
-            const AI_DEFINITION_EXPIRATION_DURATION_MS = 1000 * 60;
             const timePast = wordExisting.ai_definition_request_start_date
                 ? Date.now() -
                   new Date(
