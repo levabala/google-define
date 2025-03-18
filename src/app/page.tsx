@@ -15,6 +15,13 @@ import { useQueryState } from "nuqs";
 import { cn } from "@/lib/utils";
 import { type } from "arktype";
 
+function useShouldRequestAIDefinitionQueryState() {
+    const [shouldRequestAIDefinition, setShouldRequestAIDefinition] =
+        useQueryState("should-request-ai-definition");
+
+    return { shouldRequestAIDefinition, setShouldRequestAIDefinition };
+}
+
 function useAddWordMutation() {
     const trpc = useTRPC();
     const queryClient = useQueryClient();
@@ -326,6 +333,8 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
     const trpc = useTRPC();
     const queryClient = useQueryClient();
     const { setCurrentWordStr } = useCurrentWordStr();
+    const { shouldRequestAIDefinition, setShouldRequestAIDefinition } =
+        useShouldRequestAIDefinitionQueryState();
 
     useEffect(() => {
         console.log(word);
@@ -383,6 +392,18 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
         !!timePast &&
         timePast < AI_DEFINITION_EXPIRATION_DURATION_MS;
 
+    useEffect(() => {
+        if (shouldRequestAIDefinition) {
+            requestAIDefinition.mutate({ wordStr: word.word });
+            setShouldRequestAIDefinition(null);
+        }
+    }, [
+        requestAIDefinition,
+        setShouldRequestAIDefinition,
+        shouldRequestAIDefinition,
+        word.word,
+    ]);
+
     return (
         <CurrentWordLayout
             wordStr={word.word}
@@ -422,6 +443,8 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
 };
 
 export default function Main() {
+    const { setShouldRequestAIDefinition } =
+        useShouldRequestAIDefinitionQueryState();
     const [shouldInvalidate, setShouldInvalidate] = useQueryState("invalidate");
     const { currentWordStr, setCurrentWordStr } = useCurrentWordStr();
 
@@ -531,10 +554,11 @@ export default function Main() {
                     }
 
                     addWord.mutate(
-                        { value, shouldFetchAIDefinition: true },
+                        { value },
                         {
                             onSuccess: () => {
                                 form.reset();
+                                setShouldRequestAIDefinition("1");
                             },
                         },
                     );
