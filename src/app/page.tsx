@@ -1,8 +1,8 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Attributes, Fragment, JSX, useEffect, useMemo } from "react";
 import { Button, ButtonProps } from "@/components/ui/button";
-import { Attributes, Fragment, useEffect } from "react";
 import { Definition, DefinitionSchema } from "./types";
 import { Json, Tables } from "@/database.types";
 import { Input } from "@/components/ui/input";
@@ -77,44 +77,54 @@ function useCurrentWordStr() {
 const TextAsWords: React.FC<{
     text: string;
 }> = ({ text }) => {
-    const parts: JSX.Element[] = [];
-    let currentWord = '';
-    let currentNonWord = '';
+    const parts = useMemo(() => {
+        const parts: JSX.Element[] = [];
+        let currentWord = "";
+        let currentNonWord = "";
 
-    for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        const charCode = text.charCodeAt(i);
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            const charCode = text.charCodeAt(i);
 
-        // Check if character is alphanumeric
-        const isAlphaNum = 
-            (charCode >= 48 && charCode <= 57) || // 0-9
-            (charCode >= 65 && charCode <= 90) || // A-Z
-            (charCode >= 97 && charCode <= 122);  // a-z
+            // Check if character is alphanumeric
+            const isAlphaNum =
+                (charCode >= 48 && charCode <= 57) || // 0-9
+                (charCode >= 65 && charCode <= 90) || // A-Z
+                (charCode >= 97 && charCode <= 122); // a-z
 
-        if (isAlphaNum) {
-            // If we were building a non-word, flush it
-            if (currentNonWord) {
-                parts.push(<Fragment key={parts.length}>{currentNonWord}</Fragment>);
-                currentNonWord = '';
+            if (isAlphaNum) {
+                // If we were building a non-word, flush it
+                if (currentNonWord) {
+                    parts.push(
+                        <Fragment key={parts.length}>
+                            {currentNonWord}
+                        </Fragment>,
+                    );
+                    currentNonWord = "";
+                }
+                currentWord += char;
+            } else {
+                // If we were building a word, flush it
+                if (currentWord) {
+                    parts.push(<Word key={parts.length} word={currentWord} />);
+                    currentWord = "";
+                }
+                currentNonWord += char;
             }
-            currentWord += char;
-        } else {
-            // If we were building a word, flush it
-            if (currentWord) {
-                parts.push(<Word key={parts.length} word={currentWord} />);
-                currentWord = '';
-            }
-            currentNonWord += char;
         }
-    }
 
-    // Flush any remaining content
-    if (currentWord) {
-        parts.push(<Word key={parts.length} word={currentWord} />);
-    }
-    if (currentNonWord) {
-        parts.push(<Fragment key={parts.length}>{currentNonWord}</Fragment>);
-    }
+        // Flush any remaining content
+        if (currentWord) {
+            parts.push(<Word key={parts.length} word={currentWord} />);
+        }
+        if (currentNonWord) {
+            parts.push(
+                <Fragment key={parts.length}>{currentNonWord}</Fragment>,
+            );
+        }
+
+        return parts;
+    }, [text]);
 
     return <>{parts}</>;
 };
@@ -129,7 +139,7 @@ const Word: React.FC<
 
     const { currentWordStr, setCurrentWordStr } = useCurrentWordStr();
 
-    const isHighlighted = areWordsEqual(currentWordStr || '', word);
+    const isHighlighted = areWordsEqual(currentWordStr || "", word);
     const isAdded = Boolean(
         wordsAll.data?.find((wordInner) => areWordsEqual(wordInner.word, word)),
     );
@@ -144,7 +154,7 @@ const Word: React.FC<
                 className,
             )}
             onClick={(e) => {
-                if (!areWordsEqual(word, currentWordStr || '')) {
+                if (!areWordsEqual(word, currentWordStr || "")) {
                     if (e.metaKey) {
                         if (!isAdded) {
                             addWord.mutate({ value: word });
@@ -170,7 +180,7 @@ const WordButton: React.FC<
 > = ({ word, className, onClick, ...props }) => {
     const { currentWordStr, setCurrentWordStr } = useCurrentWordStr();
 
-    const isHighlighted = areWordsEqual(currentWordStr || '', word);
+    const isHighlighted = areWordsEqual(currentWordStr || "", word);
 
     return (
         <Button
@@ -420,7 +430,9 @@ function Main() {
                     setCurrentWordStr(data.value);
 
                     if (
-                        wordsAll.data?.find((word) => areWordsEqual(word.word, data.value))
+                        wordsAll.data?.find((word) =>
+                            areWordsEqual(word.word, data.value),
+                        )
                     ) {
                         form.reset();
                         return;
