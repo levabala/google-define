@@ -1,10 +1,10 @@
+import { AI_DEFINITION_EXPIRATION_DURATION_MS } from "@/app/constants";
 import { baseProcedure, Context, createTRPCRouter } from "../init";
 import { DefinitionSchema } from "@/app/types";
 import { type } from "arktype";
 import { ai } from "@/ai";
-import { AI_DEFINITION_EXPIRATION_DURATION_MS } from "@/app/constants";
 
-async function fetchAIDefinition(ctx: Context, wordStr: string) {
+async function updateAIDefinition(ctx: Context, wordStr: string) {
     const { error } = await ctx.supabase
         .from("word")
         .update({
@@ -62,6 +62,19 @@ async function fetchAIDefinition(ctx: Context, wordStr: string) {
 
     console.log({ aiDefinition });
 
+    // Update existing word record with AI definition
+    const { error: errorUpdateAIDefinition } = await ctx.supabase
+        .from("word")
+        .update({
+            ai_definition: aiDefinition,
+        })
+        .eq("word", wordStr)
+        .eq("user", ctx.userLogin);
+
+    if (errorUpdateAIDefinition) {
+        throw new Error(`Database error: ${errorUpdateAIDefinition.message}`);
+    }
+
     return aiDefinition;
 }
 
@@ -101,6 +114,13 @@ export const appRouter = createTRPCRouter({
                         throw new Error("failed to add the word");
                     }
 
+                    if (
+                        shouldFetchAIDefinition &&
+                        !wordExistingRecovered.ai_definition
+                    ) {
+                        updateAIDefinition(opts.ctx, value);
+                    }
+
                     return wordExistingRecovered;
                 }
 
@@ -119,7 +139,7 @@ export const appRouter = createTRPCRouter({
                 .single();
 
             if (shouldFetchAIDefinition) {
-                fetchAIDefinition(opts.ctx, value);
+                updateAIDefinition(opts.ctx, value);
             }
 
             if (!wordCreated) {
@@ -193,20 +213,7 @@ export const appRouter = createTRPCRouter({
                 throw new Error("cannot request a new definition. too soon");
             }
 
-            const aiDefinition = await fetchAIDefinition(opts.ctx, wordStr);
-
-            // Update existing word record with AI definition
-            const { error } = await supabase
-                .from("word")
-                .update({
-                    ai_definition: aiDefinition,
-                })
-                .eq("word", wordStr)
-                .eq("user", user);
-
-            if (error) {
-                throw new Error(`Database error: ${error.message}`);
-            }
+            const aiDefinition = await updateAIDefinition(opts.ctx, wordStr);
 
             return aiDefinition;
         }),

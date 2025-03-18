@@ -47,11 +47,12 @@ function useWordsAllQuery() {
     return useQuery(trpc.getWordsAll.queryOptions());
 }
 
-function isAlphanumericCharCode(charCode: number): boolean {
+function isAlphanumericCharCodeOrDash(charCode: number): boolean {
     return (
         (charCode >= 48 && charCode <= 57) || // Numbers 0-9
         (charCode >= 65 && charCode <= 90) || // Uppercase letters A-Z
-        (charCode >= 97 && charCode <= 122)
+        (charCode >= 97 && charCode <= 122) ||
+        charCode === 45 // Dash -
     ); // Lowercase letters a-z
 }
 
@@ -62,7 +63,7 @@ function removeNonAlphanumeric(str: string): string {
         const charCode = str.charCodeAt(i);
 
         if (
-            isAlphanumericCharCode(charCode) ||
+            isAlphanumericCharCodeOrDash(charCode) ||
             charCode === 32 // Space character
         ) {
             result += char;
@@ -100,7 +101,7 @@ const TextAsWords: React.FC<{
             const charCode = text.charCodeAt(i);
 
             // Check if character is alphanumeric
-            const isAlphaNum = isAlphanumericCharCode(charCode);
+            const isAlphaNum = isAlphanumericCharCodeOrDash(charCode);
 
             if (isAlphaNum) {
                 // If we were building a non-word, flush it
@@ -271,7 +272,9 @@ const CurrentWordLayout: React.FC<
             <div className="flex items-center gap-2 justify-between">
                 <span>
                     <h3 className="text-xl inline">{wordStr}</h3>
-                    <span className="text-xs text-muted-foreground ml-2">{addDate && formatDateRelativeAuto(addDate)}</span>
+                    <span className="text-xs text-muted-foreground ml-2">
+                        {addDate && formatDateRelativeAuto(addDate)}
+                    </span>
                 </span>
                 <Button variant="destructive" size="sm" {...deleteButtonProps}>
                     Delete
@@ -449,28 +452,29 @@ function Main() {
                     const form = e.target as HTMLFormElement;
                     const formData = new FormData(form);
 
-                    const data = {
-                        value: (formData.get("value")?.valueOf() as string)
-                            .trim()
-                            .toLowerCase(),
-                    };
+                    const value = (formData.get("value")?.valueOf() as string)
+                        .trim()
+                        .toLowerCase();
 
-                    setCurrentWordStr(data.value);
+                    setCurrentWordStr(value);
 
                     if (
                         wordsAll.data?.find((word) =>
-                            areWordsEqual(word.word, data.value),
+                            areWordsEqual(word.word, value),
                         )
                     ) {
                         form.reset();
                         return;
                     }
 
-                    addWord.mutate(data, {
-                        onSuccess: () => {
-                            form.reset();
+                    addWord.mutate(
+                        { value, shouldFetchAIDefinition: true },
+                        {
+                            onSuccess: () => {
+                                form.reset();
+                            },
                         },
-                    });
+                    );
                 }}
             >
                 <Input name="value" placeholder="word/phrase" className="" />
