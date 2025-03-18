@@ -274,7 +274,7 @@ const WordDefinitionsAI: React.FC<{ definitionRaw: Json }> = ({
     }
 
     return (
-        <div className="flex flex-col gap-2 grow overflow-auto">
+        <div className="flex flex-col gap-2 grow">
             {definitionList.map((definition) => (
                 <WordDefinition
                     key={definition.definition + definition.partOfSpeech}
@@ -309,7 +309,7 @@ const CurrentWordLayout: React.FC<
                     </span>
                 </span>
             </div>
-            <div className="flex flex-col grow">{children}</div>
+            <div className="flex flex-col grow overflow-auto">{children}</div>
             <div className="flex gap-1 self-end">
                 <Toggle
                     variant="outline"
