@@ -210,18 +210,20 @@ const WordButton: React.FC<
     const wordsAll = useWordsAllQuery();
     const { currentWordStr, setCurrentWordStr } = useCurrentWordStr();
 
+    const wordData = wordsAll.data?.find((wordInner) =>
+        areWordsEqual(wordInner.word, word),
+    );
     const isHighlighted = areWordsEqual(currentWordStr || "", word);
-    const isLearned =
-        wordsAll.data?.find((wordInner) => areWordsEqual(wordInner.word, word))
-            ?.status === "LEARNED";
+    const isLearned = wordData?.status === "LEARNED";
+    const hasNoAIDefinition = !wordData?.ai_definition;
 
     return (
         <Button
             variant="link"
             className={cn(
-                "flex max-w-full",
+                "flex max-w-full text-primary-foreground",
                 isLearned && "text-success decoration-success",
-                isHighlighted && "text-primary-foreground",
+                isHighlighted && "font-bold",
                 className,
             )}
             onClick={(e) => {
@@ -233,6 +235,7 @@ const WordButton: React.FC<
             <span
                 className={cn(
                     "block w-full overflow-hidden text-ellipsis whitespace-nowrap",
+                    hasNoAIDefinition && "text-muted-foreground",
                     isLearned && "text-success decoration-success",
                 )}
             >
