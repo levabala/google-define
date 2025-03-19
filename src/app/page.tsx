@@ -309,6 +309,7 @@ const CurrentWordLayout: React.FC<
         wordStr: string;
         addDate?: Date;
         deleteButtonProps: ButtonProps;
+        requestAIDefinitionButtonProps: ButtonProps;
         wordUpdateIfLearnedProps: ToggleProps;
     } & React.PropsWithChildren
 > = ({
@@ -316,6 +317,7 @@ const CurrentWordLayout: React.FC<
     addDate,
     wordStr,
     deleteButtonProps,
+    requestAIDefinitionButtonProps,
     wordUpdateIfLearnedProps,
 }) => {
     return (
@@ -336,10 +338,13 @@ const CurrentWordLayout: React.FC<
                     className="data-[state=on]:bg-success"
                     {...wordUpdateIfLearnedProps}
                 >
-                    Learned
+                    learned
                 </Toggle>
+                <Button variant="default" size="sm" {...requestAIDefinitionButtonProps}>
+                    update
+                </Button>
                 <Button variant="destructive" size="sm" {...deleteButtonProps}>
-                    Delete
+                    delete
                 </Button>
             </div>
         </div>
@@ -361,17 +366,14 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
 
     const requestAIDefinition = useMutation(
         trpc.requestAIDefinition.mutationOptions({
-            onSuccess: (res) => {
+            onSuccess: (wordUpdated) => {
                 queryClient.setQueryData(trpc.getWordsAll.queryKey(), (prev) =>
                     prev?.map((wordInner) => {
                         if (!areWordsEqual(wordInner.word, word.word)) {
                             return wordInner;
                         }
 
-                        return {
-                            ...wordInner,
-                            ai_definition: res,
-                        };
+                        return wordUpdated;
                     }),
                 );
             },
@@ -430,6 +432,11 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
             deleteButtonProps={{
                 onClick: () => deleteWord.mutate({ word: word.word }),
                 isLoading: deleteWord.isPending,
+            }}
+            requestAIDefinitionButtonProps={{
+                onClick: () => requestAIDefinition.mutate({ wordStr: word.word }),
+                isLoading: requestAIDefinition.isPending,
+                disabled: !word.ai_definition,
             }}
             wordUpdateIfLearnedProps={{
                 onClick: () =>
@@ -502,6 +509,7 @@ export default function Main() {
                     <CurrentWordLayout
                         wordStr={currentWordStr || "what to save next?"}
                         deleteButtonProps={{ disabled: true }}
+                        requestAIDefinitionButtonProps={{ disabled: true }}
                         wordUpdateIfLearnedProps={{ disabled: true }}
                     >
                         {currentWordStr ? (

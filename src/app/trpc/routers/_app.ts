@@ -63,19 +63,22 @@ async function updateAIDefinition(ctx: Context, wordStr: string) {
     console.log({ aiDefinition });
 
     // Update existing word record with AI definition
-    const { error: errorUpdateAIDefinition } = await ctx.supabase
-        .from("word")
-        .update({
-            ai_definition: aiDefinition,
-        })
-        .eq("word", wordStr)
-        .eq("user", ctx.userLogin);
+    const { data: wordUpdated, error: errorUpdateAIDefinition } =
+        await ctx.supabase
+            .from("word")
+            .update({
+                ai_definition: aiDefinition,
+            })
+            .eq("word", wordStr)
+            .eq("user", ctx.userLogin)
+            .select()
+            .single();
 
     if (errorUpdateAIDefinition) {
         throw new Error(`Database error: ${errorUpdateAIDefinition.message}`);
     }
 
-    return aiDefinition;
+    return wordUpdated;
 }
 
 export const appRouter = createTRPCRouter({
@@ -173,10 +176,12 @@ export const appRouter = createTRPCRouter({
             const { data: wordUpdated, error } = await supabase
                 .from("word")
                 .update({
-                    status: isLearned ? 'LEARNED' : 'TO_LEARN',
+                    status: isLearned ? "LEARNED" : "TO_LEARN",
                 })
                 .eq("word", word)
-                .eq("user", user).select().single();
+                .eq("user", user)
+                .select()
+                .single();
 
             if (error) {
                 throw new Error("failed to update the word");
@@ -249,9 +254,7 @@ export const appRouter = createTRPCRouter({
                 throw new Error("cannot request a new definition. too soon");
             }
 
-            const aiDefinition = await updateAIDefinition(opts.ctx, wordStr);
-
-            return aiDefinition;
+            return updateAIDefinition(opts.ctx, wordStr);
         }),
     getWordsAll: baseProcedure.query(async (opts) => {
         const { userLogin: user, supabase } = opts.ctx;
