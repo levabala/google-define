@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, JSX, Fragment } from "react";
-import { Word } from "./Word";
+import { WordClickable } from "./WordClickable";
 import { isAlphanumericCharCodeOrDash } from "../utils";
 
 export const TextAsWords: React.FC<{
@@ -32,7 +32,7 @@ export const TextAsWords: React.FC<{
             } else {
                 // If we were building a word, flush it
                 if (currentWord) {
-                    parts.push(<Word key={parts.length} word={currentWord} />);
+                    parts.push(<WordClickable key={parts.length} word={currentWord} />);
                     currentWord = "";
                 }
                 currentNonWord += char;
@@ -41,7 +41,7 @@ export const TextAsWords: React.FC<{
 
         // Flush any remaining content
         if (currentWord) {
-            parts.push(<Word key={parts.length} word={currentWord} />);
+            parts.push(<WordClickable key={parts.length} word={currentWord} />);
         }
         if (currentNonWord) {
             parts.push(

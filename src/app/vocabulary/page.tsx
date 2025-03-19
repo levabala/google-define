@@ -1,18 +1,18 @@
 "use client";
 
-import { useShouldRequestAIDefinitionQueryState } from "./hooks/useShouldRequestAIDefinitionQueryState";
-import { CurrentWordLayout } from "./components/CurrentWordLayout";
-import { useAddWordMutation } from "./hooks/useAddWordMutation";
-import { useCurrentWordStr } from "./hooks/useCurrentWordStr";
-import { useWordsAllQuery } from "./hooks/useWordsAllQuery";
-import { CurrentWord } from "./components/CurrentWord";
-import { WordButton } from "./components/WordButton";
+import { useShouldRequestAIDefinitionQueryState } from "../hooks/useShouldRequestAIDefinitionQueryState";
+import { CurrentWordLayout } from "../components/CurrentWordLayout";
+import { useAddWordMutation } from "../hooks/useAddWordMutation";
+import { useCurrentWordStr } from "../hooks/useCurrentWordStr";
+import { useWordsAllQuery } from "../hooks/useWordsAllQuery";
+import { CurrentWord } from "../components/CurrentWord";
+import { WordButton } from "../components/WordButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tables } from "@/database.types";
-import { areWordsEqual } from "./helpers";
-import { useQueryState } from "nuqs";
+import { areWordsEqual } from "../helpers";
 import { useLayoutEffect } from "react";
+import { useQueryState } from "nuqs";
+import { Word } from "../types";
 
 export default function Main() {
     const { setShouldRequestAIDefinition } =
@@ -23,7 +23,7 @@ export default function Main() {
     const addWord = useAddWordMutation();
     const wordsAll = useWordsAllQuery();
 
-    const currentWord: Tables<"word"> | null =
+    const currentWord: Word | null =
         wordsAll.data?.find((word) => word.word === currentWordStr) || null;
 
     useLayoutEffect(() => {
@@ -47,7 +47,7 @@ export default function Main() {
     }, [setShouldInvalidate, shouldInvalidate, wordsAll]);
 
     return (
-        <main className="bg-background flex h-screen flex-col gap-2 p-2 max-w-[500px] mx-auto">
+        <>
             <div className="flex flex-col grow overflow-hidden">
                 {currentWord ? (
                     <CurrentWord key={currentWord.word} word={currentWord} />
@@ -116,6 +116,6 @@ export default function Main() {
                     look up
                 </Button>
             </form>
-        </main>
+        </>
     );
 }

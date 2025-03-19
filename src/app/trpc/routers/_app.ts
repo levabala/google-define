@@ -1,6 +1,6 @@
 import { AI_DEFINITION_EXPIRATION_DURATION_MS } from "@/app/constants";
 import { baseProcedure, Context, createTRPCRouter } from "../init";
-import { DefinitionSchema } from "@/app/types";
+import { DefinitionSchema, WordSchema } from "@/app/types";
 import { type } from "arktype";
 import { ai } from "@/ai";
 
@@ -78,7 +78,7 @@ async function updateAIDefinition(ctx: Context, wordStr: string) {
         throw new Error(`Database error: ${errorUpdateAIDefinition.message}`);
     }
 
-    return wordUpdated;
+    return parseWord(wordUpdated);
 }
 
 export const appRouter = createTRPCRouter({
@@ -124,7 +124,7 @@ export const appRouter = createTRPCRouter({
                         updateAIDefinition(opts.ctx, value);
                     }
 
-                    return wordExistingRecovered;
+                    return parseWord(wordExistingRecovered);
                 }
 
                 throw new Error("the word is already added");
@@ -149,7 +149,7 @@ export const appRouter = createTRPCRouter({
                 throw new Error("failed to create the word");
             }
 
-            return wordCreated;
+            return parseWord(wordCreated);
         }),
     wordUpdateIfLearned: baseProcedure
         .input(
@@ -187,7 +187,7 @@ export const appRouter = createTRPCRouter({
                 throw new Error("failed to update the word");
             }
 
-            return wordUpdated;
+            return parseWord(wordUpdated);
         }),
     deleteWord: baseProcedure
         .input(
@@ -270,8 +270,61 @@ export const appRouter = createTRPCRouter({
             throw new Error("unexpected");
         }
 
-        return wordsList;
+        return wordsList.map(parseWord);
     }),
+    recordQuizChoice: baseProcedure
+        .input(
+            type({
+                word: "string",
+                definition: "string",
+                isSuccess: "boolean",
+            }).assert,
+        )
+        .mutation(async (opts) => {
+            const { userLogin: user, supabase } = opts.ctx;
+            const { word, definition, isSuccess } = opts.input;
+
+            const { data: wordExisting } = await supabase
+                .from("word")
+                .select()
+                .eq("word", word)
+                .eq("user", user)
+                .maybeSingle();
+
+            if (!wordExisting) {
+                throw new Error("the word doesnt exist");
+            }
+
+            const { error } = await supabase.from("training").insert({
+                word,
+                definition,
+                user,
+                is_success: isSuccess,
+            });
+
+            if (error) {
+                throw new Error("failed to record the quiz choice", {
+                    cause: error,
+                });
+            }
+        }),
 });
+
+function parseWord(word: object) {
+    const wordResult = WordSchema.omit("ai_definition")(word);
+    if (wordResult instanceof type.errors) {
+        throw new Error("word parse error", { cause: wordResult });
+    }
+
+    const ai_definitionResult = WordSchema.pick("ai_definition")(word);
+
+    return {
+        ...wordResult,
+        ai_definition:
+            ai_definitionResult instanceof type.errors
+                ? null
+                : ai_definitionResult.ai_definition,
+    };
+}
 
 export type AppRouter = typeof appRouter;

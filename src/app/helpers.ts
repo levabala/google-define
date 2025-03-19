@@ -1,7 +1,7 @@
-import { Tables } from "@/database.types";
 import { removeNonAlphanumeric } from "./utils";
+import { Word } from "./types";
 
-export function sortWordsAll(wordsAll: Tables<"word">[]) {
+export function sortWordsAll(wordsAll: Word[]) {
     return wordsAll.slice().sort((a, b) => {
         if (a.status === "LEARNED" && b.status !== "LEARNED") {
             return 1;

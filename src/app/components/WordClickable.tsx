@@ -1,13 +1,12 @@
 "use client";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 import { areWordsEqual } from "../helpers";
 import { useAddWordMutation } from "../hooks/useAddWordMutation";
 import { useCurrentWordStr } from "../hooks/useCurrentWordStr";
 import { useShouldRequestAIDefinitionQueryState } from "../hooks/useShouldRequestAIDefinitionQueryState";
 import { useWordsAllQuery } from "../hooks/useWordsAllQuery";
 
-
-export const Word: React.FC<
+export const WordClickable: React.FC<
     {
         word: string;
     } & React.HTMLAttributes<HTMLSpanElement>

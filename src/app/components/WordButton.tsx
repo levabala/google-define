@@ -2,7 +2,7 @@ import { useCurrentWordStr } from "../hooks/useCurrentWordStr";
 import { useWordsAllQuery } from "../hooks/useWordsAllQuery";
 import { Button } from "@/components/ui/button";
 import { areWordsEqual } from "../helpers";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 export const WordButton: React.FC<
     {

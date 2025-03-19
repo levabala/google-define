@@ -1,16 +1,16 @@
 import { useShouldRequestAIDefinitionQueryState } from "../hooks/useShouldRequestAIDefinitionQueryState";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { AI_DEFINITION_EXPIRATION_DURATION_MS } from "../constants";
-import { Attributes, useEffect, useLayoutEffect } from "react";
 import { useCurrentWordStr } from "../hooks/useCurrentWordStr";
+import { Attributes, useEffect, useLayoutEffect } from "react";
 import { CurrentWordLayout } from "./CurrentWordLayout";
 import { WordDefinitionsAI } from "./WordDefinitionsAI";
 import { Button } from "@/components/ui/button";
-import { Tables } from "@/database.types";
 import { areWordsEqual } from "../helpers";
 import { useTRPC } from "../trpc/client";
+import { Word } from "../types";
 
-export const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
+export const CurrentWord: React.FC<{ word: Word } & Attributes> = ({
     word,
 }) => {
     const trpc = useTRPC();

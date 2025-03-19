@@ -1,5 +1,5 @@
-import Main from "./main";
+import { redirect, RedirectType } from "next/navigation";
 
-export default async function MainWrapper() {
-    return <Main />;
+export default function MainWrapper() {
+    redirect("/vocabulary", RedirectType.replace);
 }
