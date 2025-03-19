@@ -11,7 +11,6 @@ import { cache } from "react";
 export const getQueryClient = cache(makeQueryClient);
 
 export const trpc = createTRPCOptionsProxy({
-    // @ts-expect-error -- i dunno
     ctx: createTRPCContext,
     router: appRouter,
     queryClient: getQueryClient,

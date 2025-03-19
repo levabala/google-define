@@ -5,10 +5,6 @@ import type { Metadata } from "next";
 import { Toast } from "./toast";
 import "./globals.css";
 
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { getQueryClient } from "./trpc/server";
-import { Suspense } from "react";
-
 const geistSans = Geist({
     variable: "--font-geist-sans",
     subsets: ["latin"],
@@ -29,8 +25,6 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const queryClient = getQueryClient();
-
     return (
         <html className="dark">
             <body className={`${geistSans.variable} ${geistMono.variable}`}>
@@ -44,11 +38,7 @@ export default function RootLayout({
                     }}
                 />
                 <NuqsAdapter>
-                    <Providers>
-                        <HydrationBoundary state={dehydrate(queryClient)}>
-                            <Suspense fallback="loading">{children}</Suspense>
-                        </HydrationBoundary>
-                    </Providers>
+                    <Providers>{children}</Providers>
                 </NuqsAdapter>
                 <Toast />
             </body>

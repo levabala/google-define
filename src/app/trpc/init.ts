@@ -4,13 +4,13 @@ import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { getUser } from "@/auth";
 import { cache } from "react";
+import { cookies } from "next/headers";
 
 export const createTRPCContext = cache(
-    async (opts: { req: Request }) => {
-        console.log('recreate context');
-        const { req } = opts;
+    async () => {
+        const cook = await cookies();
 
-        const userLogin = await getUser(req as unknown as NextRequest);
+        const userLogin = await getUser({ cookies: cook } as unknown as NextRequest);
         const supabase = await createClient();
 
         return {
