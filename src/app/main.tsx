@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Tables } from "@/database.types";
 import { areWordsEqual } from "./helpers";
 import { useQueryState } from "nuqs";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 
 export default function Main() {
     const { setShouldRequestAIDefinition } =
@@ -26,7 +26,7 @@ export default function Main() {
     const currentWord: Tables<"word"> | null =
         wordsAll.data?.find((word) => word.word === currentWordStr) || null;
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (
             !currentWordStr ||
             currentWord?.word === currentWordStr ||
@@ -39,7 +39,7 @@ export default function Main() {
         addWord.mutate({ value: currentWordStr });
     }, [addWord, currentWord?.word, currentWordStr, wordsAll.data]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (shouldInvalidate) {
             wordsAll.refetch();
             setShouldInvalidate(null);
@@ -57,37 +57,7 @@ export default function Main() {
                         deleteButtonProps={{ disabled: true }}
                         requestAIDefinitionButtonProps={{ disabled: true }}
                         wordUpdateIfLearnedProps={{ disabled: true }}
-                    >
-                        {currentWordStr ? (
-                            <div className="flex justify-center items-center grow">
-                                <Button
-                                    type="submit"
-                                    className=""
-                                    isLoading={addWord.isPending}
-                                    onClick={() => {
-                                        if (!currentWordStr) {
-                                            return;
-                                        }
-
-                                        addWord.mutate(
-                                            { value: currentWordStr },
-                                            {
-                                                onSuccess: () => {
-                                                    (
-                                                        document.getElementById(
-                                                            "addWordForm",
-                                                        ) as HTMLFormElement
-                                                    ).reset();
-                                                },
-                                            },
-                                        );
-                                    }}
-                                >
-                                    look up
-                                </Button>
-                            </div>
-                        ) : null}
-                    </CurrentWordLayout>
+                    />
                 )}
             </div>
             <hr className="border-t border-gray-500" />
