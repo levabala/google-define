@@ -272,6 +272,45 @@ export const appRouter = createTRPCRouter({
 
         return wordsList.map(parseWord);
     }),
+    getWordTrainingStat: baseProcedure
+        .input(type({ word: "string" }))
+        .query(async (opts) => {
+            const { userLogin: user, supabase } = opts.ctx;
+            const { word } = opts.input;
+
+            const [totalAttemptsResult, successfulAttemptsResult] =
+                await Promise.all([
+                    supabase
+                        .from("training")
+                        .select("*", { count: "exact" })
+                        .eq("word", word)
+                        .eq("user", user),
+                    supabase
+                        .from("training")
+                        .select("*", { count: "exact" })
+                        .eq("word", word)
+                        .eq("user", user)
+                        .eq("is_success", true),
+                ]);
+
+            if (totalAttemptsResult.error || successfulAttemptsResult.error) {
+                throw new Error("failed to get stat", {
+                    cause: {
+                        totalAttemptsResult: totalAttemptsResult.error,
+                        successfulAttemptsResult:
+                            successfulAttemptsResult.error,
+                    },
+                });
+            }
+
+            const totalAttempts = totalAttemptsResult.count || 0;
+            const successfulAttempts = successfulAttemptsResult.count || 0;
+
+            return {
+                totalAttempts,
+                successfulAttempts,
+            };
+        }),
     recordQuizChoice: baseProcedure
         .input(
             type({

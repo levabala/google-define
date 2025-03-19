@@ -1,9 +1,9 @@
 "use client";
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useWordsAllQuery } from "@/app/hooks/useWordsAllQuery";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useEffect, useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
 import { Definition, Word } from "@/app/types";
 import { sample, shuffle, take } from "remeda";
 import { useTRPC } from "@/app/trpc/client";
@@ -20,21 +20,48 @@ function isWordWithDefinition(word: Word): word is WordWithDefinition {
 }
 
 function Page() {
+    const trpc = useTRPC();
+    const queryClient = useQueryClient();
     const wordsAll = useWordsAllQuery();
 
     type QuizState = {
         targetWord: Word;
         targetDefinition: Definition;
         definitionVariants: Definition[];
+        stateNext: QuizState | null;
     };
 
     const [quizState, setQuizState] = useState<QuizState | null>(() =>
         getNextQuizState(null),
     );
 
-    function getNextQuizState(prevState: QuizState | null): QuizState | null {
+    function getNextQuizState(
+        prevState: QuizState | null,
+        disableNextStateCalculation?: boolean,
+    ): QuizState | null {
         if (!wordsAll.data) {
             return null;
+        }
+
+        function calcNextInAdvanceAndPrefetch(stateCurrent: QuizState) {
+            const stateNext = getNextQuizState(stateCurrent, true);
+
+            if (stateNext) {
+                queryClient.prefetchQuery(
+                    trpc.getWordTrainingStat.queryOptions({
+                        word: stateNext.targetWord.word,
+                    }),
+                );
+            }
+
+            return stateNext;
+        }
+
+        if (prevState?.stateNext) {
+            const stateNextNext = calcNextInAdvanceAndPrefetch(
+                prevState.stateNext,
+            );
+            return { ...prevState.stateNext, stateNext: stateNextNext };
         }
 
         const wordsWithDefinition = wordsAll.data.filter(isWordWithDefinition);
@@ -79,11 +106,19 @@ function Page() {
                     continue;
                 }
 
-                return {
+                const result: QuizState = {
                     targetWord,
                     targetDefinition,
                     definitionVariants: take(shuffle(potentialDefinitions), 3),
+                    stateNext: null,
                 };
+
+                if (!disableNextStateCalculation) {
+                    const stateNext = calcNextInAdvanceAndPrefetch(result);
+                    result.stateNext = stateNext;
+                }
+
+                return result;
             }
         }
 
@@ -96,9 +131,25 @@ function Page() {
         null,
     );
 
-    const trpc = useTRPC();
     const recordQuizChoice = useMutation(
-        trpc.recordQuizChoice.mutationOptions(),
+        trpc.recordQuizChoice.mutationOptions({
+            onSuccess: (_, { isSuccess }) => {
+                queryClient.setQueryData(
+                    trpc.getWordTrainingStat.queryKey({
+                        word: quizState?.targetWord.word,
+                    }),
+                    (prev) =>
+                        prev
+                            ? {
+                                  successfulAttempts:
+                                      prev.successfulAttempts +
+                                      (isSuccess ? 1 : 0),
+                                  totalAttempts: prev.totalAttempts + 1,
+                              }
+                            : undefined,
+                );
+            },
+        }),
     );
 
     const chooseDefinition = (definition: string) => {
@@ -125,22 +176,45 @@ function Page() {
         [quizState],
     );
 
+    const trainingStat = useQuery(
+        trpc.getWordTrainingStat.queryOptions(
+            {
+                word: quizState?.targetWord.word || "",
+            },
+            { enabled: Boolean(quizState) },
+        ),
+    );
+
     return (
         <>
             <div className="flex flex-col grow gap-2 justify-between">
-                <div className="flex justify-between gap-1 items-baseline">
-                    <h3 className="text-xl inline">
-                        {quizState?.targetWord.word || "no word huh"}
-                    </h3>
-                    <Link
-                        href="/vocabulary"
-                        className={buttonVariants({
-                            variant: "outline",
-                            size: "sm",
-                        })}
+                <div className="flex flex-col gap-1">
+                    <div className="flex justify-between gap-1 items-baseline">
+                        <h3 className="text-xl inline">
+                            {quizState?.targetWord.word || "no word huh"}
+                        </h3>
+                        <Link
+                            href="/vocabulary"
+                            className={buttonVariants({
+                                variant: "outline",
+                                size: "sm",
+                            })}
+                        >
+                            <Home />
+                        </Link>
+                    </div>
+                    <div
+                        className={cn(
+                            "text-sm",
+                            trainingStat.isPending
+                                ? "text-muted-foreground"
+                                : "text-accent-foreground",
+                        )}
                     >
-                        <Home />
-                    </Link>
+                        {trainingStat.data
+                            ? `${trainingStat.data.successfulAttempts}/${trainingStat.data.totalAttempts}`
+                            : "loading..."}
+                    </div>
                 </div>
                 <div className="flex flex-col gap-4">
                     {quizState && (
