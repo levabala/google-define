@@ -8,7 +8,6 @@ import { Definition, Word } from "@/app/types";
 import { sample, shuffle, take } from "remeda";
 import { useTRPC } from "@/app/trpc/client";
 import { Home } from "lucide-react";
-import dynamic from "next/dynamic";
 import { cn } from "@/utils/cn";
 import Link from "next/link";
 
@@ -19,7 +18,7 @@ function isWordWithDefinition(word: Word): word is WordWithDefinition {
     return Boolean(word.ai_definition);
 }
 
-function Page() {
+export default function Page() {
     const trpc = useTRPC();
     const queryClient = useQueryClient();
     const wordsAll = useWordsAllQuery();
@@ -290,4 +289,3 @@ function Page() {
         </>
     );
 }
-export default dynamic(() => Promise.resolve(Page), { ssr: false });
