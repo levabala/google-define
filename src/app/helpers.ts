@@ -1,12 +1,13 @@
 import { Tables } from "@/database.types";
+import { removeNonAlphanumeric } from "./utils";
 
-export function sortWordsAll(wordsAll: Tables<'word'>[]) {
-    return wordsAll.slice().sort((a,b) => {
-        if (a.status === 'LEARNED' && b.status !== 'LEARNED') {
+export function sortWordsAll(wordsAll: Tables<"word">[]) {
+    return wordsAll.slice().sort((a, b) => {
+        if (a.status === "LEARNED" && b.status !== "LEARNED") {
             return 1;
         }
 
-        if (a.status !== 'LEARNED' && b.status === 'LEARNED') {
+        if (a.status !== "LEARNED" && b.status === "LEARNED") {
             return -1;
         }
 
@@ -19,5 +20,13 @@ export function sortWordsAll(wordsAll: Tables<'word'>[]) {
         }
 
         return 0;
-    })
+    });
+}
+
+export function normalizeWord(str: string): string {
+    return removeNonAlphanumeric(str).trim().toLowerCase();
+}
+
+export function areWordsEqual(w1: string, w2: string) {
+    return normalizeWord(w1) === normalizeWord(w2);
 }

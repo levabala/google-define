@@ -33,3 +33,28 @@ export function formatDateRelativeAuto(date: Date, locale = "en") {
         return rtf.format(diffInSeconds, "second");
     }
 }
+
+export function isAlphanumericCharCodeOrDash(charCode: number): boolean {
+    return (
+        (charCode >= 48 && charCode <= 57) || // Numbers 0-9
+        (charCode >= 65 && charCode <= 90) || // Uppercase letters A-Z
+        (charCode >= 97 && charCode <= 122) || // Lowercase letters a-z
+        charCode === 45 // Dash -
+    );
+}
+
+export function removeNonAlphanumeric(str: string): string {
+    let result = "";
+    for (let i = 0; i < str.length; i++) {
+        const char = str[i];
+        const charCode = str.charCodeAt(i);
+
+        if (
+            isAlphanumericCharCodeOrDash(charCode) ||
+            charCode === 32 // Space character
+        ) {
+            result += char;
+        }
+    }
+    return result;
+}
