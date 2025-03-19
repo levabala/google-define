@@ -2,10 +2,10 @@
 
 import { useWordsAllQuery } from "@/app/hooks/useWordsAllQuery";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { randomInteger, sample, shuffle, take } from "remeda";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Definition, Word } from "@/app/types";
+import { sample, shuffle, take } from "remeda";
 import { useTRPC } from "@/app/trpc/client";
 import { Home } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -41,7 +41,9 @@ function Page() {
 
         const potentialWords = prevState
             ? wordsWithDefinition.filter(
-                  (word) => word.word !== prevState.targetWord.word,
+                  (word) =>
+                      word.word !== prevState.targetWord.word &&
+                      word.status !== "LEARNED",
               )
             : wordsWithDefinition;
 
@@ -49,41 +51,43 @@ function Page() {
             return null;
         }
 
-        const targetWord =
-            potentialWords[randomInteger(0, potentialWords.length - 1)];
-        const targetDefinition = sample(targetWord.ai_definition, 1)[0]!;
+        for (const targetWord of shuffle(potentialWords)) {
+            for (const targetDefinition of shuffle(targetWord.ai_definition)) {
+                const potentialDefinitions: Definition[] = [];
+                for (const word of potentialWords) {
+                    if (word === targetWord || !word.ai_definition) {
+                        continue;
+                    }
 
-        const potentialDefinitions: Definition[] = [];
-        for (const word of potentialWords) {
-            if (word === targetWord || !word.ai_definition) {
-                continue;
+                    const definition = sample(
+                        word.ai_definition.filter(
+                            (definitions) =>
+                                definitions.partOfSpeech ===
+                                targetDefinition.partOfSpeech,
+                        ),
+                        1,
+                    )[0];
+
+                    if (!definition) {
+                        continue;
+                    }
+
+                    potentialDefinitions.push(definition);
+                }
+
+                if (!potentialDefinitions.length) {
+                    continue;
+                }
+
+                return {
+                    targetWord,
+                    targetDefinition,
+                    definitionVariants: take(shuffle(potentialDefinitions), 3),
+                };
             }
-
-            const definition = sample(
-                word.ai_definition.filter(
-                    (definitions) =>
-                        definitions.partOfSpeech ===
-                        targetDefinition.partOfSpeech,
-                ),
-                1,
-            )[0];
-
-            if (!definition) {
-                continue;
-            }
-
-            potentialDefinitions.push(definition);
         }
 
-        if (!potentialDefinitions.length) {
-            return null;
-        }
-
-        return {
-            targetWord,
-            targetDefinition,
-            definitionVariants: take(shuffle(potentialDefinitions), 3),
-        };
+        return null;
     }
 
     useEffect(() => console.log(quizState), [quizState]);
