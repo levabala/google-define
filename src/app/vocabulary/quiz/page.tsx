@@ -195,6 +195,7 @@ function Page() {
                         </h3>
                         <Link
                             href="/vocabulary"
+                            shallow
                             className={buttonVariants({
                                 variant: "outline",
                                 size: "sm",

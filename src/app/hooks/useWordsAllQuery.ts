@@ -6,7 +6,11 @@ import { useMemo } from "react";
 export function useWordsAllQuery() {
     const trpc = useTRPC();
 
-    const query = useQuery(trpc.getWordsAll.queryOptions());
+    const query = useQuery(
+        trpc.getWordsAll.queryOptions(undefined, {
+            refetchOnMount: false,
+        }),
+    );
 
     return useMemo(() => {
         return {

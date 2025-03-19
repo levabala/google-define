@@ -51,6 +51,7 @@ export const CurrentWordLayout: React.FC<
                         size: "sm",
                     })}
                     href="/vocabulary/quiz"
+                    shallow
                 >
                     quiz
                 </Link>
