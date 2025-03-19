@@ -1,7 +1,14 @@
 "use client";
 
+import {
+    Attributes,
+    Fragment,
+    JSX,
+    useEffect,
+    useLayoutEffect,
+    useMemo,
+} from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Attributes, Fragment, JSX, useEffect, useLayoutEffect, useMemo } from "react";
 import { AI_DEFINITION_EXPIRATION_DURATION_MS } from "./constants";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { Toggle, ToggleProps } from "@/components/ui/toggle";
@@ -70,9 +77,9 @@ function isAlphanumericCharCodeOrDash(charCode: number): boolean {
     return (
         (charCode >= 48 && charCode <= 57) || // Numbers 0-9
         (charCode >= 65 && charCode <= 90) || // Uppercase letters A-Z
-        (charCode >= 97 && charCode <= 122) ||
+        (charCode >= 97 && charCode <= 122) || // Lowercase letters a-z
         charCode === 45 // Dash -
-    ); // Lowercase letters a-z
+    );
 }
 
 function removeNonAlphanumeric(str: string): string {
@@ -340,7 +347,11 @@ const CurrentWordLayout: React.FC<
                 >
                     learned
                 </Toggle>
-                <Button variant="default" size="sm" {...requestAIDefinitionButtonProps}>
+                <Button
+                    variant="default"
+                    size="sm"
+                    {...requestAIDefinitionButtonProps}
+                >
                     update
                 </Button>
                 <Button variant="destructive" size="sm" {...deleteButtonProps}>
@@ -434,7 +445,8 @@ const CurrentWord: React.FC<{ word: Tables<"word"> } & Attributes> = ({
                 isLoading: deleteWord.isPending,
             }}
             requestAIDefinitionButtonProps={{
-                onClick: () => requestAIDefinition.mutate({ wordStr: word.word }),
+                onClick: () =>
+                    requestAIDefinition.mutate({ wordStr: word.word }),
                 isLoading: requestAIDefinition.isPending,
                 disabled: !word.ai_definition,
             }}
