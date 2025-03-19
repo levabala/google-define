@@ -10,7 +10,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     }
 
     try {
-        const ctx = await createTRPCContext({ req });
+        const ctx = await createTRPCContext();
         const router = appRouter.createCaller(ctx);
 
         await router.addWord({ value: word });
