@@ -193,6 +193,7 @@ export default function Page() {
                             {quizState?.targetWord.word || "no word huh"}
                         </h3>
                         <Link
+                            prefetch
                             href="/vocabulary"
                             shallow
                             className={buttonVariants({
