@@ -1,24 +1,18 @@
 "use client";
 import { WordDefinition } from "./WordDefinition";
-import { DefinitionSchema } from "../types";
-import { Json } from "@/database.types";
-import { type } from "arktype";
+import { Definition } from "../types";
 
-export const WordDefinitionsAI: React.FC<{ definitionRaw: Json }> = ({
-    definitionRaw,
-}) => {
-    const definitionList = DefinitionSchema.array()(definitionRaw);
-
-    if (definitionList instanceof type.errors) {
-        return <div className="text-muted">invalid definition</div>;
-    }
-
+export const WordDefinitionsAI: React.FC<{
+    definitions: Definition[];
+    shouldShowPronounciations: boolean;
+}> = ({ definitions, shouldShowPronounciations }) => {
     return (
         <div className="flex flex-col gap-2 grow">
-            {definitionList.map((definition) => (
+            {definitions.map((definition) => (
                 <WordDefinition
                     key={definition.definition + definition.partOfSpeech}
                     definition={definition}
+                    showTranscription={shouldShowPronounciations}
                 />
             ))}
         </div>

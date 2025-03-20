@@ -25,14 +25,14 @@ export const CurrentWord: React.FC<{ word: Word } & Attributes> = ({
 
     const requestAIDefinition = useMutation(
         trpc.requestAIDefinition.mutationOptions({
-            onSuccess: (wordUpdated) => {
+            onSuccess: (ai_definition) => {
                 queryClient.setQueryData(trpc.getWordsAll.queryKey(), (prev) =>
                     prev?.map((wordInner) => {
                         if (!areWordsEqual(wordInner.word, word.word)) {
                             return wordInner;
                         }
 
-                        return wordUpdated;
+                        return { ...wordInner, ai_definition };
                     }),
                 );
             },
@@ -84,10 +84,29 @@ export const CurrentWord: React.FC<{ word: Word } & Attributes> = ({
         word.word,
     ]);
 
+    const pronunciationsUnique = word.ai_definition
+        ?.filter((def) => def.pronunciation)
+        .map((def) => def.pronunciation)
+        ?.reduce((acc, pron) => {
+            if (!pron) {
+                return acc;
+            }
+
+            acc.add(pron);
+
+            return acc;
+        }, new Set<string>());
+
+    const pronunciationMain =
+        pronunciationsUnique?.size === 1
+            ? pronunciationsUnique.values().next().value!
+            : undefined;
+
     return (
         <CurrentWordLayout
             wordStr={word.word}
             addDate={new Date(word.created_at)}
+            pronunciation={pronunciationMain}
             deleteButtonProps={{
                 onClick: () => deleteWord.mutate({ word: word.word }),
                 isLoading: deleteWord.isPending,
@@ -109,7 +128,10 @@ export const CurrentWord: React.FC<{ word: Word } & Attributes> = ({
             }}
         >
             {word.ai_definition ? (
-                <WordDefinitionsAI definitionRaw={word.ai_definition} />
+                <WordDefinitionsAI
+                    definitions={word.ai_definition}
+                    shouldShowPronounciations={!pronunciationMain}
+                />
             ) : (
                 <div className="flex justify-center items-center grow">
                     <Button

@@ -1,69 +1,26 @@
-import throttle from "lodash.throttle";
+import { RateLimiter } from "./utils/rateLimiter";
 import { OpenAI } from "openai";
 
-// Rate limiting configuration
-export const MINUTE_LIMIT = 30; // Max calls per minute
-export const HOUR_LIMIT = 200; // Max calls per hour
-export const MINUTE_MS = 60000; // Milliseconds in a minute
-export const HOUR_MS = 3600000; // Milliseconds in an hour
-export const THROTTLE_MS = 500; // Throttle delay in milliseconds
+const rateLimiter = new RateLimiter(4, 1000);
 
-// Track call history (exported for testing)
-export const callHistory: number[] = [];
+type CreateParams = Parameters<
+    InstanceType<typeof OpenAI>["chat"]["completions"]["create"]
+>;
 
-function checkRateLimit(): { allowed: boolean; retryAfter?: number } {
-    const now = Date.now();
+export async function ai(...args: CreateParams) {
+    const openai = new OpenAI({
+        baseURL: "https://openrouter.ai/api/v1",
+        apiKey: process.env.OPENROUTER_API_KEY,
+    });
 
-    // Remove calls older than 1 hour
-    while (callHistory.length > 0 && callHistory[0] < now - HOUR_MS) {
-        callHistory.shift();
+    if (!rateLimiter.allowRequest()) {
+        throw new Error("rate limited");
     }
 
-    // Count calls in last minute
-    const minuteCount = callHistory.filter((t) => t > now - MINUTE_MS).length;
-
-    // Check limits
-    if (callHistory.length >= HOUR_LIMIT) {
-        const retryAfter = HOUR_MS - (now - callHistory[0]);
-        return { allowed: false, retryAfter };
-    }
-    if (minuteCount >= MINUTE_LIMIT) {
-        const retryAfter =
-            MINUTE_MS - (now - callHistory[callHistory.length - MINUTE_LIMIT]);
-        return { allowed: false, retryAfter };
-    }
-
-    // Add current call to history
-    callHistory.push(now);
-    return { allowed: true };
-}
-
-type CreateParams = Parameters<typeof openai.chat.completions.create>;
-
-let openai: OpenAI;
-async function callAIInternal(...args: CreateParams) {
-    if (!openai) {
-        openai = new OpenAI({
-            baseURL: "https://openrouter.ai/api/v1",
-            apiKey: process.env.OPENROUTER_API_KEY,
-        });
-    }
-
-    const { allowed, retryAfter } = checkRateLimit();
-    if (!allowed) {
-        const error = new Error(
-            `Rate limit exceeded. Try again in ${Math.ceil((retryAfter || 0) / 1000)} seconds`,
-        );
-        error.name = "RateLimitError";
-        throw error;
-    }
-
+    const start = Date.now();
     console.log("hit ai api");
-    return await openai.chat.completions.create(...args);
-}
+    const res = await openai.chat.completions.create(...args);
+    console.log("ai api has responded", `${Date.now() - start}ms`);
 
-// Throttle to 1 call every 500ms
-export const ai = throttle(callAIInternal, THROTTLE_MS, {
-    leading: true,
-    trailing: false,
-});
+    return res;
+}

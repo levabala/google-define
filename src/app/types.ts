@@ -3,6 +3,7 @@ import { type } from "arktype";
 export const DefinitionSchema = type({
     definition: "string",
     partOfSpeech: "string",
+    pronunciation: "string?",
     examples: "string[]",
 });
 

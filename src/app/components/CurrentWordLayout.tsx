@@ -8,6 +8,7 @@ import Link from "next/link";
 export const CurrentWordLayout: React.FC<
     {
         wordStr: string;
+        pronunciation?: string;
         addDate?: Date;
         deleteButtonProps: ButtonProps;
         requestAIDefinitionButtonProps: ButtonProps;
@@ -15,6 +16,7 @@ export const CurrentWordLayout: React.FC<
     } & React.PropsWithChildren
 > = ({
     children,
+    pronunciation,
     addDate,
     wordStr,
     deleteButtonProps,
@@ -24,12 +26,17 @@ export const CurrentWordLayout: React.FC<
     return (
         <div className="flex grow flex-col gap-1 overflow-hidden">
             <div className="flex items-baseline gap-2 justify-between">
-                <span>
+                <div className="flex gap-1 items-baseline">
                     <h3 className="text-xl inline">{wordStr}</h3>
-                    <span className="text-xs text-muted-foreground ml-2 whitespace-nowrap">
+                    {pronunciation ? (
+                        <span className="text-muted-foreground whitespace-nowrap">
+                            {pronunciation}
+                        </span>
+                    ) : null}
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">
                         {addDate && formatDateRelativeAuto(addDate)}
                     </span>
-                </span>
+                </div>
                 <Link
                     href="/vocabulary"
                     className={cn(
