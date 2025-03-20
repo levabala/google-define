@@ -38,6 +38,7 @@ export const CurrentWordLayout: React.FC<
                     </span>
                 </div>
                 <Link
+                    prefetch
                     href="/vocabulary"
                     className={cn(
                         buttonVariants({
@@ -53,6 +54,7 @@ export const CurrentWordLayout: React.FC<
             <div className="flex flex-col grow overflow-auto">{children}</div>
             <div className="flex justify-between gap-1">
                 <Link
+                    prefetch
                     className={buttonVariants({
                         variant: "default",
                         size: "sm",
