@@ -6,8 +6,8 @@ loadEnvConfig(process.cwd());
 const nextConfig: NextConfig = {
     experimental: {
         staleTimes: {
-            dynamic: Infinity,
-            static: Infinity,
+            dynamic: 99999999,
+            static: 99999999,
         },
     },
     logging: {
