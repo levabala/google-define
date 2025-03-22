@@ -146,25 +146,29 @@ export const appRouter = createTRPCRouter({
             const { userLogin: user, supabase } = opts.ctx;
             const { value, shouldFetchAIDefinition } = opts.input;
 
-            const { data: wordExisting } = await supabase
-                .from("word")
+            const [wordExisting] = await db
                 .select()
-                .eq("word", value)
-                .eq("user", user)
-                .maybeSingle();
+                .from(wordTable)
+                .where(
+                    and(
+                        eq(wordTable.word, value),
+                        eq(wordTable.user, user)
+                    )
+                )
+                .limit(1);
 
             if (wordExisting) {
                 if (wordExisting.status === "HIDDEN") {
-                    const { data: wordExistingRecovered, error } =
-                        await supabase
-                            .from("word")
-                            .update({
-                                status: "NONE",
-                            })
-                            .eq("word", wordExisting.word)
-                            .eq("user", user)
-                            .select()
-                            .single();
+                    const [wordExistingRecovered] = await db
+                        .update(wordTable)
+                        .set({ status: "NONE" })
+                        .where(
+                            and(
+                                eq(wordTable.word, wordExisting.word),
+                                eq(wordTable.user, user)
+                            )
+                        )
+                        .returning();
 
                     if (error) {
                         throw new Error("failed to add the word");
@@ -183,16 +187,15 @@ export const appRouter = createTRPCRouter({
                 throw new Error("the word is already added");
             }
 
-            const { data: wordCreated } = await supabase
-                .from("word")
-                .insert({
+            const [wordCreated] = await db
+                .insert(wordTable)
+                .values({
                     word: value,
                     raw: {},
                     status: "NONE",
                     user,
                 })
-                .select()
-                .single();
+                .returning();
 
             if (shouldFetchAIDefinition) {
                 updateAIDefinition(opts.ctx, value);
@@ -215,26 +218,31 @@ export const appRouter = createTRPCRouter({
             const { userLogin: user, supabase } = opts.ctx;
             const { word, isLearned } = opts.input;
 
-            const { data: wordExisting } = await supabase
-                .from("word")
+            const [wordExisting] = await db
                 .select()
-                .eq("word", word)
-                .eq("user", user)
-                .maybeSingle();
+                .from(wordTable)
+                .where(
+                    and(
+                        eq(wordTable.word, word),
+                        eq(wordTable.user, user)
+                    )
+                )
+                .limit(1);
 
             if (!wordExisting) {
                 throw new Error("the word doesnt exist");
             }
 
-            const { data: wordUpdated, error } = await supabase
-                .from("word")
-                .update({
-                    status: isLearned ? "LEARNED" : "TO_LEARN",
-                })
-                .eq("word", word)
-                .eq("user", user)
-                .select()
-                .single();
+            const [wordUpdated] = await db
+                .update(wordTable)
+                .set({ status: isLearned ? "LEARNED" : "TO_LEARN" })
+                .where(
+                    and(
+                        eq(wordTable.word, word),
+                        eq(wordTable.user, user)
+                    )
+                )
+                .returning();
 
             if (error) {
                 throw new Error("failed to update the word");
@@ -263,13 +271,15 @@ export const appRouter = createTRPCRouter({
                 throw new Error("the word doesnt exist");
             }
 
-            const { error } = await supabase
-                .from("word")
-                .update({
-                    status: "HIDDEN",
-                })
-                .eq("word", word)
-                .eq("user", user);
+            await db
+                .update(wordTable)
+                .set({ status: "HIDDEN" })
+                .where(
+                    and(
+                        eq(wordTable.word, word),
+                        eq(wordTable.user, user)
+                    )
+                );
 
             if (error) {
                 throw new Error("failed to delete the word");
@@ -308,17 +318,25 @@ export const appRouter = createTRPCRouter({
 
             const [totalAttemptsResult, successfulAttemptsResult] =
                 await Promise.all([
-                    supabase
-                        .from("training")
-                        .select("*", { count: "exact" })
-                        .eq("word", word)
-                        .eq("user", user),
-                    supabase
-                        .from("training")
-                        .select("*", { count: "exact" })
-                        .eq("word", word)
-                        .eq("user", user)
-                        .eq("is_success", true),
+                    db
+                        .select({ count: sql<number>`count(*)` })
+                        .from(trainingTable)
+                        .where(
+                            and(
+                                eq(trainingTable.word, word),
+                                eq(trainingTable.user, user)
+                            )
+                        ),
+                    db
+                        .select({ count: sql<number>`count(*)` })
+                        .from(trainingTable)
+                        .where(
+                            and(
+                                eq(trainingTable.word, word),
+                                eq(trainingTable.user, user),
+                                eq(trainingTable.is_success, true)
+                            )
+                        ),
                 ]);
 
             if (totalAttemptsResult.error || successfulAttemptsResult.error) {
@@ -362,7 +380,7 @@ export const appRouter = createTRPCRouter({
                 throw new Error("the word doesnt exist");
             }
 
-            const { error } = await supabase.from("training").insert({
+            await db.insert(trainingTable).values({
                 word,
                 definition,
                 user,
