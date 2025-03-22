@@ -25,14 +25,14 @@ export const CurrentWord: React.FC<{ word: Word } & Attributes> = ({
 
     const requestAIDefinition = useMutation(
         trpc.requestAIDefinition.mutationOptions({
-            onSuccess: (ai_definition) => {
+            onSuccess: (aiDefinition) => {
                 queryClient.setQueryData(trpc.getWordsAll.queryKey(), (prev) =>
                     prev?.map((wordInner) => {
                         if (!areWordsEqual(wordInner.word, word.word)) {
                             return wordInner;
                         }
 
-                        return { ...wordInner, ai_definition };
+                        return { ...wordInner, aiDefinition };
                     }),
                 );
             },
