@@ -1,7 +1,7 @@
 import { baseProcedure, Context, createTRPCRouter } from "../init";
 import { DefinitionSchema, WordSchema } from "@/app/types";
 import { trainingTable, wordTable } from "@/db/schema";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, not, and, sql } from "drizzle-orm";
 import { type } from "arktype";
 import { ai } from "@/ai";
 import { db } from "@/db";
@@ -222,16 +222,6 @@ export const appRouter = createTRPCRouter({
             const { userLogin: user } = opts.ctx;
             const { word } = opts.input;
 
-            const [wordExisting] = await db
-                .select()
-                .from(wordTable)
-                .where(and(eq(wordTable.word, word), eq(wordTable.user, user)))
-                .limit(1);
-
-            if (!wordExisting) {
-                throw new Error("the word doesnt exist");
-            }
-
             await db
                 .update(wordTable)
                 .set({ status: "HIDDEN" })
@@ -254,7 +244,12 @@ export const appRouter = createTRPCRouter({
         const wordsList = await db
             .select()
             .from(wordTable)
-            .where(eq(wordTable.user, user));
+            .where(
+                and(
+                    eq(wordTable.user, user),
+                    not(eq(wordTable.status, "HIDDEN")),
+                ),
+            );
 
         if (!wordsList) {
             throw new Error("unexpected");
