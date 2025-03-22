@@ -46,17 +46,14 @@ async function parseAiResponse(
 }
 
 async function updateAIDefinition(ctx: Context, wordStr: string) {
-    db.update(wordTable)
-        .set({ 
-            ai_definition_request_start_date: new Date().toISOString() 
+    ctx.supabase
+        .from("word")
+        .update({
+            ai_definition_request_start_date: new Date().toISOString(),
         })
-        .where(and(
-            eq(wordTable.word, wordStr), 
-            eq(wordTable.user, ctx.userLogin)
-        ))
-        .execute()
-        .then((result) => {
-            const error = result[0].error;
+        .eq("word", wordStr)
+        .eq("user", ctx.userLogin)
+        .then(({ error }) => {
             if (error) {
                 console.error(
                     "failed to update ai_definition_request_start_date",
@@ -92,17 +89,14 @@ async function updateAIDefinition(ctx: Context, wordStr: string) {
         JSON.parse(content)?.definitions,
     );
 
-    db.update(wordTable)
-        .set({ 
-            ai_definition: aiDefinition 
+    ctx.supabase
+        .from("word")
+        .update({
+            ai_definition: aiDefinition,
         })
-        .where(and(
-            eq(wordTable.word, wordStr), 
-            eq(wordTable.user, ctx.userLogin)
-        ))
-        .execute()
-        .then((result) => {
-            const error = result[0].error;
+        .eq("word", wordStr)
+        .eq("user", ctx.userLogin)
+        .then(({ error }) => {
             if (error) {
                 console.error(error);
             }
@@ -122,16 +116,15 @@ async function updateAIDefinition(ctx: Context, wordStr: string) {
             JSON.parse(content)?.definitions,
         );
 
-        const [updatedWord] = await db
-            .update(wordTable)
-            .set({ 
-                ai_definition: aiDefinition 
+        const { error: errorUpdateAIDefinition } = await ctx.supabase
+            .from("word")
+            .update({
+                ai_definition: aiDefinition,
             })
-            .where(and(
-                eq(wordTable.word, wordStr), 
-                eq(wordTable.user, ctx.userLogin)
-            ))
-            .returning();
+            .eq("word", wordStr)
+            .eq("user", ctx.userLogin)
+            .select()
+            .single();
 
         if (errorUpdateAIDefinition) {
             console.error(`Database error: ${errorUpdateAIDefinition.message}`);
@@ -244,14 +237,12 @@ export const appRouter = createTRPCRouter({
             const { userLogin: user, supabase } = opts.ctx;
             const { word } = opts.input;
 
-            const [wordExisting] = await db
+            const { data: wordExisting } = await supabase
+                .from("word")
                 .select()
-                .from(wordTable)
-                .where(and(
-                    eq(wordTable.word, word), 
-                    eq(wordTable.user, user)
-                ))
-                .limit(1);
+                .eq("word", word)
+                .eq("user", user)
+                .maybeSingle();
 
             if (!wordExisting) {
                 throw new Error("the word doesnt exist");
