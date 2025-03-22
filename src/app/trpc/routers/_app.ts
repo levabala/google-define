@@ -2,6 +2,7 @@ import { baseProcedure, Context, createTRPCRouter } from "../init";
 import { DefinitionSchema, WordSchema } from "@/app/types";
 import { trainingTable, wordTable } from "@/db/schema";
 import { eq, not, and, sql } from "drizzle-orm";
+import { logger } from "../logger";
 import { type } from "arktype";
 import { ai } from "@/ai";
 import { db } from "@/db";
@@ -74,7 +75,8 @@ async function updateAIDefinition(ctx: Context, wordStr: string) {
         throw new Error("No content received from AI");
     }
 
-    console.log("raw ai response:", content);
+    logger.verbose("raw ai response", { content: JSON.parse(content) });
+    logger.info("json ai response", { content: JSON.parse(content) });
 
     const aiDefinition = DefinitionSchema.array().assert(
         JSON.parse(content)?.definitions,
@@ -93,11 +95,14 @@ async function updateAIDefinition(ctx: Context, wordStr: string) {
         const content = await parseAiResponse(res);
 
         if (!content) {
-            console.error("No content received from AI for the long request");
+            logger.error("No content received from AI for the long request");
             return;
         }
 
-        console.log("raw long ai response:", content);
+        logger.verbose("raw long ai response", {
+            content: JSON.parse(content),
+        });
+        logger.info("json long ai response", { content: JSON.parse(content) });
 
         const aiDefinition = DefinitionSchema.array().assert(
             JSON.parse(content)?.definitions,
@@ -328,8 +333,10 @@ export const appRouter = createTRPCRouter({
 function parseWord(word: object) {
     const wordResult = WordSchema.omit("aiDefinition")(word);
     if (wordResult instanceof type.errors) {
-        console.log(word);
-        console.error(wordResult.summary);
+        logger.error("error parsing the word", {
+            word,
+            summary: wordResult.summary,
+        });
         throw new Error("word parse error", { cause: wordResult });
     }
 

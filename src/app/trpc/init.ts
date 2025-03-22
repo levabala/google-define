@@ -1,9 +1,12 @@
+import { logger, createRequestIdFormat } from "./logger";
 import { NextRequest } from "next/server";
 import { initTRPC } from "@trpc/server";
 import { cookies } from "next/headers";
 import superjson from "superjson";
 import { getUser } from "@/auth";
+import winston from "winston";
 import { cache } from "react";
+import { v4 } from "uuid";
 
 export const createTRPCContext = cache(async () => {
     const cook = await cookies();
@@ -27,12 +30,22 @@ const t = initTRPC.context<Context>().create({
     transformer: superjson,
 });
 
-const logger = t.middleware(async ({ path, type, next, ctx }) => {
+const loggerMiddleware = t.middleware(async ({ path, type, next, ctx }) => {
+    const requestId = v4();
+
+    logger.format = winston.format.combine(
+        winston.format.timestamp(),
+        createRequestIdFormat(requestId), // Create format WITH requestId
+    );
+
     const start = Date.now();
     console.log(`[${type}] ${path} hit`); // Log just the path and type
 
     const result = await next({
-        ctx,
+        ctx: {
+            ...ctx,
+            requestId,
+        },
     });
 
     const durationMs = Date.now() - start;
@@ -43,4 +56,4 @@ const logger = t.middleware(async ({ path, type, next, ctx }) => {
 // Base router and procedure helpers
 export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
-export const baseProcedure = t.procedure.use(logger);
+export const baseProcedure = t.procedure.use(loggerMiddleware);
