@@ -1,6 +1,6 @@
 import { ButtonProps, Button, buttonVariants } from "@/components/ui/button";
+import { formatDateRelativeAuto, generateRandomWord } from "../utils";
 import { Toggle, ToggleProps } from "@/components/ui/toggle";
-import { formatDateRelativeAuto } from "../utils";
 import { Home } from "lucide-react";
 import { cn } from "@/utils/cn";
 import Link from "next/link";
@@ -59,7 +59,10 @@ export const CurrentWordLayout: React.FC<
                         variant: "default",
                         size: "sm",
                     })}
-                    href="/vocabulary/quiz"
+                    href={
+                        "/vocabulary/training/quiz?seed=" +
+                        generateRandomWord(6)
+                    }
                     shallow
                 >
                     quiz

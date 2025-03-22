@@ -9,7 +9,10 @@ export function formatDateRelativeAuto(date: Date, locale = "en") {
     const now = new Date();
     const diffInSeconds = Math.round((date.valueOf() - now.valueOf()) / 1000);
 
-    const rtf = new Intl.RelativeTimeFormat(locale, { style: 'short', numeric: "auto" });
+    const rtf = new Intl.RelativeTimeFormat(locale, {
+        style: "short",
+        numeric: "auto",
+    });
 
     if (Math.abs(diffInSeconds) >= SECONDS_IN_YEAR) {
         return rtf.format(Math.round(diffInSeconds / SECONDS_IN_YEAR), "year");
@@ -56,5 +59,29 @@ export function removeNonAlphanumeric(str: string): string {
             result += char;
         }
     }
+    return result;
+}
+
+export function generateRandomWord(length: number): string {
+    if (length <= 0) return "";
+
+    const consonants: string[] = "bcdfghjklmnpqrstvwxyz".split("");
+    const vowels: string[] = "aeiou".split("");
+
+    let result = "";
+
+    // Start with a consonant or vowel at random.
+    let useConsonant = Math.random() < 0.5;
+
+    for (let i = 0; i < length; i++) {
+        if (useConsonant) {
+            result += consonants[Math.floor(Math.random() * consonants.length)];
+        } else {
+            result += vowels[Math.floor(Math.random() * vowels.length)];
+        }
+        // Alternate letter type for a word-like pattern.
+        useConsonant = !useConsonant;
+    }
+
     return result;
 }

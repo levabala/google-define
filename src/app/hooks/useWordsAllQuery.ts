@@ -12,10 +12,14 @@ export function useWordsAllQuery() {
         }),
     );
 
+    const data = useMemo(() => {
+        return query.data ? sortWordsAll(query.data) : query.data;
+    }, [query.data]);
+
     return useMemo(() => {
         return {
             ...query,
-            data: query.data ? sortWordsAll(query.data) : query.data,
+            data,
         };
-    }, [query]);
+    }, [query, data]);
 }

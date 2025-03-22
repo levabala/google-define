@@ -1,7 +1,7 @@
 import { baseProcedure, Context, createTRPCRouter } from "../init";
 import { DefinitionSchema, WordSchema } from "@/app/types";
+import { eq, not, and, sql, gte, lte } from "drizzle-orm";
 import { trainingTable, wordTable } from "@/db/schema";
-import { eq, not, and, sql } from "drizzle-orm";
 import { logger } from "../logger";
 import { type } from "arktype";
 import { ai } from "@/ai";
@@ -188,6 +188,128 @@ export const appRouter = createTRPCRouter({
 
             return parseWord(wordCreated);
         }),
+    pickWordsToTrain: baseProcedure
+        .input(
+            type({
+                seed: "string",
+                wordsCountSets: {
+                    learned: "number",
+                    sets: type({
+                        count: "number",
+                        successRateMin: "number?",
+                        successRateMax: "number?",
+                        triesMin: "number?",
+                        triesMax: "number?",
+                    })
+                        .array()
+                        .atMostLength(10),
+                },
+            }).assert,
+        )
+        .query(async (opts) => {
+            const { userLogin } = opts.ctx;
+            const { seed, wordsCountSets } = opts.input;
+            console.log({ wordsCountSets });
+
+            const trainingStatByWord = db.$with("training_start_by_word").as(
+                db
+                    .select({
+                        word: trainingTable.word,
+                        successCount: sql<number>`
+                        count(case when ${trainingTable.isSuccess} = true then 1 else null end)::int
+                    `.as("success_count"),
+                        totalCount: sql<number>`count(*)::int`.as(
+                            "total_count",
+                        ),
+                    })
+                    .from(trainingTable)
+                    .where(eq(trainingTable.user, userLogin))
+                    .groupBy(trainingTable.word),
+            );
+
+            const learnedWordPromise = wordsCountSets.learned
+                ? db
+                      .with(trainingStatByWord)
+                      .select({
+                          word: trainingStatByWord.word,
+                          successCount: trainingStatByWord.successCount,
+                          totalCount: trainingStatByWord.totalCount,
+                          successRate:
+                              sql<number>`${trainingStatByWord.successCount}::float8 / ${trainingStatByWord.totalCount}`.as(
+                                  "success_rate",
+                              ),
+                      })
+                      .from(trainingStatByWord)
+                      .leftJoin(
+                          wordTable,
+                          eq(trainingStatByWord.word, wordTable.word),
+                      )
+                      .where(
+                          and(
+                              eq(wordTable.status, "LEARNED"),
+                              eq(wordTable.user, userLogin),
+                          ),
+                      )
+                      .limit(wordsCountSets.learned)
+                : null;
+
+            const wordSetsToTrain = await Promise.all([
+                learnedWordPromise,
+                ...wordsCountSets.sets.map((set) => {
+                    return db
+                        .with(trainingStatByWord)
+                        .select({
+                            word: trainingStatByWord.word,
+                            successCount: trainingStatByWord.successCount,
+                            totalCount: trainingStatByWord.totalCount,
+                            successRate:
+                                sql<number>`${trainingStatByWord.successCount}::float8 / ${trainingStatByWord.totalCount}`.as(
+                                    "success_rate",
+                                ),
+                        })
+                        .from(trainingStatByWord)
+                        .leftJoin(
+                            wordTable,
+                            eq(trainingStatByWord.word, wordTable.word),
+                        )
+                        .where(
+                            and(
+                                eq(wordTable.user, userLogin),
+                                set.successRateMin === undefined
+                                    ? undefined
+                                    : gte(
+                                          sql<number>`${trainingStatByWord.successCount}::float8 / ${trainingStatByWord.totalCount}`,
+                                          set.successRateMin,
+                                      ),
+                                set.successRateMax === undefined
+                                    ? undefined
+                                    : lte(
+                                          sql<number>`${trainingStatByWord.successCount}::float8 / ${trainingStatByWord.totalCount}`,
+                                          set.successRateMax,
+                                      ),
+                                set.triesMin === undefined
+                                    ? undefined
+                                    : gte(
+                                          trainingStatByWord.totalCount,
+                                          set.triesMin,
+                                      ),
+                                set.triesMax === undefined
+                                    ? undefined
+                                    : lte(
+                                          trainingStatByWord.totalCount,
+                                          set.triesMax,
+                                      ),
+                            ),
+                        )
+                        .orderBy(sql`md5(md5(${seed}) || ${wordTable.word})`)
+                        .limit(Math.min(set.count, 10));
+                }),
+            ]);
+
+            console.log("wordSetsToTrain", wordSetsToTrain);
+
+            return wordSetsToTrain.flat();
+        }),
     wordUpdateIfLearned: baseProcedure
         .input(
             type({
@@ -271,7 +393,7 @@ export const appRouter = createTRPCRouter({
             const [[totalAttemptsResult], [successfulAttemptsResult]] =
                 await Promise.all([
                     db
-                        .select({ count: sql<number>`count(*)` })
+                        .select({ count: sql<number>`count(*)::int` })
                         .from(trainingTable)
                         .where(
                             and(
@@ -280,7 +402,7 @@ export const appRouter = createTRPCRouter({
                             ),
                         ),
                     db
-                        .select({ count: sql<number>`count(*)` })
+                        .select({ count: sql<number>`count(*)::int` })
                         .from(trainingTable)
                         .where(
                             and(
