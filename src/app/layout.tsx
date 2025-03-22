@@ -28,7 +28,6 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    console.log("------- root layout");
     const queryClient = getQueryClient();
 
     await queryClient.prefetchQuery(trpc.getWordsAll.queryOptions());

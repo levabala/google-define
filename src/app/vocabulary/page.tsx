@@ -15,8 +15,6 @@ import { useQueryState } from "nuqs";
 import { Word } from "../types";
 
 export default function Main() {
-    console.log('------- vocabulary page', typeof window);
-
     const { setShouldRequestAIDefinition } =
         useShouldRequestAIDefinitionQueryState();
     const [shouldInvalidate, setShouldInvalidate] = useQueryState("invalidate");
