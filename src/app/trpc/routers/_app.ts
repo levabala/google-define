@@ -56,15 +56,7 @@ async function updateAIDefinition(ctx: Context, wordStr: string) {
                 eq(wordTable.word, wordStr),
                 eq(wordTable.user, ctx.userLogin)
             )
-        )
-        .catch((error) => {
-            console.error(
-                "failed to update aiDefinitionRequestStartDate",
-                {
-                    cause: error,
-                },
-            );
-        });
+        );
 
     const [aiResponseFast, aiResponseLong] = [
         ai({
@@ -101,10 +93,7 @@ async function updateAIDefinition(ctx: Context, wordStr: string) {
                 eq(wordTable.word, wordStr),
                 eq(wordTable.user, ctx.userLogin)
             )
-        )
-        .catch((error) => {
-            console.error(error);
-        });
+        );
 
     aiResponseLong.then(async (res) => {
         const content = await parseAiResponse(res);
@@ -120,7 +109,7 @@ async function updateAIDefinition(ctx: Context, wordStr: string) {
             JSON.parse(content)?.definitions,
         );
 
-        const [updatedWord] = await db
+        await db
             .update(wordTable)
             .set({
                 aiDefinition: aiDefinition,
@@ -130,12 +119,7 @@ async function updateAIDefinition(ctx: Context, wordStr: string) {
                     eq(wordTable.word, wordStr),
                     eq(wordTable.user, ctx.userLogin)
                 )
-            )
-            .returning();
-
-        if (errorUpdateAIDefinition) {
-            console.error(`Database error: ${errorUpdateAIDefinition.message}`);
-        }
+            );
     });
 
     return aiDefinition;
@@ -241,7 +225,7 @@ export const appRouter = createTRPCRouter({
             }).assert,
         )
         .mutation(async (opts) => {
-            const { userLogin: user, supabase } = opts.ctx;
+            const { userLogin: user } = opts.ctx;
             const { word } = opts.input;
 
             const [wordExisting] = await db
@@ -335,7 +319,7 @@ export const appRouter = createTRPCRouter({
             }).assert,
         )
         .mutation(async (opts) => {
-            const { userLogin: user, supabase } = opts.ctx;
+            const { userLogin: user } = opts.ctx;
             const { word, definition, isSuccess } = opts.input;
 
             const [wordExisting] = await db
