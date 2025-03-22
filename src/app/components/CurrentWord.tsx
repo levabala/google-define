@@ -64,11 +64,11 @@ export const CurrentWord: React.FC<{ word: Word } & Attributes> = ({
         }),
     );
 
-    const timePast = word.ai_definition_request_start_date
-        ? Date.now() - new Date(word.ai_definition_request_start_date).valueOf()
+    const timePast = word.aiDefinitionRequestStartDate
+        ? Date.now() - new Date(word.aiDefinitionRequestStartDate).valueOf()
         : null;
     const aiRequestAlreadyPending =
-        !word.ai_definition &&
+        !word.aiDefinition &&
         !!timePast &&
         timePast < AI_DEFINITION_EXPIRATION_DURATION_MS;
 
@@ -84,7 +84,7 @@ export const CurrentWord: React.FC<{ word: Word } & Attributes> = ({
         word.word,
     ]);
 
-    const pronunciationsUnique = word.ai_definition
+    const pronunciationsUnique = word.aiDefinition
         ?.filter((def) => def.pronunciation)
         .map((def) => def.pronunciation)
         ?.reduce((acc, pron) => {
@@ -105,7 +105,7 @@ export const CurrentWord: React.FC<{ word: Word } & Attributes> = ({
     return (
         <CurrentWordLayout
             wordStr={word.word}
-            addDate={new Date(word.created_at)}
+            addDate={new Date(word.createdAt)}
             pronunciation={pronunciationMain}
             deleteButtonProps={{
                 onClick: () => deleteWord.mutate({ word: word.word }),
@@ -115,7 +115,7 @@ export const CurrentWord: React.FC<{ word: Word } & Attributes> = ({
                 onClick: () =>
                     requestAIDefinition.mutate({ wordStr: word.word }),
                 isLoading: requestAIDefinition.isPending,
-                disabled: !word.ai_definition,
+                disabled: !word.aiDefinition,
             }}
             wordUpdateIfLearnedProps={{
                 onClick: () =>
@@ -127,9 +127,9 @@ export const CurrentWord: React.FC<{ word: Word } & Attributes> = ({
                 pressed: word.status === "LEARNED",
             }}
         >
-            {word.ai_definition ? (
+            {word.aiDefinition ? (
                 <WordDefinitionsAI
-                    definitions={word.ai_definition}
+                    definitions={word.aiDefinition}
                     shouldShowPronounciations={!pronunciationMain}
                 />
             ) : (

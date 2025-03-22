@@ -1,24 +1,21 @@
 import { NextRequest } from "next/server";
-import { createClient } from "@/utils/db";
 import { initTRPC } from "@trpc/server";
+import { cookies } from "next/headers";
 import superjson from "superjson";
 import { getUser } from "@/auth";
 import { cache } from "react";
-import { cookies } from "next/headers";
 
-export const createTRPCContext = cache(
-    async () => {
-        const cook = await cookies();
+export const createTRPCContext = cache(async () => {
+    const cook = await cookies();
 
-        const userLogin = await getUser({ cookies: cook } as unknown as NextRequest);
-        const supabase = await createClient();
+    const userLogin = await getUser({
+        cookies: cook,
+    } as unknown as NextRequest);
 
-        return {
-            userLogin,
-            supabase,
-        };
-    },
-);
+    return {
+        userLogin,
+    };
+});
 
 export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
 
@@ -42,7 +39,6 @@ const logger = t.middleware(async ({ path, type, next, ctx }) => {
     console.log(`[${type}] ${path} done ${durationMs}ms`); // Log just the path and type
     return result;
 });
-
 
 // Base router and procedure helpers
 export const createTRPCRouter = t.router;

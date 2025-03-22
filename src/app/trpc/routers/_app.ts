@@ -52,10 +52,7 @@ async function updateAIDefinition(ctx: Context, wordStr: string) {
             aiDefinitionRequestStartDate: new Date().toISOString(),
         })
         .where(
-            and(
-                eq(wordTable.word, wordStr),
-                eq(wordTable.user, ctx.userLogin)
-            )
+            and(eq(wordTable.word, wordStr), eq(wordTable.user, ctx.userLogin)),
         );
 
     const [aiResponseFast, aiResponseLong] = [
@@ -89,10 +86,7 @@ async function updateAIDefinition(ctx: Context, wordStr: string) {
             aiDefinition: aiDefinition,
         })
         .where(
-            and(
-                eq(wordTable.word, wordStr),
-                eq(wordTable.user, ctx.userLogin)
-            )
+            and(eq(wordTable.word, wordStr), eq(wordTable.user, ctx.userLogin)),
         );
 
     aiResponseLong.then(async (res) => {
@@ -117,8 +111,8 @@ async function updateAIDefinition(ctx: Context, wordStr: string) {
             .where(
                 and(
                     eq(wordTable.word, wordStr),
-                    eq(wordTable.user, ctx.userLogin)
-                )
+                    eq(wordTable.user, ctx.userLogin),
+                ),
             );
     });
 
@@ -231,12 +225,7 @@ export const appRouter = createTRPCRouter({
             const [wordExisting] = await db
                 .select()
                 .from(wordTable)
-                .where(
-                    and(
-                        eq(wordTable.word, word),
-                        eq(wordTable.user, user)
-                    )
-                )
+                .where(and(eq(wordTable.word, word), eq(wordTable.user, user)))
                 .limit(1);
 
             if (!wordExisting) {
@@ -325,12 +314,7 @@ export const appRouter = createTRPCRouter({
             const [wordExisting] = await db
                 .select()
                 .from(wordTable)
-                .where(
-                    and(
-                        eq(wordTable.word, word),
-                        eq(wordTable.user, user)
-                    )
-                )
+                .where(and(eq(wordTable.word, word), eq(wordTable.user, user)))
                 .limit(1);
 
             if (!wordExisting) {
@@ -354,14 +338,14 @@ function parseWord(word: object) {
         throw new Error("word parse error", { cause: wordResult });
     }
 
-    const ai_definitionResult = WordSchema.pick("aiDefinition")(word);
+    const aiDefinitionResult = WordSchema.pick("aiDefinition")(word);
 
     return {
         ...wordResult,
-        ai_definition:
-            ai_definitionResult instanceof type.errors
+        aiDefinition:
+            aiDefinitionResult instanceof type.errors
                 ? null
-                : ai_definitionResult.aiDefinition,
+                : aiDefinitionResult.aiDefinition,
     };
 }
 

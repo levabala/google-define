@@ -1,10 +1,12 @@
-import { createClient } from '@/utils/db';
-import { NextRequest, NextResponse } from 'next/server';
-import { SignJWT } from 'jose';
-import { serialize } from 'cookie';
+import { NextRequest, NextResponse } from "next/server";
+import { userTable } from "@/db/schema";
+import { serialize } from "cookie";
+import { eq } from "drizzle-orm";
+import { SignJWT } from "jose";
+import { db } from "@/db";
 
 if (!process.env.JWT_SECRET) {
-    throw new Error('JWT_SECRET is not set');
+    throw new Error("JWT_SECRET is not set");
 }
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
@@ -13,13 +15,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     try {
         const authData = await req.formData();
 
-        const tokenGeneral = authData.get('token');
-        const login = authData.get('login');
-        const passphrase = authData.get('passphrase');
+        const tokenGeneral = authData.get("token");
+        const login = authData.get("login");
+        const passphrase = authData.get("passphrase");
 
         if (!tokenGeneral || !login || !passphrase) {
             return NextResponse.json(
-                { error: 'Missing token, login or passphrase' },
+                { error: "Missing token, login or passphrase" },
                 { status: 400 },
             );
         }
@@ -30,31 +32,31 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
         if (!isValid) {
             return NextResponse.json(
-                { error: 'Invalid creds' },
+                { error: "Invalid creds" },
                 { status: 400 },
             );
         }
 
-        const response = NextResponse.redirect(new URL('/', req.url), 303);
+        const response = NextResponse.redirect(new URL("/", req.url), 303);
         const token = await new SignJWT({ login })
-            .setProtectedHeader({ alg: 'HS256' })
-            .setExpirationTime('7d')
+            .setProtectedHeader({ alg: "HS256" })
+            .setExpirationTime("7d")
             .sign(JWT_SECRET);
 
-        const cookie = serialize('token', token, {
+        const cookie = serialize("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/',
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            path: "/",
             maxAge: 60 * 60 * 24 * 7, // 1 week
         });
 
-        response.headers.set('Set-Cookie', cookie);
+        response.headers.set("Set-Cookie", cookie);
 
         return response;
     } catch (e) {
         console.error(e);
-        return NextResponse.redirect(new URL('/login', req.url), 303);
+        return NextResponse.redirect(new URL("/login", req.url), 303);
     }
 }
 
@@ -63,13 +65,10 @@ function validateToken(token: string) {
 }
 
 async function validateLogin(login: string, passphrase: string) {
-    const supabase = await createClient();
-
-    const { data: user } = await supabase
-        .from('user')
+    const [user] = await db
         .select()
-        .eq('login', login)
-        .single();
+        .from(userTable)
+        .where(eq(userTable.login, login));
 
     if (!user || user.passphrase !== passphrase) {
         return false;

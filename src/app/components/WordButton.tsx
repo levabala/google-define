@@ -17,7 +17,7 @@ export const WordButton: React.FC<
     );
     const isHighlighted = areWordsEqual(currentWordStr || "", word);
     const isLearned = wordData?.status === "LEARNED";
-    const hasNoAIDefinition = !wordData?.ai_definition;
+    const hasNoAIDefinition = !wordData?.aiDefinition;
 
     return (
         <Button

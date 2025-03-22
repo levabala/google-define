@@ -11,11 +11,11 @@ import { Home } from "lucide-react";
 import { cn } from "@/utils/cn";
 import Link from "next/link";
 
-type WordWithDefinition = Omit<Word, "ai_definition"> & {
-    ai_definition: NonNullable<Word["ai_definition"]>;
+type WordWithDefinition = Omit<Word, "aiDefinition"> & {
+    aiDefinition: NonNullable<Word["aiDefinition"]>;
 };
 function isWordWithDefinition(word: Word): word is WordWithDefinition {
-    return Boolean(word.ai_definition);
+    return Boolean(word.aiDefinition);
 }
 
 export default function Page() {
@@ -78,15 +78,15 @@ export default function Page() {
         }
 
         for (const targetWord of shuffle(potentialWords)) {
-            for (const targetDefinition of shuffle(targetWord.ai_definition)) {
+            for (const targetDefinition of shuffle(targetWord.aiDefinition)) {
                 const potentialDefinitions: Definition[] = [];
                 for (const word of potentialWords) {
-                    if (word === targetWord || !word.ai_definition) {
+                    if (word === targetWord || !word.aiDefinition) {
                         continue;
                     }
 
                     const definition = sample(
-                        word.ai_definition.filter(
+                        word.aiDefinition.filter(
                             (definitions) =>
                                 definitions.partOfSpeech ===
                                 targetDefinition.partOfSpeech,

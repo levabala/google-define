@@ -11,11 +11,11 @@ export function sortWordsAll(wordsAll: Word[]) {
             return -1;
         }
 
-        if (a.created_at < b.created_at) {
+        if (a.createdAt < b.createdAt) {
             return 1;
         }
 
-        if (a.created_at > b.created_at) {
+        if (a.createdAt > b.createdAt) {
             return -1;
         }
 
