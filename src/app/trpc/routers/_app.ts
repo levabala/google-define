@@ -1,7 +1,7 @@
 import { baseProcedure, Context, createTRPCRouter } from "../init";
 import { DefinitionSchema, WordSchema } from "@/app/types";
-import { wordTable } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { trainingTable, wordTable } from "@/db/schema";
+import { eq, and, sql } from "drizzle-orm";
 import { type } from "arktype";
 import { ai } from "@/ai";
 import { db } from "@/db";
@@ -143,18 +143,13 @@ export const appRouter = createTRPCRouter({
             }).assert,
         )
         .mutation(async (opts) => {
-            const { userLogin: user, supabase } = opts.ctx;
+            const { userLogin: user } = opts.ctx;
             const { value, shouldFetchAIDefinition } = opts.input;
 
             const [wordExisting] = await db
                 .select()
                 .from(wordTable)
-                .where(
-                    and(
-                        eq(wordTable.word, value),
-                        eq(wordTable.user, user)
-                    )
-                )
+                .where(and(eq(wordTable.word, value), eq(wordTable.user, user)))
                 .limit(1);
 
             if (wordExisting) {
@@ -165,18 +160,14 @@ export const appRouter = createTRPCRouter({
                         .where(
                             and(
                                 eq(wordTable.word, wordExisting.word),
-                                eq(wordTable.user, user)
-                            )
+                                eq(wordTable.user, user),
+                            ),
                         )
                         .returning();
 
-                    if (error) {
-                        throw new Error("failed to add the word");
-                    }
-
                     if (
                         shouldFetchAIDefinition &&
-                        !wordExistingRecovered.ai_definition
+                        !wordExistingRecovered.aiDefinition
                     ) {
                         updateAIDefinition(opts.ctx, value);
                     }
@@ -215,18 +206,13 @@ export const appRouter = createTRPCRouter({
             }).assert,
         )
         .mutation(async (opts) => {
-            const { userLogin: user, supabase } = opts.ctx;
+            const { userLogin: user } = opts.ctx;
             const { word, isLearned } = opts.input;
 
             const [wordExisting] = await db
                 .select()
                 .from(wordTable)
-                .where(
-                    and(
-                        eq(wordTable.word, word),
-                        eq(wordTable.user, user)
-                    )
-                )
+                .where(and(eq(wordTable.word, word), eq(wordTable.user, user)))
                 .limit(1);
 
             if (!wordExisting) {
@@ -236,17 +222,8 @@ export const appRouter = createTRPCRouter({
             const [wordUpdated] = await db
                 .update(wordTable)
                 .set({ status: isLearned ? "LEARNED" : "TO_LEARN" })
-                .where(
-                    and(
-                        eq(wordTable.word, word),
-                        eq(wordTable.user, user)
-                    )
-                )
+                .where(and(eq(wordTable.word, word), eq(wordTable.user, user)))
                 .returning();
-
-            if (error) {
-                throw new Error("failed to update the word");
-            }
 
             return parseWord(wordUpdated);
         }),
@@ -274,16 +251,7 @@ export const appRouter = createTRPCRouter({
             await db
                 .update(wordTable)
                 .set({ status: "HIDDEN" })
-                .where(
-                    and(
-                        eq(wordTable.word, word),
-                        eq(wordTable.user, user)
-                    )
-                );
-
-            if (error) {
-                throw new Error("failed to delete the word");
-            }
+                .where(and(eq(wordTable.word, word), eq(wordTable.user, user)));
         }),
     requestAIDefinition: baseProcedure
         .input(
@@ -302,7 +270,7 @@ export const appRouter = createTRPCRouter({
         const wordsList = await db
             .select()
             .from(wordTable)
-            .where(eq(wordTable.user, user))
+            .where(eq(wordTable.user, user));
 
         if (!wordsList) {
             throw new Error("unexpected");
@@ -313,10 +281,10 @@ export const appRouter = createTRPCRouter({
     getWordTrainingStat: baseProcedure
         .input(type({ word: "string" }))
         .query(async (opts) => {
-            const { userLogin: user, supabase } = opts.ctx;
+            const { userLogin: user } = opts.ctx;
             const { word } = opts.input;
 
-            const [totalAttemptsResult, successfulAttemptsResult] =
+            const [[totalAttemptsResult], [successfulAttemptsResult]] =
                 await Promise.all([
                     db
                         .select({ count: sql<number>`count(*)` })
@@ -324,8 +292,8 @@ export const appRouter = createTRPCRouter({
                         .where(
                             and(
                                 eq(trainingTable.word, word),
-                                eq(trainingTable.user, user)
-                            )
+                                eq(trainingTable.user, user),
+                            ),
                         ),
                     db
                         .select({ count: sql<number>`count(*)` })
@@ -334,20 +302,10 @@ export const appRouter = createTRPCRouter({
                             and(
                                 eq(trainingTable.word, word),
                                 eq(trainingTable.user, user),
-                                eq(trainingTable.is_success, true)
-                            )
+                                eq(trainingTable.isSuccess, true),
+                            ),
                         ),
                 ]);
-
-            if (totalAttemptsResult.error || successfulAttemptsResult.error) {
-                throw new Error("failed to get stat", {
-                    cause: {
-                        totalAttemptsResult: totalAttemptsResult.error,
-                        successfulAttemptsResult:
-                            successfulAttemptsResult.error,
-                    },
-                });
-            }
 
             const totalAttempts = totalAttemptsResult.count || 0;
             const successfulAttempts = successfulAttemptsResult.count || 0;
@@ -384,14 +342,8 @@ export const appRouter = createTRPCRouter({
                 word,
                 definition,
                 user,
-                is_success: isSuccess,
+                isSuccess,
             });
-
-            if (error) {
-                throw new Error("failed to record the quiz choice", {
-                    cause: error,
-                });
-            }
         }),
 });
 
