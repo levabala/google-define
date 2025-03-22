@@ -1,7 +1,10 @@
 import { baseProcedure, Context, createTRPCRouter } from "../init";
 import { DefinitionSchema, WordSchema } from "@/app/types";
+import { wordTable } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { type } from "arktype";
 import { ai } from "@/ai";
+import { db } from "@/db";
 
 const createPrompt = (
     wordStr: string,
@@ -284,14 +287,12 @@ export const appRouter = createTRPCRouter({
             return updateAIDefinition(opts.ctx, wordStr);
         }),
     getWordsAll: baseProcedure.query(async (opts) => {
-        const { userLogin: user, supabase } = opts.ctx;
+        const { userLogin: user } = opts.ctx;
 
-        const { data: wordsList } = await supabase
-            .from("word")
+        const wordsList = await db
             .select()
-            .eq("user", user)
-            .neq("status", "HIDDEN")
-            .order("created_at", { ascending: false });
+            .from(wordTable)
+            .where(eq(wordTable.user, user))
 
         if (!wordsList) {
             throw new Error("unexpected");
@@ -377,19 +378,21 @@ export const appRouter = createTRPCRouter({
 });
 
 function parseWord(word: object) {
-    const wordResult = WordSchema.omit("ai_definition")(word);
+    const wordResult = WordSchema.omit("aiDefinition")(word);
     if (wordResult instanceof type.errors) {
+        console.log(word);
+        console.error(wordResult.summary);
         throw new Error("word parse error", { cause: wordResult });
     }
 
-    const ai_definitionResult = WordSchema.pick("ai_definition")(word);
+    const ai_definitionResult = WordSchema.pick("aiDefinition")(word);
 
     return {
         ...wordResult,
         ai_definition:
             ai_definitionResult instanceof type.errors
                 ? null
-                : ai_definitionResult.ai_definition,
+                : ai_definitionResult.aiDefinition,
     };
 }
 
