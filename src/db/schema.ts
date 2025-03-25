@@ -3,20 +3,22 @@ import { pgTable, foreignKey, text, timestamp, jsonb, date, bigint, smallint, bo
 export const wordStatus = pgEnum("word_status", ['NONE', 'TO_LEARN', 'LEARNED', 'HIDDEN'])
 
 export const wordTable = pgTable("word", {
-	word: text().primaryKey().notNull(),
+	word: text().notNull(),
+	user: text().notNull(),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	raw: jsonb().notNull(),
 	status: wordStatus().default('NONE').notNull(),
 	user: text().notNull(),
 	aiDefinition: jsonb("ai_definition"),
 	aiDefinitionRequestStartDate: date("ai_definition_request_start_date"),
-}, (table) => [
-	foreignKey({
-			columns: [table.user],
-			foreignColumns: [userTable.login],
-			name: "word_user_fkey"
-		}),
-]);
+}, (table) => ({
+	primaryKey: primaryKey({ columns: [table.word, table.user] }),
+	userFkey: foreignKey({
+		columns: [table.user],
+		foreignColumns: [userTable.login],
+		name: "word_user_fkey"
+	}),
+}));
 
 export const trainingSpellingTable = pgTable("training_spelling", {
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
@@ -33,10 +35,10 @@ export const trainingSpellingTable = pgTable("training_spelling", {
 			name: "training_spelling_user_fkey"
 		}),
 	foreignKey({
-			columns: [table.word],
-			foreignColumns: [wordTable.word],
-			name: "training_spelling_word_fkey"
-		}),
+		columns: [table.word, table.user],
+		foreignColumns: [wordTable.word, wordTable.user],
+		name: "training_spelling_word_fkey"
+	}),
 ]);
 
 export const pronunciationTable = pgTable("pronunciation", {
@@ -54,10 +56,10 @@ export const pronunciationTable = pgTable("pronunciation", {
 			name: "pronunciation_user_fkey"
 		}),
 	foreignKey({
-			columns: [table.word],
-			foreignColumns: [wordTable.word],
-			name: "pronunciation_word_fkey"
-		}),
+		columns: [table.word, table.user],
+		foreignColumns: [wordTable.word, wordTable.user],
+		name: "pronunciation_word_fkey"
+	}),
 ]);
 
 export const trainingTable = pgTable("training", {
@@ -75,10 +77,10 @@ export const trainingTable = pgTable("training", {
 			name: "training_user_fkey"
 		}),
 	foreignKey({
-			columns: [table.word],
-			foreignColumns: [wordTable.word],
-			name: "training_word_fkey"
-		}),
+		columns: [table.word, table.user],
+		foreignColumns: [wordTable.word, wordTable.user],
+		name: "training_word_fkey"
+	}),
 ]);
 
 export const userTable = pgTable("user", {
