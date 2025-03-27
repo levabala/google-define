@@ -8,9 +8,9 @@ import {
     useState,
 } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { clone, isNonNullish, sample, shuffle, take } from "remeda";
 import { useWordsAllQuery } from "@/app/hooks/useWordsAllQuery";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { isNonNullish, sample, shuffle, take } from "remeda";
 import { generateRandomWord } from "@/app/utils";
 import { Definition, Word } from "@/app/types";
 import { useTRPC } from "@/app/trpc/client";
@@ -240,35 +240,31 @@ export default function Page() {
     );
 
     const recordQuizChoice = useMutation(
-        trpc.recordQuizChoice.mutationOptions({
-            onSuccess: (_, { isSuccess }) => {
-                queryClient.setQueryData(
-                    trpc.getWordTrainingStat.queryKey({
-                        word: quizState?.targetWord.word,
-                    }),
-                    (prev) =>
-                        prev
-                            ? {
-                                  successfulAttempts:
-                                      prev.successfulAttempts +
-                                      (isSuccess ? 1 : 0),
-                                  totalAttempts: prev.totalAttempts + 1,
-                              }
-                            : undefined,
-                );
-            },
-        }),
+        trpc.recordQuizChoice.mutationOptions(),
     );
+
+    const [successfullWordGuesses, setSuccessfullWordGuesses] = useState<
+        Array<{ word: string; definition: string }>
+    >([]);
 
     const chooseDefinition = (definition: string) => {
         if (!quizState) {
             return;
         }
 
+        const isSuccess = quizState.targetDefinition.definition === definition;
+
+        if (isSuccess) {
+            setSuccessfullWordGuesses((prev) => [
+                ...prev,
+                { word: quizState.targetWord.word, definition },
+            ]);
+        }
+
         setDefinitionChoosen(definition);
         recordQuizChoice.mutate({
             definition,
-            isSuccess: quizState.targetDefinition.definition === definition,
+            isSuccess,
             word: quizState.targetWord.word,
         });
     };
@@ -287,14 +283,45 @@ export default function Page() {
         [quizState],
     );
 
-    const trainingStat = useQuery(
-        trpc.getWordTrainingStat.queryOptions(
+    const trainingStateInfoBase = useMemo(() => {
+        if (!wordsToTrainMain || !wordsToTrainAny) {
+            return {};
+        }
+
+        const acc: Record<
+            string,
             {
-                word: quizState?.targetWord.word || "",
-            },
-            { enabled: Boolean(quizState) },
-        ),
-    );
+                totalCount: number;
+                successCount: number;
+            }
+        > = {};
+        for (const word of [...wordsToTrainMain, ...wordsToTrainAny]) {
+            if (!word) {
+                continue;
+            }
+
+            const { totalCount, successCount } = word;
+            acc[word.word] = {
+                totalCount,
+                successCount,
+            };
+        }
+
+        return acc;
+    }, [wordsToTrainAny, wordsToTrainMain]);
+
+    const trainingStatInfoAll = useMemo(() => {
+        const base = clone(trainingStateInfoBase);
+
+        for (const successfulGuess of successfullWordGuesses) {
+            base[successfulGuess.word].successCount++;
+        }
+
+        return base;
+    }, [successfullWordGuesses, trainingStateInfoBase]);
+
+    const trainingStatInfo =
+        quizState && trainingStatInfoAll[quizState.targetWord.word];
 
     return (
         <>
@@ -316,16 +343,9 @@ export default function Page() {
                             <Home />
                         </Link>
                     </div>
-                    <div
-                        className={cn(
-                            "text-sm",
-                            trainingStat.isPending
-                                ? "text-muted-foreground"
-                                : "text-accent-foreground",
-                        )}
-                    >
-                        {trainingStat.data
-                            ? `${trainingStat.data.successfulAttempts}/${trainingStat.data.totalAttempts}`
+                    <div className={cn("text-sm")}>
+                        {trainingStatInfo
+                            ? `${trainingStatInfo.successCount}/${trainingStatInfo.totalCount}`
                             : "Loading..."}
                     </div>
                 </div>

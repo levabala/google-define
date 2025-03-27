@@ -8,6 +8,13 @@
       "when": 1742648506287,
       "tag": "0000_heavy_lady_mastermind",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1742939277286,
+      "tag": "0001_tired_longshot",
+      "breakpoints": true
     }
   ]
 }

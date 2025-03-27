@@ -384,43 +384,6 @@ export const appRouter = createTRPCRouter({
 
         return wordsList.map(parseWord);
     }),
-    getWordTrainingStat: baseProcedure
-        .input(type({ word: "string" }))
-        .query(async (opts) => {
-            const { userLogin: user } = opts.ctx;
-            const { word } = opts.input;
-
-            const [[totalAttemptsResult], [successfulAttemptsResult]] =
-                await Promise.all([
-                    db
-                        .select({ count: sql<number>`count(*)::int` })
-                        .from(trainingTable)
-                        .where(
-                            and(
-                                eq(trainingTable.word, word),
-                                eq(trainingTable.user, user),
-                            ),
-                        ),
-                    db
-                        .select({ count: sql<number>`count(*)::int` })
-                        .from(trainingTable)
-                        .where(
-                            and(
-                                eq(trainingTable.word, word),
-                                eq(trainingTable.user, user),
-                                eq(trainingTable.isSuccess, true),
-                            ),
-                        ),
-                ]);
-
-            const totalAttempts = totalAttemptsResult.count || 0;
-            const successfulAttempts = successfulAttemptsResult.count || 0;
-
-            return {
-                totalAttempts,
-                successfulAttempts,
-            };
-        }),
     recordQuizChoice: baseProcedure
         .input(
             type({
