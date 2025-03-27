@@ -4,6 +4,7 @@ export const DefinitionSchema = type({
     definition: "string",
     partOfSpeech: "string",
     pronunciation: "string?",
+    synonyms: "string[]?",
     examples: "string[]",
 });
 
