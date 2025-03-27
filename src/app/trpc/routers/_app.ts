@@ -20,11 +20,19 @@ const createPrompt = (
         content: `
                     Provide the definitions of the word "${wordStr}" in JSON format with the top-level property "definitions" as an array.
                     Like { "definitions": [{ ... }, { ... }] }
-                    Each element of the array should include the following fields: definition (string), partOfSpeech (string), pronunciation (string) and examples (array of 2 strings).
+                    Each element of the array should include the following fields: 
+                        - definition (string)
+                        - partOfSpeech (string)
+                        - pronunciation (string)
+                        - examples (array of 2 strings)
+                        - synonyms (array of up to 30 strings)
                     Each element should represent a distinct meaning of the word. If the word has completely different meanings - include them as the definitions as well.
                     The pronunciation should reflect the original word exaclty, not a variation of it.
                     Pronunciation must be american.
                     Format the pronunciation in IPA notation.
+                    Synonyms must be ordered by the general usage frequency.
+                    Synonyms must not include the word itself.
+                    Try to include at least 10 synonyms per word defition.
                     No code block formatting for json, emit just json in the response.
                 `,
     },
@@ -69,18 +77,27 @@ async function updateAIDefinition(ctx: Context, wordStr: string) {
         }),
     ];
 
-    const content = await parseAiResponse(await aiResponseFast);
+    const contentRaw = await parseAiResponse(await aiResponseFast);
 
-    if (!content) {
+    if (!contentRaw) {
         throw new Error("No content received from AI");
     }
 
-    logger.verbose("raw ai response", { content: JSON.parse(content) });
-    logger.info("json ai response", { content: JSON.parse(content) });
+    let content;
+    try {
+        content = JSON.parse(contentRaw);
+    } catch (e) {
+        logger.info("error while parsing the raw ai response", {
+            contentRaw,
+            e,
+        });
 
-    const aiDefinition = DefinitionSchema.array().assert(
-        JSON.parse(content)?.definitions,
-    );
+        throw e;
+    }
+
+    logger.info("json ai response", { content });
+
+    const aiDefinition = DefinitionSchema.array().assert(content.definitions);
 
     await db
         .update(wordTable)
