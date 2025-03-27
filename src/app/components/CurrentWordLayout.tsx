@@ -1,6 +1,9 @@
+"use client";
+
 import { ButtonProps, Button, buttonVariants } from "@/components/ui/button";
 import { formatDateRelativeAuto, generateRandomWord } from "../utils";
 import { Toggle, ToggleProps } from "@/components/ui/toggle";
+import { useLayoutEffect, useState } from "react";
 import { Home } from "lucide-react";
 import { cn } from "@/utils/cn";
 import Link from "next/link";
@@ -23,6 +26,14 @@ export const CurrentWordLayout: React.FC<
     requestAIDefinitionButtonProps,
     wordUpdateIfLearnedProps,
 }) => {
+    const [seed, setSeed] = useState("");
+
+    useLayoutEffect(() => {
+        setSeed(generateRandomWord(6));
+    }, []);
+
+    const quizUrl = "/vocabulary/training/quiz?seed=" + seed;
+
     return (
         <div className="flex grow flex-col gap-1 overflow-hidden">
             <div className="flex items-baseline gap-2 justify-between">
@@ -59,10 +70,7 @@ export const CurrentWordLayout: React.FC<
                         variant: "default",
                         size: "sm",
                     })}
-                    href={
-                        "/vocabulary/training/quiz?seed=" +
-                        generateRandomWord(6)
-                    }
+                    href={quizUrl}
                     shallow
                 >
                     quiz
