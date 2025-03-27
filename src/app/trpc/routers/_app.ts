@@ -41,6 +41,12 @@ const createPrompt = (
 async function parseAiResponse(
     aiResponse: NonNullable<Awaited<ReturnType<typeof ai>>>,
 ) {
+    if ("error" in aiResponse) {
+        logger.error("ai response contains an error", { aiResponse });
+
+        throw new Error("invalid ai response");
+    }
+
     // Parse and validate AI response
     // Handle both streaming and non-streaming responses
     return "choices" in aiResponse
@@ -77,7 +83,19 @@ async function updateAIDefinition(ctx: Context, wordStr: string) {
         }),
     ];
 
-    const contentRaw = await parseAiResponse(await aiResponseFast);
+    const contentRaw = await aiResponseFast
+        .then(parseAiResponse)
+        .then((res) => {
+            logger.info("the fast ai request has succeeded");
+            return res;
+        })
+        .catch((error) => {
+            logger.error(
+                "the fast response has failed, falling back to the long one",
+                { error },
+            );
+            return aiResponseLong.then(parseAiResponse);
+        });
 
     if (!contentRaw) {
         throw new Error("No content received from AI");
