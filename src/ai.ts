@@ -1,7 +1,7 @@
 import { RateLimiter } from "./utils/rateLimiter";
 import { OpenAI } from "openai";
 
-const rateLimiter = new RateLimiter(4, 1000);
+const rateLimiter = new RateLimiter(10, 1000);
 
 type CreateParams = Parameters<
     InstanceType<typeof OpenAI>["chat"]["completions"]["create"]
