@@ -77,7 +77,7 @@ export const WordDefinition: React.FC<{
                         <span className="text-xs text-muted-foreground">
                             similar:{" "}
                         </span>
-                        {synonyms.slice(0, 5).map((synonym, i, arr) => (
+                        {synonyms.map((synonym, i, arr) => (
                             <Fragment key={synonym + i}>
                                 <WordClickable word={synonym}>
                                     {synonym}
