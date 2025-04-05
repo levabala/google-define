@@ -5,7 +5,6 @@ import { getQueryClient, trpc } from "./trpc/server";
 import { Providers } from "./providers";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Toast } from "./toast";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -51,7 +50,6 @@ export default async function RootLayout({
                         </HydrationBoundary>
                     </Providers>
                 </NuqsAdapter>
-                <Toast />
                 <div className="absolute left-[2px] bottom-[2px] text-[8px] text-muted-foreground leading-none">
                     v{process.env.NEXT_PUBLIC_APP_VERSION}
                 </div>
