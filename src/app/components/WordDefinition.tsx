@@ -8,6 +8,7 @@ import { ChevronDown } from "lucide-react";
 import throttle from "lodash/throttle";
 import { Definition } from "../types";
 import { cn } from "@/utils/cn";
+import { normalizeWord } from "../helpers";
 
 export const WordDefinition: React.FC<{
     definition: Definition;
@@ -80,7 +81,7 @@ export const WordDefinition: React.FC<{
                         {synonyms.map((synonym, i, arr) => (
                             <Fragment key={synonym + i}>
                                 <WordClickable word={synonym}>
-                                    {synonym}
+                                    {normalizeWord(synonym)}
                                 </WordClickable>
                                 {i !== arr.length - 1 ? (
                                     <span>{", "}</span>
