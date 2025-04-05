@@ -1,7 +1,8 @@
+import { Definition, DefinitionSchema, WordSchema } from "@/app/types";
 import { baseProcedure, Context, createTRPCRouter } from "../init";
-import { DefinitionSchema, WordSchema } from "@/app/types";
 import { eq, not, and, sql, gte, lte } from "drizzle-orm";
 import { trainingTable, wordTable } from "@/db/schema";
+import { observable } from "@trpc/server/observable";
 import { logger } from "../logger";
 import { type } from "arktype";
 import { ai } from "@/ai";
@@ -38,7 +39,7 @@ const createPrompt = (
     },
 ];
 
-async function parseAiResponse(
+async function parseAIResponse(
     aiResponse: NonNullable<Awaited<ReturnType<typeof ai>>>,
 ) {
     if ("error" in aiResponse) {
@@ -60,103 +61,105 @@ async function parseAiResponse(
           })();
 }
 
-async function updateAIDefinition(ctx: Context, wordStr: string) {
-    await db
-        .update(wordTable)
+async function* updateAIDefinition(ctx: Context, wordStr: string) {
+    db.update(wordTable)
         .set({
             aiDefinitionRequestStartDate: new Date().toISOString(),
         })
         .where(
             and(eq(wordTable.word, wordStr), eq(wordTable.user, ctx.userLogin)),
-        );
-
-    const [aiResponseFast, aiResponseLong] = [
-        ai({
-            messages: createPrompt(wordStr),
-            model: "google/gemini-flash-1.5-8b",
-            response_format: { type: "json_object" },
-        }),
-        ai({
-            messages: createPrompt(wordStr),
-            model: "deepseek/deepseek-r1",
-            response_format: { type: "json_object" },
-        }),
-    ];
-
-    const contentRaw = await aiResponseFast
-        .then(parseAiResponse)
-        .then((res) => {
-            logger.info("the fast ai request has succeeded");
-            return res;
-        })
+        )
         .catch((error) => {
             logger.error(
-                "the fast response has failed, falling back to the long one",
+                "error while setting the aiDefinitionRequestStartDate",
                 { error },
             );
-            return aiResponseLong.then(parseAiResponse);
         });
 
-    if (!contentRaw) {
-        throw new Error("No content received from AI");
+    function processAIResponse(aiResponse: Awaited<ReturnType<typeof ai>>) {
+        return Promise.resolve(aiResponse)
+            .then(parseAIResponse)
+            .then((contentRaw) => {
+                if (!contentRaw) {
+                    throw new Error("no content received from AI");
+                }
+
+                try {
+                    return JSON.parse(contentRaw);
+                } catch (e) {
+                    logger.info("error while parsing the raw ai response", {
+                        contentRaw,
+                        e,
+                    });
+
+                    throw e;
+                }
+            })
+            .then((content) => {
+                return DefinitionSchema.array().assert(content.definitions);
+            });
     }
 
-    let content;
-    try {
-        content = JSON.parse(contentRaw);
-    } catch (e) {
-        logger.info("error while parsing the raw ai response", {
-            contentRaw,
-            e,
-        });
-
-        throw e;
-    }
-
-    logger.info("json ai response", { content });
-
-    const aiDefinition = DefinitionSchema.array().assert(content.definitions);
-
-    await db
-        .update(wordTable)
-        .set({
-            aiDefinition: aiDefinition,
-        })
-        .where(
-            and(eq(wordTable.word, wordStr), eq(wordTable.user, ctx.userLogin)),
-        );
-
-    aiResponseLong.then(async (res) => {
-        const content = await parseAiResponse(res);
-
-        if (!content) {
-            logger.error("No content received from AI for the long request");
-            return;
-        }
-
-        logger.verbose("raw long ai response", {
-            content: JSON.parse(content),
-        });
-        logger.info("json long ai response", { content: JSON.parse(content) });
-
-        const aiDefinition = DefinitionSchema.array().assert(
-            JSON.parse(content)?.definitions,
-        );
-
-        await db
+    function updateAIDefinitionDB(aiDefinition: Definition[]) {
+        return db
             .update(wordTable)
             .set({
-                aiDefinition: aiDefinition,
+                aiDefinition,
             })
             .where(
                 and(
                     eq(wordTable.word, wordStr),
                     eq(wordTable.user, ctx.userLogin),
                 ),
-            );
-    });
+            )
+            .catch((error) => {
+                logger.error("error while updating the aiDefinition", {
+                    error,
+                });
+            });
+    }
 
-    return aiDefinition;
+    let fastUpdatePromiseResolver;
+    const fastUpdatePromise = new Promise(
+        (res) => (fastUpdatePromiseResolver = res),
+    );
+
+    const aiResponseFastPromise = ai({
+        messages: createPrompt(wordStr),
+        model: "google/gemini-flash-1.5-8b",
+        response_format: { type: "json_object" },
+    })
+        .then(processAIResponse)
+        .catch((error) => {
+            logger.error(
+                "the fast response has failed, falling back to the long one",
+                { error },
+            );
+
+            return null;
+        });
+    aiResponseFastPromise
+        .then((res) => (res !== null ? updateAIDefinitionDB(res) : null))
+        .finally(fastUpdatePromiseResolver);
+
+    const aiResponseLongPromise = ai({
+        messages: createPrompt(wordStr),
+        model: "deepseek/deepseek-r1",
+        response_format: { type: "json_object" },
+    })
+        .then(processAIResponse)
+        .catch((error) => {
+            logger.error("the long response has failed", { error });
+
+            return null;
+        });
+
+    aiResponseLongPromise
+        .then((content) => fastUpdatePromise.then(() => content))
+        .then((res) => (res !== null ? updateAIDefinitionDB(res) : null));
+
+    yield { type: 'fast', aiDefinition: await aiResponseFastPromise } as const;
+    yield { type: 'slow', aiDefinition: await aiResponseLongPromise } as const;
 }
 
 export const appRouter = createTRPCRouter({
@@ -395,10 +398,10 @@ export const appRouter = createTRPCRouter({
                 wordStr: "string",
             }).assert,
         )
-        .mutation(async (opts) => {
+        .mutation(async function* (opts) {
             const { wordStr } = opts.input;
 
-            return updateAIDefinition(opts.ctx, wordStr);
+            yield* updateAIDefinition(opts.ctx, wordStr);
         }),
     getWordsAll: baseProcedure.query(async (opts) => {
         const { userLogin: user } = opts.ctx;

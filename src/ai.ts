@@ -18,9 +18,9 @@ export async function ai(...args: CreateParams) {
     }
 
     const start = Date.now();
-    console.log("hit ai api");
+    console.log("hit ai api", args[0].model);
     const res = await openai.chat.completions.create(...args);
-    console.log("ai api has responded", `${Date.now() - start}ms`);
+    console.log("ai api has responded", args[0].model, `${Date.now() - start}ms`);
 
     return res;
 }

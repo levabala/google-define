@@ -11,6 +11,7 @@ import Link from "next/link";
 export const CurrentWordLayout: React.FC<
     {
         wordStr: string;
+        status?: React.ReactNode;
         pronunciation?: string;
         addDate?: Date;
         deleteButtonProps: ButtonProps;
@@ -19,6 +20,7 @@ export const CurrentWordLayout: React.FC<
     } & React.PropsWithChildren
 > = ({
     children,
+    status,
     pronunciation,
     addDate,
     wordStr,
@@ -63,18 +65,21 @@ export const CurrentWordLayout: React.FC<
                 </Link>
             </div>
             <div className="flex flex-col grow overflow-auto">{children}</div>
+            <div className="flex text-xs text-muted-foreground">{status}</div>
             <div className="flex justify-between gap-1">
-                <Link
-                    prefetch
-                    className={buttonVariants({
-                        variant: "default",
-                        size: "sm",
-                    })}
-                    href={quizUrl}
-                    shallow
-                >
-                    quiz
-                </Link>
+                <div className="flex gap-1">
+                    <Link
+                        prefetch
+                        className={buttonVariants({
+                            variant: "default",
+                            size: "sm",
+                        })}
+                        href={quizUrl}
+                        shallow
+                    >
+                        quiz
+                    </Link>
+                </div>
                 <div className="flex gap-1">
                     <Toggle
                         variant="outline"
