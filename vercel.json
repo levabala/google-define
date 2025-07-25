@@ -28,7 +28,61 @@
             ]
         },
         {
-            "source": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
+            "source": "/(.*).js",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=2592000, must-revalidate"
+                }
+            ]
+        },
+        {
+            "source": "/(.*).css",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=2592000, must-revalidate"
+                }
+            ]
+        },
+        {
+            "source": "/(.*).png",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=2592000, must-revalidate"
+                }
+            ]
+        },
+        {
+            "source": "/(.*).jpg",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=2592000, must-revalidate"
+                }
+            ]
+        },
+        {
+            "source": "/(.*).svg",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=2592000, must-revalidate"
+                }
+            ]
+        },
+        {
+            "source": "/(.*).ico",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=2592000, must-revalidate"
+                }
+            ]
+        },
+        {
+            "source": "/(.*).woff2",
             "headers": [
                 {
                     "key": "Cache-Control",
