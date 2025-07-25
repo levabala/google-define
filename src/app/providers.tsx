@@ -3,6 +3,7 @@
 // import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 // import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useTokenRefresh } from "./hooks/useTokenRefresh";
 import { TRPCReactProvider } from "./trpc/client";
 // import { getQueryClient } from "./trpc/client";
 
@@ -29,6 +30,11 @@ import { TRPCReactProvider } from "./trpc/client";
 //     });
 // }
 
+function TokenRefreshProvider({ children }: { children: React.ReactNode }) {
+    useTokenRefresh();
+    return <>{children}</>;
+}
+
 export function Providers({
     children,
 }: Readonly<{
@@ -36,8 +42,10 @@ export function Providers({
 }>) {
     return (
         <TRPCReactProvider>
-            {children}
-            <ReactQueryDevtools initialIsOpen={false} />
+            <TokenRefreshProvider>
+                {children}
+                <ReactQueryDevtools initialIsOpen={false} />
+            </TokenRefreshProvider>
         </TRPCReactProvider>
     );
 }

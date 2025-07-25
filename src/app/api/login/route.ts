@@ -1,15 +1,8 @@
+import { createAuthToken, createAuthCookie } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { userTable } from "@/db/schema";
-import { serialize } from "cookie";
 import { eq } from "drizzle-orm";
-import { SignJWT } from "jose";
 import { db } from "@/db";
-
-if (!process.env.JWT_SECRET) {
-    throw new Error("JWT_SECRET is not set");
-}
-
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
     try {
@@ -38,18 +31,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         }
 
         const response = NextResponse.redirect(new URL("/", req.url), 303);
-        const token = await new SignJWT({ login })
-            .setProtectedHeader({ alg: "HS256" })
-            .setExpirationTime("7d")
-            .sign(JWT_SECRET);
-
-        const cookie = serialize("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            path: "/",
-            maxAge: 60 * 60 * 24 * 7, // 1 week
-        });
+        const token = await createAuthToken(login.toString());
+        const cookie = createAuthCookie(token);
 
         response.headers.set("Set-Cookie", cookie);
 
