@@ -3,6 +3,7 @@ const CACHE_NAME = "google-define-v1";
 const CACHEABLE_ROUTES = [
     "/_next/static/",
     "/favicon.ico",
+    "/icon.png",
     "/manifest.json",
     "/file.svg",
     "/globe.svg",

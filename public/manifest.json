@@ -29,25 +29,13 @@
             "name": "Vocabulary",
             "short_name": "Vocab",
             "description": "View your vocabulary list",
-            "url": "/vocabulary",
-            "icons": [
-                {
-                    "src": "/icon.png",
-                    "sizes": "192x192"
-                }
-            ]
+            "url": "/vocabulary"
         },
         {
             "name": "Quiz",
             "short_name": "Quiz",
             "description": "Practice vocabulary quiz",
-            "url": "/vocabulary/training/quiz",
-            "icons": [
-                {
-                    "src": "/icon.png",
-                    "sizes": "192x192"
-                }
-            ]
+            "url": "/vocabulary/training/quiz"
         }
     ],
     "prefer_related_applications": false,
