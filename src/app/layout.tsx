@@ -20,6 +20,22 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
     title: "Define",
     description: "Define - personal dictionary",
+    manifest: "/manifest.json",
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: "black-translucent",
+        title: "Define",
+    },
+    formatDetection: {
+        telephone: false,
+    },
+    viewport: {
+        width: "device-width",
+        initialScale: 1,
+        maximumScale: 1,
+        userScalable: false,
+        viewportFit: "cover",
+    },
 };
 
 export default async function RootLayout({
