@@ -60,13 +60,30 @@ export default async function RootLayout({
                         `,
                     }}
                 />
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            if ('serviceWorker' in navigator) {
+                                window.addEventListener('load', () => {
+                                    navigator.serviceWorker.register('/sw.js')
+                                        .then(registration => {
+                                            console.log('SW registered: ', registration);
+                                        })
+                                        .catch(registrationError => {
+                                            console.log('SW registration failed: ', registrationError);
+                                        });
+                                });
+                            }
+                        `,
+                    }}
+                />
                 <NuqsAdapter>
                     <Providers>
                         <HydrationBoundary state={dehydrate(queryClient)}>
                             <Suspense fallback="loading">{children}</Suspense>
                         </HydrationBoundary>
                     </Providers>
-                </NuqsAdapter>
+                </NuqsAdapter>{" "}
                 <div className="absolute left-[2px] bottom-[2px] text-[8px] text-muted-foreground leading-none">
                     v{process.env.NEXT_PUBLIC_APP_VERSION}
                 </div>

@@ -1,6 +1,6 @@
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { useTRPC } from "../trpc/client";
 import { normalizeWord } from "../helpers";
+import { useTRPC } from "../trpc/client";
 
 export function useAddWordMutation() {
     const trpc = useTRPC();

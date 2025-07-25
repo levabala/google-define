@@ -25,9 +25,9 @@ export async function middleware(req: NextRequest) {
     try {
         const payload = await verifyUser(token);
 
-        console.log('check', payload);
+        console.log("check", payload);
         if (isTokenExpiringSoon(payload)) {
-        console.log('-------- renew');
+            console.log("-------- renew");
             const newToken = await createAuthToken(payload.login);
             const cookie = createAuthCookie(newToken);
 
@@ -42,5 +42,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/((?!api|_next|static|public).*)"],
+    matcher: [
+        "/((?!api|_next|static|public|manifest\.json|sw\.js|.*\.svg|.*\.png|favicon\.ico).*)",
+    ],
 };

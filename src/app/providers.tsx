@@ -2,6 +2,7 @@
 
 // import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 // import { persistQueryClient } from "@tanstack/react-query-persist-client";
+import { useServiceWorkerCache } from "./hooks/useServiceWorkerCache";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useTokenRefresh } from "./hooks/useTokenRefresh";
 import { TRPCReactProvider } from "./trpc/client";
@@ -32,6 +33,7 @@ import { TRPCReactProvider } from "./trpc/client";
 
 function TokenRefreshProvider({ children }: { children: React.ReactNode }) {
     useTokenRefresh();
+    useServiceWorkerCache();
     return <>{children}</>;
 }
 
