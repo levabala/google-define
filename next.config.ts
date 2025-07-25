@@ -6,8 +6,8 @@ loadEnvConfig(process.cwd());
 const nextConfig: NextConfig = {
     experimental: {
         staleTimes: {
-            dynamic: 99999999,
-            static: 99999999,
+            dynamic: 2592000,
+            static: 2592000,
         },
     },
     logging: {
@@ -18,6 +18,7 @@ const nextConfig: NextConfig = {
     env: {
         NEXT_PUBLIC_APP_VERSION: process.env.npm_package_version,
     },
+    generateEtags: true,
 };
 
 export default nextConfig;

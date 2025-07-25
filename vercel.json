@@ -1,0 +1,49 @@
+{
+    "headers": [
+        {
+            "source": "/_next/static/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=2592000, must-revalidate"
+                }
+            ]
+        },
+        {
+            "source": "/api/trpc/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=300, must-revalidate"
+                }
+            ]
+        },
+        {
+            "source": "/api/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "no-cache, no-store, must-revalidate"
+                }
+            ]
+        },
+        {
+            "source": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=2592000, must-revalidate"
+                }
+            ]
+        },
+        {
+            "source": "/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=86400, must-revalidate"
+                }
+            ]
+        }
+    ]
+}
